@@ -1,0 +1,384 @@
+{
+  "common": {
+    "appName": "enpractice",
+    "openSettings": "Mở cài đặt",
+    "openPreview": "Mở preview",
+    "logout": "Đăng xuất",
+    "theme": "Giao diện",
+    "language": "Ngôn ngữ",
+    "profile": "Hồ sơ",
+    "background": "Nền",
+    "mode": "Chế độ",
+    "solidPrimary": "Màu solid primary",
+    "current": "Hiện tại"
+  },
+  "auth": {
+    "loading": {
+      "title": "Đang khôi phục phiên đăng nhập",
+      "subtitle": "Ứng dụng đang kiểm tra token đã lưu và kết nối lại với backend EN Practice."
+    },
+    "tabs": {
+      "signIn": "Đăng nhập",
+      "register": "Đăng ký"
+    },
+    "login": {
+      "hero": {
+        "badge": "Mobile auth đã sẵn API",
+        "loginTitle": "Chào mừng bạn quay lại",
+        "loginSubtitle": "Đăng nhập để tiếp tục hành trình học tập và đồng bộ tiến độ của bạn.",
+        "registerTitle": "Tạo tài khoản học tập",
+        "registerSubtitle": "Tạo tài khoản để lưu tiến độ và dùng liền mạch trải nghiệm học tập của bạn trên nhiều thiết bị."
+      },
+      "footnote": {
+        "login": "Access token và refresh token được lưu cục bộ để app có thể tự khôi phục phiên ở lần mở sau.",
+        "register": "Đăng ký đang dùng đúng schema backend như web: display name, email và password."
+      }
+    },
+    "form": {
+      "displayName": "Tên hiển thị",
+      "displayNameHint": "Bạn muốn được gọi là gì?",
+      "email": "Email",
+      "emailHint": "name@example.com",
+      "password": "Mật khẩu",
+      "passwordHint": "Tối thiểu 8 ký tự",
+      "confirmPassword": "Nhập lại mật khẩu",
+      "confirmPasswordHint": "Nhập lại mật khẩu"
+    },
+    "actions": {
+      "signIn": "Đăng nhập",
+      "createAccount": "Tạo tài khoản"
+    },
+    "validation": {
+      "displayNameRequired": "Vui lòng nhập tên hiển thị.",
+      "emailRequired": "Vui lòng nhập email.",
+      "emailInvalid": "Vui lòng nhập email hợp lệ.",
+      "passwordRequired": "Vui lòng nhập mật khẩu.",
+      "passwordMin": "Mật khẩu cần có ít nhất 8 ký tự.",
+      "confirmPasswordRequired": "Vui lòng nhập lại mật khẩu.",
+      "confirmPasswordMismatch": "Mật khẩu nhập lại chưa khớp."
+    },
+    "meta": {
+      "endpointLabel": "API endpoint đang dùng"
+    }
+  },
+  "app": {
+    "nav": {
+      "home": "Trang chủ",
+      "dashboard": "Tổng quan",
+      "dictionary": "Từ điển",
+      "ielts": "IELTS",
+      "writing": "Viết",
+      "speaking": "Nói",
+      "profile": "Hồ sơ",
+      "leaderboard": "Bảng xếp hạng",
+      "preview": "Preview",
+      "settings": "Cài đặt"
+    },
+    "language": {
+      "en": "Tiếng Anh",
+      "vi": "Tiếng Việt"
+    },
+    "theme": {
+      "modes": {
+        "light": "Sáng",
+        "dark": "Tối",
+        "system": "Theo hệ thống"
+      },
+      "profiles": {
+        "glass": "Glass",
+        "calm": "Calm",
+        "contrast": "Contrast",
+        "editorial": "Editorial",
+        "pulse": "Pulse",
+        "focus": "Focus",
+        "signal": "Signal",
+        "solid": "Solid",
+        "mono": "Mono"
+      },
+      "backgrounds": {
+        "balanced": "Balanced",
+        "sage": "Sage",
+        "ocean": "Ocean",
+        "dawn": "Dawn",
+        "amethyst": "Amethyst",
+        "blossom": "Blossom",
+        "petal": "Petal",
+        "midnight": "Midnight",
+        "ember": "Ember",
+        "canopy": "Canopy"
+      },
+      "solidPrimary": {
+        "violet": "Violet",
+        "blue": "Blue",
+        "emerald": "Emerald",
+        "amber": "Amber",
+        "rose": "Rose"
+      }
+    },
+    "pagePalettes": {
+      "profile": "Hồ sơ",
+      "dashboard": "Tổng quan",
+      "dictionary": "Từ điển",
+      "vocabularyTest": "Kiểm tra từ vựng",
+      "vocabularyCheck": "Soát từ vựng",
+      "review": "Ôn tập",
+      "evaluation": "Đánh giá",
+      "ielts": "IELTS",
+      "speaking": "Nói",
+      "writing": "Viết",
+      "leaderboard": "Bảng xếp hạng"
+    }
+  },
+  "home": {
+    "common": {
+      "minutes": "phút",
+      "retry": "Thử lại",
+      "errorTitle": "Chưa thể tải Trang chủ",
+      "errorDescription": "App chưa lấy được learning launchpad. Hãy kéo để tải lại hoặc thử lại sau ít phút.",
+      "externalRouteUnsupported": "Hành động này đang trỏ tới một đích ngoài app và chưa được bật trên mobile."
+    },
+    "feedback": {
+      "completed": "Đã hoàn thành",
+      "defaultTask": "nhiệm vụ học tập"
+    },
+    "continueLearning": {
+      "eyebrow": "Học tiếp",
+      "fallbackTitle": "Bắt đầu với một lượt ôn từ vựng ngắn",
+      "fallbackDescription": "Một lượt review ngắn là cách nhanh nhất để quay lại nhịp học hôm nay.",
+      "resume": "Tiếp tục ngay",
+      "start": "Bắt đầu ngay"
+    },
+    "dailyPlan": {
+      "title": "Kế hoạch học hôm nay",
+      "subtitle": "Ba hành động ngắn để giữ nhịp mà không làm màn đầu bị quá tải.",
+      "viewAll": "Xem tất cả",
+      "emptyTitle": "Chưa có task trong ngày",
+      "emptyDescription": "Khi có nhiệm vụ mới, app sẽ gợi ý một kế hoạch học ngắn ngay tại đây.",
+      "sheetTitle": "Kế hoạch hôm nay",
+      "sheetSubtitle": "Hãy dùng danh sách này như checklist nhẹ cho cả ngày.",
+      "completed": "Xong"
+    },
+    "quickPractice": {
+      "title": "Luyện nhanh",
+      "subtitle": "Các phiên ngắn có thể bắt đầu ngay khi bạn cần một chiến thắng nhỏ.",
+      "emptyTitle": "Phần luyện nhanh sẽ xuất hiện ở đây",
+      "emptyDescription": "Khi API trả về các hoạt động ngắn, đây sẽ là điểm vào nhanh nhất của bạn.",
+      "startNow": "Bắt đầu"
+    },
+    "progress": {
+      "title": "Snapshot tiến độ",
+      "subtitle": "Khối phản hồi nhẹ để thấy hôm nay bạn đang đi tới đâu.",
+      "today": "Hôm nay",
+      "streak": "Chuỗi ngày",
+      "weeklyXp": "XP tuần này",
+      "progressLabel": "mục tiêu hôm nay"
+    }
+  },
+  "learningSession": {
+    "title": "Placeholder cho phiên học",
+    "description": "Route này giờ đã hoạt động như một learning session thật cho navigation và analytics, để team có thể verify end-to-end daily loop.",
+    "complete": "Hoàn thành phiên học",
+    "backHome": "Về trang chủ",
+    "metaTitle": "Ngữ cảnh phiên học",
+    "routeLabel": "Route",
+    "moduleLabel": "Module"
+  },
+  "dashboard": {
+    "hero": {
+      "title": "Trung tâm điều phối học tập",
+      "subtitle": "Dashboard giờ là app hub: điểm vào nhanh cho các module, nhịp học trong ngày, trạng thái runtime và app shell ổn định để tiếp tục triển khai feature.",
+      "badge": "Khung App Giai Đoạn 1"
+    },
+    "overview": {
+      "title": "Nhịp học hôm nay",
+      "subtitle": "Dùng các card này làm phần tóm tắt đầu trang trong khi dữ liệu feature thật đang được nối tiếp vào."
+    },
+    "metrics": {
+      "streak": "Chuỗi ngày học",
+      "streakCaption": "ngày liên tiếp",
+      "reviewQueue": "Hàng đợi ôn tập",
+      "reviewQueueCaption": "từ đang chờ",
+      "mockReadiness": "Độ sẵn sàng mock",
+      "mockReadinessCaption": "mức tự tin IELTS",
+      "timeToday": "Thời gian tập trung",
+      "timeTodayCaption": "đã học hôm nay"
+    },
+    "quickAccess": {
+      "title": "Các màn chính",
+      "subtitle": "Các route này đã được nối vào shell để team có thể build từng module mà không cần thay lại navigation sau này."
+    },
+    "focus": {
+      "title": "Trọng tâm triển khai hiện tại",
+      "subtitle": "Dashboard bắt đầu rollout bằng cách đẩy lên ba bề mặt học có khả năng định hình flow người dùng đầu tiên.",
+      "dictionaryTitle": "Nền từ điển",
+      "dictionarySubtitle": "Tìm kiếm, lưu từ và vòng ôn tập",
+      "writingTitle": "Không gian viết",
+      "writingSubtitle": "Prompt, editor shell và feedback output",
+      "speakingTitle": "Speaking coach",
+      "speakingSubtitle": "Điểm vào ghi âm, chấm fluency và prompt dẫn dắt"
+    },
+    "system": {
+      "title": "Trạng thái app đang chạy",
+      "subtitle": "Theme, ngôn ngữ và preference runtime vẫn được hiển thị tại đây để team kiểm tra base system trong lúc đẩy UI sản phẩm."
+    },
+    "summary": {
+      "account": "Tài khoản",
+      "email": "Email",
+      "selectedMode": "Mode đã chọn",
+      "effectiveMode": "Mode thực tế",
+      "profile": "Theme profile",
+      "background": "Background preset",
+      "solidPrimary": "Solid primary",
+      "language": "Ngôn ngữ"
+    },
+    "moduleCardsDictionary": "Tra từ, chi tiết từ và thao tác lưu từ.",
+    "moduleCardsIelts": "Lộ trình thi, điểm vào task và snapshot hiệu suất.",
+    "moduleCardsWriting": "Luồng viết theo prompt và bề mặt feedback AI.",
+    "moduleCardsSpeaking": "Luyện nói, soát fluency và bài tập speaking.",
+    "moduleCardsProfile": "Thông tin cá nhân, tổng hợp tiến độ và preference.",
+    "moduleCardsLeaderboard": "Xếp hạng cạnh tranh, vòng lặp bạn bè và phần thưởng."
+  },
+  "featureHub": {
+    "sections": {
+      "focus": "Các lát cắt ưu tiên",
+      "scope": "Phạm vi hiện tại",
+      "actions": "Bước tiếp theo"
+    },
+    "copy": {
+      "scope": "Màn này hiện đã có route, visual identity và page scaffold. Bước tiếp theo là thay phần placeholder bằng flow và trạng thái dữ liệu thật.",
+      "actions": "Hãy dùng landing page này như checkpoint đầu tiên cho từng module trước khi nối những flow chi tiết hơn."
+    },
+    "actions": {
+      "backDashboard": "Về dashboard",
+      "openSettings": "Mở cài đặt"
+    }
+  },
+  "pages": {
+    "dictionary": {
+      "hero": {
+        "title": "Không gian từ điển",
+        "subtitle": "Bắt đầu từ đây cho trải nghiệm tra từ: search, chi tiết từ, lưu từ và điểm vào ôn tập."
+      },
+      "focus": {
+        "lookup": "Tra từ nhanh",
+        "savedWords": "Bộ sưu tập từ đã lưu",
+        "review": "Điểm nối sang ôn tập"
+      }
+    },
+    "ielts": {
+      "hero": {
+        "title": "Trung tâm IELTS",
+        "subtitle": "Khu vực này đã sẵn cho lộ trình task, theo dõi mức sẵn sàng và kế hoạch học hướng điểm số."
+      },
+      "focus": {
+        "roadmap": "Lộ trình học",
+        "practice": "Điểm vào luyện task",
+        "results": "Snapshot kết quả"
+      }
+    },
+    "writing": {
+      "hero": {
+        "title": "Writing studio",
+        "subtitle": "Dùng shell này cho flow chọn prompt, editor, lịch sử bài viết và review feedback."
+      },
+      "focus": {
+        "prompts": "Pipeline prompt",
+        "feedback": "Card feedback",
+        "history": "Lịch sử bản nháp"
+      }
+    },
+    "speaking": {
+      "hero": {
+        "title": "Speaking coach",
+        "subtitle": "Route này đã sẵn cho ghi âm, practice track và vòng feedback cho speaking."
+      },
+      "focus": {
+        "recording": "Bắt đầu ghi âm",
+        "fluency": "Soát fluency",
+        "coaching": "Hướng dẫn luyện tập"
+      }
+    },
+    "profile": {
+      "hero": {
+        "title": "Profile hub",
+        "subtitle": "Thông tin cá nhân, điểm nhấn tiến độ và bề mặt preference giờ có thể phát triển tiếp từ shell ổn định này."
+      },
+      "account": {
+        "title": "Tài khoản đang đăng nhập",
+        "subtitle": "Trang profile giờ phản ánh phiên auth được khôi phục từ storage và cho phép người dùng đăng xuất an toàn.",
+        "name": "Tên hiển thị",
+        "email": "Email",
+        "status": "Trạng thái",
+        "statusActive": "Đã xác thực",
+        "logout": "Đăng xuất"
+      },
+      "focus": {
+        "identity": "Nhận diện tài khoản",
+        "progress": "Tiến độ học tập",
+        "preferences": "Preference cá nhân"
+      }
+    },
+    "leaderboard": {
+      "hero": {
+        "title": "Bảng xếp hạng",
+        "subtitle": "Màn này dựng sẵn route cho ranking, yếu tố cạnh tranh và các tính năng tạo động lực xã hội."
+      },
+      "focus": {
+        "rankings": "Thứ hạng",
+        "friends": "Nhóm bạn bè",
+        "rewards": "Móc phần thưởng"
+      }
+    }
+  },
+  "settingsPage": {
+    "hero": {
+      "title": "Cài đặt giao diện",
+      "subtitle": "Đây là settings demo page theo tài liệu handoff. Mọi thay đổi được lưu bằng SharedPreferences."
+    },
+    "sections": {
+      "appearance": "Giao diện",
+      "language": "Ngôn ngữ",
+      "locks": "Hành vi profile"
+    },
+    "hints": {
+      "solidPrimary": "Solid primary chỉ có hiệu lực khi profile hiện tại là Solid."
+    },
+    "locks": {
+      "mode": "Mode đang bị profile này khóa.",
+      "background": "Background đang bị profile này khóa.",
+      "open": "Profile này không khóa mode hoặc background."
+    }
+  },
+  "themePreview": {
+    "hero": {
+      "title": "Theme preview",
+      "subtitle": "Dùng màn này để kiểm tra token, cảm giác component và accent theo module trước khi các feature page đi vào."
+    },
+    "sections": {
+      "colors": "Màu semantic",
+      "buttons": "Button và chip",
+      "typography": "Typography và motion",
+      "density": "Density token",
+      "palettes": "Page palette"
+    },
+    "labels": {
+      "primary": "Primary",
+      "accent": "Accent",
+      "secondary": "Secondary",
+      "success": "Success",
+      "warning": "Warning",
+      "danger": "Danger",
+      "fast": "Motion nhanh",
+      "normal": "Motion thường",
+      "slow": "Motion chậm",
+      "blurSoft": "Blur nhẹ",
+      "blurStrong": "Blur mạnh",
+      "controlHeight": "Chiều cao control",
+      "controlHeightSmall": "Control nhỏ",
+      "controlHeightLarge": "Control lớn",
+      "compactGap": "Khoảng cách gọn",
+      "regularGap": "Khoảng cách thường",
+      "panelPadding": "Padding panel"
+    }
+  }
+}

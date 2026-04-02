@@ -1,0 +1,233 @@
+import 'dart:convert';
+
+class AppResolvedRoute {
+  const AppResolvedRoute({
+    required this.href,
+    required this.pathname,
+    required this.search,
+    required this.fragment,
+  });
+
+  final String href;
+  final String pathname;
+  final String search;
+  final String fragment;
+}
+
+const supportedAppRoutePatterns = <String>[
+  '/home',
+  '/dictionary',
+  '/dictionary/review',
+  '/ielts',
+  '/ielts/test/:testId',
+  '/ielts/take/:attemptId',
+  '/ielts/result/:attemptId',
+  '/writing',
+  '/writing/history',
+  '/writing/task/:taskId',
+  '/writing/task/:taskId/take',
+  '/writing/submission/:submissionId',
+  '/speaking',
+  '/speaking/practice/:id',
+  '/speaking/result/:id',
+  '/speaking/history',
+  '/speaking/conversation/:topicId',
+  '/speaking/conversation/result/:id',
+  '/custom-speaking',
+  '/custom-speaking/conversation/:id',
+  '/custom-speaking/result/:id',
+  '/weekly-report',
+  '/challenges',
+  '/notifications',
+  '/settings',
+];
+
+const learningSessionRoutePatterns = <String>[
+  '/dictionary/review',
+  '/ielts/take/:attemptId',
+  '/writing/task/:taskId/take',
+  '/speaking/practice/:id',
+  '/custom-speaking/conversation/:id',
+];
+
+const reviewRoutePatterns = <String>[
+  '/ielts/result/:attemptId',
+  '/writing/submission/:submissionId',
+  '/speaking/result/:id',
+  '/custom-speaking/result/:id',
+];
+
+final _routeAliases = <MapEntry<RegExp, String>>[
+  MapEntry(RegExp(r'^/dashboard(?=/|$)', caseSensitive: false), '/home'),
+  MapEntry(
+    RegExp(r'^/writing/submissions/([^/?#]+)', caseSensitive: false),
+    '/writing/submission/\$1',
+  ),
+  MapEntry(
+    RegExp(r'^/ielts/attempts/([^/?#]+)', caseSensitive: false),
+    '/ielts/result/\$1',
+  ),
+  MapEntry(
+    RegExp(r'^/speaking/attempts/([^/?#]+)', caseSensitive: false),
+    '/speaking/result/\$1',
+  ),
+  MapEntry(
+    RegExp(r'^/ielts/tests/([^/?#]+)/resume', caseSensitive: false),
+    '/ielts/test/\$1',
+  ),
+  MapEntry(
+    RegExp(r'^/practice/reading/matching-headings', caseSensitive: false),
+    '/ielts?mode=mini&skill=READING',
+  ),
+  MapEntry(
+    RegExp(r'^/speaking/daily-prompt/([^/?#]+)', caseSensitive: false),
+    '/speaking?mode=quick',
+  ),
+  MapEntry(
+    RegExp(r'^/custom-speaking-conversations/([^/?#]+)', caseSensitive: false),
+    '/custom-speaking/result/\$1',
+  ),
+];
+
+AppResolvedRoute? normalizeInternalRoute(String? route) {
+  if (route == null) {
+    return null;
+  }
+
+  final raw = route.trim();
+  if (raw.isEmpty) {
+    return null;
+  }
+
+  final rawUri = Uri.tryParse(raw);
+  if (rawUri != null && rawUri.hasScheme) {
+    final scheme = rawUri.scheme.toLowerCase();
+    if (scheme == 'http' || scheme == 'https') {
+      return null;
+    }
+  }
+
+  final normalizedInput = raw.startsWith('/') ? raw : '/$raw';
+  final uri = Uri.parse('https://en-practice.local$normalizedInput');
+
+  var normalizedPathname = uri.path.isEmpty ? '/' : uri.path;
+  for (final alias in _routeAliases) {
+    normalizedPathname = normalizedPathname.replaceFirst(alias.key, alias.value);
+  }
+
+  final questionIndex = normalizedPathname.indexOf('?');
+  final normalizedSearch = questionIndex >= 0
+      ? normalizedPathname.substring(questionIndex)
+      : (uri.hasQuery ? '?${uri.query}' : '');
+  if (questionIndex >= 0) {
+    normalizedPathname = normalizedPathname.substring(0, questionIndex);
+  }
+
+  final normalizedFragment = uri.fragment.isEmpty ? '' : '#${uri.fragment}';
+
+  return AppResolvedRoute(
+    href: '$normalizedPathname$normalizedSearch$normalizedFragment',
+    pathname: normalizedPathname,
+    search: normalizedSearch,
+    fragment: normalizedFragment,
+  );
+}
+
+bool isSupportedAppRoute(String? route) {
+  final normalized = normalizeInternalRoute(route);
+  if (normalized == null) {
+    return false;
+  }
+
+  return supportedAppRoutePatterns.any(
+    (pattern) => matchRoutePattern(normalized.pathname, pattern),
+  );
+}
+
+bool isLearningSessionRoute(String? route) {
+  final normalized = normalizeInternalRoute(route);
+  if (normalized == null) {
+    return false;
+  }
+
+  return learningSessionRoutePatterns.any(
+    (pattern) => matchRoutePattern(normalized.pathname, pattern),
+  );
+}
+
+bool isReviewRoute(String? route) {
+  final normalized = normalizeInternalRoute(route);
+  if (normalized == null) {
+    return false;
+  }
+
+  return reviewRoutePatterns.any(
+    (pattern) => matchRoutePattern(normalized.pathname, pattern),
+  );
+}
+
+bool routesMatch(String? routeA, String? routeB) {
+  final normalizedA = normalizeInternalRoute(routeA);
+  final normalizedB = normalizeInternalRoute(routeB);
+
+  if (normalizedA == null || normalizedB == null) {
+    return false;
+  }
+
+  return normalizedA.pathname == normalizedB.pathname ||
+      normalizedB.pathname.startsWith('${normalizedA.pathname}/');
+}
+
+bool matchRoutePattern(String path, String pattern) {
+  final normalizedPath = _normalizeSegments(path);
+  final normalizedPattern = _normalizeSegments(pattern);
+
+  if (normalizedPath.length != normalizedPattern.length) {
+    return false;
+  }
+
+  for (var index = 0; index < normalizedPattern.length; index += 1) {
+    final patternSegment = normalizedPattern[index];
+    if (patternSegment.startsWith(':')) {
+      continue;
+    }
+
+    if (patternSegment.toLowerCase() != normalizedPath[index].toLowerCase()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+List<String> _normalizeSegments(String value) {
+  return value
+      .split('/')
+      .where((segment) => segment.trim().isNotEmpty)
+      .map((segment) => Uri.decodeComponent(segment))
+      .toList(growable: false);
+}
+
+Map<String, dynamic>? sanitizeMetadata(Map<String, dynamic>? metadata) {
+  if (metadata == null || metadata.isEmpty) {
+    return null;
+  }
+
+  final sanitized = <String, dynamic>{};
+  for (final entry in metadata.entries) {
+    final value = entry.value;
+    if (value == null ||
+        value is num ||
+        value is bool ||
+        value is String ||
+        value is List ||
+        value is Map) {
+      sanitized[entry.key] = value;
+      continue;
+    }
+
+    sanitized[entry.key] = json.decode(json.encode(value.toString()));
+  }
+
+  return sanitized.isEmpty ? null : sanitized;
+}

@@ -1,0 +1,384 @@
+{
+  "common": {
+    "appName": "enpractice",
+    "openSettings": "Open settings",
+    "openPreview": "Open preview",
+    "logout": "Log out",
+    "theme": "Theme",
+    "language": "Language",
+    "profile": "Profile",
+    "background": "Background",
+    "mode": "Mode",
+    "solidPrimary": "Solid primary",
+    "current": "Current"
+  },
+  "auth": {
+    "loading": {
+      "title": "Restoring your session",
+      "subtitle": "Checking saved credentials and reconnecting to the EN Practice backend."
+    },
+    "tabs": {
+      "signIn": "Sign in",
+      "register": "Register"
+    },
+    "login": {
+      "hero": {
+        "badge": "API-ready mobile auth",
+        "loginTitle": "Welcome back",
+        "loginSubtitle": "Sign in to continue your learning journey and keep your progress in sync.",
+        "registerTitle": "Create your learning account",
+        "registerSubtitle": "Create an account to save your progress and access your study experience across devices."
+      },
+      "footnote": {
+        "login": "Access and refresh tokens are stored locally so the app can restore your session on the next launch.",
+        "register": "Registration follows the same backend schema as web: display name, email and password."
+      }
+    },
+    "form": {
+      "displayName": "Display name",
+      "displayNameHint": "How should we call you?",
+      "email": "Email",
+      "emailHint": "name@example.com",
+      "password": "Password",
+      "passwordHint": "At least 8 characters",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordHint": "Re-enter your password"
+    },
+    "actions": {
+      "signIn": "Sign in",
+      "createAccount": "Create account"
+    },
+    "validation": {
+      "displayNameRequired": "Please enter your display name.",
+      "emailRequired": "Please enter your email.",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordRequired": "Please enter your password.",
+      "passwordMin": "Password must be at least 8 characters.",
+      "confirmPasswordRequired": "Please confirm your password.",
+      "confirmPasswordMismatch": "Passwords do not match."
+    },
+    "meta": {
+      "endpointLabel": "Active API endpoint"
+    }
+  },
+  "app": {
+    "nav": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "dictionary": "Dictionary",
+      "ielts": "IELTS",
+      "writing": "Writing",
+      "speaking": "Speaking",
+      "profile": "Profile",
+      "leaderboard": "Leaderboard",
+      "preview": "Preview",
+      "settings": "Settings"
+    },
+    "language": {
+      "en": "English",
+      "vi": "Vietnamese"
+    },
+    "theme": {
+      "modes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "profiles": {
+        "glass": "Glass",
+        "calm": "Calm",
+        "contrast": "Contrast",
+        "editorial": "Editorial",
+        "pulse": "Pulse",
+        "focus": "Focus",
+        "signal": "Signal",
+        "solid": "Solid",
+        "mono": "Mono"
+      },
+      "backgrounds": {
+        "balanced": "Balanced",
+        "sage": "Sage",
+        "ocean": "Ocean",
+        "dawn": "Dawn",
+        "amethyst": "Amethyst",
+        "blossom": "Blossom",
+        "petal": "Petal",
+        "midnight": "Midnight",
+        "ember": "Ember",
+        "canopy": "Canopy"
+      },
+      "solidPrimary": {
+        "violet": "Violet",
+        "blue": "Blue",
+        "emerald": "Emerald",
+        "amber": "Amber",
+        "rose": "Rose"
+      }
+    },
+    "pagePalettes": {
+      "profile": "Profile",
+      "dashboard": "Dashboard",
+      "dictionary": "Dictionary",
+      "vocabularyTest": "Vocabulary test",
+      "vocabularyCheck": "Vocabulary check",
+      "review": "Review",
+      "evaluation": "Evaluation",
+      "ielts": "IELTS",
+      "speaking": "Speaking",
+      "writing": "Writing",
+      "leaderboard": "Leaderboard"
+    }
+  },
+  "home": {
+    "common": {
+      "minutes": "min",
+      "retry": "Try again",
+      "errorTitle": "Home is unavailable right now",
+      "errorDescription": "We could not load your learning launchpad. Pull to refresh or try again in a moment.",
+      "externalRouteUnsupported": "This action points to an external destination that is not enabled on mobile yet."
+    },
+    "feedback": {
+      "completed": "Completed",
+      "defaultTask": "your study task"
+    },
+    "continueLearning": {
+      "eyebrow": "Continue learning",
+      "fallbackTitle": "Start with a quick vocabulary review",
+      "fallbackDescription": "A short review session is the fastest way to get back into your learning loop today.",
+      "resume": "Resume now",
+      "start": "Start now"
+    },
+    "dailyPlan": {
+      "title": "Daily learning plan",
+      "subtitle": "Three focused actions to keep momentum without overloading the first screen.",
+      "viewAll": "See all",
+      "emptyTitle": "No daily tasks yet",
+      "emptyDescription": "We will suggest a compact learning plan here as soon as new tasks are ready.",
+      "sheetTitle": "Today's plan",
+      "sheetSubtitle": "Use this list as your lightweight checklist for the day.",
+      "completed": "Done"
+    },
+    "quickPractice": {
+      "title": "Quick practice",
+      "subtitle": "Short sessions you can start right away when you need a small win.",
+      "emptyTitle": "Quick practice will appear here",
+      "emptyDescription": "Once the API returns compact activities, this section becomes your fast-start rail.",
+      "startNow": "Start"
+    },
+    "progress": {
+      "title": "Progress snapshot",
+      "subtitle": "A light feedback block to show how today is moving forward.",
+      "today": "Today",
+      "streak": "Streak",
+      "weeklyXp": "Weekly XP",
+      "progressLabel": "of today's goal"
+    }
+  },
+  "learningSession": {
+    "title": "Learning session placeholder",
+    "description": "This route now behaves like a real learning session for navigation and analytics, so the product loop can be verified end to end.",
+    "complete": "Complete session",
+    "backHome": "Back home",
+    "metaTitle": "Session context",
+    "routeLabel": "Route",
+    "moduleLabel": "Module"
+  },
+  "dashboard": {
+    "hero": {
+      "title": "Learning command center",
+      "subtitle": "This dashboard is now the app hub: quick entry points, study momentum, runtime state and a stable shell for the next feature slices.",
+      "badge": "Phase 1 Shell"
+    },
+    "overview": {
+      "title": "Today's momentum",
+      "subtitle": "Use these cards as the anchor summary for the home experience while deeper feature data is being wired."
+    },
+    "metrics": {
+      "streak": "Streak",
+      "streakCaption": "days in a row",
+      "reviewQueue": "Review queue",
+      "reviewQueueCaption": "words waiting",
+      "mockReadiness": "Mock readiness",
+      "mockReadinessCaption": "IELTS confidence",
+      "timeToday": "Focus time",
+      "timeTodayCaption": "already today"
+    },
+    "quickAccess": {
+      "title": "Main screens",
+      "subtitle": "These destinations are now wired into the shell so the team can build each module without changing navigation later."
+    },
+    "focus": {
+      "title": "Current build focus",
+      "subtitle": "The dashboard starts the rollout by exposing the three study surfaces most likely to shape the first real user flows.",
+      "dictionaryTitle": "Dictionary foundation",
+      "dictionarySubtitle": "Search, saved words and spaced review loop",
+      "writingTitle": "Writing workspace",
+      "writingSubtitle": "Prompt flow, editor shell and feedback output",
+      "speakingTitle": "Speaking coach",
+      "speakingSubtitle": "Recording entry, fluency scoring and guided prompts"
+    },
+    "system": {
+      "title": "Live app state",
+      "subtitle": "Theme, language and runtime preferences are still visible here so the team can verify the base system while building product UI."
+    },
+    "summary": {
+      "account": "Account",
+      "email": "Email",
+      "selectedMode": "Selected mode",
+      "effectiveMode": "Effective mode",
+      "profile": "Theme profile",
+      "background": "Background preset",
+      "solidPrimary": "Solid primary",
+      "language": "Language"
+    },
+    "moduleCardsDictionary": "Vocabulary lookup, word details and save actions.",
+    "moduleCardsIelts": "Exam roadmap, task entry and performance snapshots.",
+    "moduleCardsWriting": "Prompt-based writing flow and AI feedback surface.",
+    "moduleCardsSpeaking": "Voice practice, fluency review and speaking drills.",
+    "moduleCardsProfile": "Identity, progress summary and personal settings.",
+    "moduleCardsLeaderboard": "Competitive ranking, friend loops and rewards."
+  },
+  "featureHub": {
+    "sections": {
+      "focus": "Priority slices",
+      "scope": "Current scope",
+      "actions": "Next actions"
+    },
+    "copy": {
+      "scope": "This screen already has route wiring, visual identity and page scaffolding. The next step is to replace placeholder content with real feature flows and data states.",
+      "actions": "Use this landing page as the first checkpoint for each module before the detailed flows are connected."
+    },
+    "actions": {
+      "backDashboard": "Back to dashboard",
+      "openSettings": "Open settings"
+    }
+  },
+  "pages": {
+    "dictionary": {
+      "hero": {
+        "title": "Dictionary workspace",
+        "subtitle": "Build the lookup experience here first: search, details, saved words and review entry points."
+      },
+      "focus": {
+        "lookup": "Fast word lookup",
+        "savedWords": "Saved word collections",
+        "review": "Review loop handoff"
+      }
+    },
+    "ielts": {
+      "hero": {
+        "title": "IELTS planner",
+        "subtitle": "This area is ready for task routing, readiness tracking and score-oriented study plans."
+      },
+      "focus": {
+        "roadmap": "Study roadmap",
+        "practice": "Task practice entry",
+        "results": "Result snapshots"
+      }
+    },
+    "writing": {
+      "hero": {
+        "title": "Writing studio",
+        "subtitle": "Use this shell for prompt selection, editor flow, draft history and feedback review."
+      },
+      "focus": {
+        "prompts": "Prompt pipeline",
+        "feedback": "Feedback cards",
+        "history": "Draft history"
+      }
+    },
+    "speaking": {
+      "hero": {
+        "title": "Speaking coach",
+        "subtitle": "This route is ready for recording entry, practice tracks and speaking feedback loops."
+      },
+      "focus": {
+        "recording": "Recording start",
+        "fluency": "Fluency review",
+        "coaching": "Guided coaching"
+      }
+    },
+    "profile": {
+      "hero": {
+        "title": "Profile hub",
+        "subtitle": "Personal identity, progress highlights and preference surfaces can now grow from this stable shell."
+      },
+      "account": {
+        "title": "Signed-in account",
+        "subtitle": "This profile page now reflects the auth session restored from storage and lets the user log out safely.",
+        "name": "Display name",
+        "email": "Email",
+        "status": "Status",
+        "statusActive": "Authenticated",
+        "logout": "Log out"
+      },
+      "focus": {
+        "identity": "Account identity",
+        "progress": "Learning progress",
+        "preferences": "Personal preferences"
+      }
+    },
+    "leaderboard": {
+      "hero": {
+        "title": "Leaderboard",
+        "subtitle": "This screen sets up the route for competitive loops, rankings and social motivation features."
+      },
+      "focus": {
+        "rankings": "Ranked standings",
+        "friends": "Friend groups",
+        "rewards": "Reward hooks"
+      }
+    }
+  },
+  "settingsPage": {
+    "hero": {
+      "title": "Appearance settings",
+      "subtitle": "This page is the base settings demo requested in the handoff. Changes persist with SharedPreferences."
+    },
+    "sections": {
+      "appearance": "Appearance",
+      "language": "Language",
+      "locks": "Profile behavior"
+    },
+    "hints": {
+      "solidPrimary": "Solid primary only changes the theme when the active profile is Solid."
+    },
+    "locks": {
+      "mode": "Mode is locked by this profile.",
+      "background": "Background is locked by this profile.",
+      "open": "This profile does not lock mode or background."
+    }
+  },
+  "themePreview": {
+    "hero": {
+      "title": "Theme preview",
+      "subtitle": "Use this screen to validate tokens, component feel and module accents before feature pages land."
+    },
+    "sections": {
+      "colors": "Semantic colors",
+      "buttons": "Buttons and chips",
+      "typography": "Typography and motion",
+      "density": "Density tokens",
+      "palettes": "Page palettes"
+    },
+    "labels": {
+      "primary": "Primary",
+      "accent": "Accent",
+      "secondary": "Secondary",
+      "success": "Success",
+      "warning": "Warning",
+      "danger": "Danger",
+      "fast": "Fast motion",
+      "normal": "Normal motion",
+      "slow": "Slow motion",
+      "blurSoft": "Soft blur",
+      "blurStrong": "Strong blur",
+      "controlHeight": "Control height",
+      "controlHeightSmall": "Small control",
+      "controlHeightLarge": "Large control",
+      "compactGap": "Compact gap",
+      "regularGap": "Regular gap",
+      "panelPadding": "Panel padding"
+    }
+  }
+}
