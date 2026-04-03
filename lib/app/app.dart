@@ -49,7 +49,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
     if (push.pendingRoute != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final route = ref.read(pushLifecycleControllerProvider).consumePendingRoute();
+        final route = ref
+            .read(pushLifecycleControllerProvider)
+            .consumePendingRoute();
         if (route != null) {
           router.go(route);
         }
@@ -58,7 +60,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'enpractice',
+      title: 'EN Practice',
       routerConfig: router,
       locale: locale.locale,
       supportedLocales: AppLocalizations.supportedLocales,

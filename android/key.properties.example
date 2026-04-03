@@ -1,0 +1,7 @@
+# Copy this file to `android/key.properties` and update it with your real keystore values.
+# `storeFile` is resolved relative to `android/app/build.gradle.kts`.
+
+storeFile=../secrets/android-upload-keystore.jks
+storePassword=replace_me
+keyAlias=upload
+keyPassword=replace_me

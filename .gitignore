@@ -46,3 +46,7 @@ app.*.map.json
 /android/.kotlin/
 /android/local.properties
 local.properties
+.env.firebase
+firebase-service-account*.json
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist

@@ -1,6 +1,6 @@
-# enpractice
+# EN Practice
 
-Flutter app scaffold for the `enpractice` mobile project.
+Flutter app scaffold for the `EN Practice` mobile project.
 
 ## Current status
 
@@ -94,8 +94,25 @@ flutter doctor -v
 
 - `android/local.properties` is machine-specific and should not be committed.
 - The `Visual Studio` warning in `flutter doctor` only matters for Windows desktop builds. It does not block Android development.
-- The current Android package id is `com.example.enpractice`.
+- The current Android package id is `com.swpts.enpractice`.
 
 ## Reference
 
 - [Flutter docs](https://docs.flutter.dev/)
+
+## Firebase App Distribution
+
+The repo now includes a CLI-based Firebase App Distribution scaffold for Android and iOS:
+
+- [docs/firebase_app_distribution.md](docs/firebase_app_distribution.md)
+- `scripts/configure_flutterfire.ps1`
+- `scripts/distribute_firebase_android.ps1`
+- `scripts/distribute_firebase_ios.sh`
+- `.env.firebase.example`
+
+Current Firebase identity for mobile:
+
+- Android application ID: `com.swpts.enpractice`
+- iOS bundle identifier: `com.swpts.enpractice`
+
+Update those identifiers first, then register the Android and iOS apps in Firebase with the exact same IDs.
