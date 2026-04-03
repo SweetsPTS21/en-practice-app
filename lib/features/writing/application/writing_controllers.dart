@@ -41,7 +41,10 @@ class WritingListController extends AutoDisposeAsyncNotifier<WritingListState> {
     state = const AsyncLoading();
     state = AsyncData(
       await _load(
-        current.copyWith(taskType: taskType == 'ALL' ? null : taskType),
+        current.copyWith(
+          taskType: taskType == 'ALL' ? null : taskType,
+          page: 0,
+        ),
       ),
     );
   }
@@ -51,9 +54,22 @@ class WritingListController extends AutoDisposeAsyncNotifier<WritingListState> {
     state = const AsyncLoading();
     state = AsyncData(
       await _load(
-        current.copyWith(difficulty: difficulty == 'ALL' ? null : difficulty),
+        current.copyWith(
+          difficulty: difficulty == 'ALL' ? null : difficulty,
+          page: 0,
+        ),
       ),
     );
+  }
+
+  Future<void> goToPage(int page) async {
+    final current = state.valueOrNull?.query ?? const WritingTaskQueryParams();
+    if (page < 0 || page == current.page) {
+      return;
+    }
+
+    state = const AsyncLoading();
+    state = AsyncData(await _load(current.copyWith(page: page)));
   }
 
   Future<WritingListState> _load(WritingTaskQueryParams query) async {

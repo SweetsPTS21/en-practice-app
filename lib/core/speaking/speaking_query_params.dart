@@ -1,3 +1,5 @@
+const Object _speakingUnset = Object();
+
 class SpeakingTopicQueryParams {
   const SpeakingTopicQueryParams({
     this.part,
@@ -11,12 +13,19 @@ class SpeakingTopicQueryParams {
   final int page;
   final int size;
 
-  SpeakingTopicQueryParams copyWith({String? part, String? difficulty}) {
+  SpeakingTopicQueryParams copyWith({
+    Object? part = _speakingUnset,
+    Object? difficulty = _speakingUnset,
+    int? page,
+    int? size,
+  }) {
     return SpeakingTopicQueryParams(
-      part: part,
-      difficulty: difficulty,
-      page: page,
-      size: size,
+      part: identical(part, _speakingUnset) ? this.part : part as String?,
+      difficulty: identical(difficulty, _speakingUnset)
+          ? this.difficulty
+          : difficulty as String?,
+      page: page ?? this.page,
+      size: size ?? this.size,
     );
   }
 

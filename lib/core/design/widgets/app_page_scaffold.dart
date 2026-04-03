@@ -33,14 +33,11 @@ class AppPageScaffold extends StatelessWidget {
             : width >= 720
             ? 24.0
             : 20.0;
+        final contentWidth = width > 960 ? 960.0 : width;
 
         Widget wrapContent(Widget child) {
-          return Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 960),
-              child: child,
-            ),
+          return Center(
+            child: SizedBox(width: contentWidth, child: child),
           );
         }
 

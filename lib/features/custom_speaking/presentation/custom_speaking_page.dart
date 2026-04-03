@@ -56,6 +56,14 @@ class _CustomSpeakingPageState extends ConsumerState<CustomSpeakingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              AppButton(
+                label: 'Speaking',
+                icon: Icons.arrow_back_rounded,
+                compact: true,
+                variant: AppButtonVariant.outline,
+                onPressed: () => context.go('/speaking'),
+              ),
+              const SizedBox(height: 14),
               TextField(
                 controller: _topicController,
                 decoration: const InputDecoration(

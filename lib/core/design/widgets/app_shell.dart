@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/navigation/app_destinations.dart';
@@ -26,9 +27,29 @@ class AppShell extends ConsumerStatefulWidget {
 class _AppShellState extends ConsumerState<AppShell> {
   static const double _hideHeaderThreshold = 28;
   static const double _showHeaderThreshold = 18;
+  static const _doubleBackWindow = Duration(seconds: 2);
+  static const _shellRootRoutes = <String>{
+    '/home',
+    '/dictionary',
+    '/vocabulary/check',
+    '/vocabulary-tests',
+    '/ielts',
+    '/writing',
+    '/speaking',
+    '/custom-speaking',
+    '/weekly-report',
+    '/challenges',
+    '/notifications',
+    '/profile',
+    '/leaderboard',
+    '/xp-history',
+    '/preview',
+    '/settings',
+  };
 
   bool _isHeaderVisible = true;
   double _scrollAccumulator = 0;
+  DateTime? _lastBackPressedAt;
 
   bool _handleScrollNotification(ScrollNotification notification) {
     if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) {
@@ -96,144 +117,199 @@ class _AppShellState extends ConsumerState<AppShell> {
     return false;
   }
 
+  Future<void> _handleBackPressed(
+    BuildContext context,
+    AppDestination currentDestination,
+  ) async {
+    final target = _resolveBackTarget(currentDestination);
+    if (target != null) {
+      ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
+      context.go(target);
+      return;
+    }
+
+    final now = DateTime.now();
+    if (_lastBackPressedAt == null ||
+        now.difference(_lastBackPressedAt!) > _doubleBackWindow) {
+      _lastBackPressedAt = now;
+      ScaffoldMessenger.maybeOf(context)
+        ?..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Press back again to exit'),
+            duration: _doubleBackWindow,
+          ),
+        );
+      return;
+    }
+
+    await SystemNavigator.pop();
+  }
+
+  String? _resolveBackTarget(AppDestination currentDestination) {
+    final location = widget.location;
+
+    if (location == '/custom-speaking' ||
+        location.startsWith('/custom-speaking/')) {
+      return '/speaking';
+    }
+
+    if (_shellRootRoutes.contains(location)) {
+      return null;
+    }
+
+    return currentDestination.route == location
+        ? null
+        : currentDestination.route;
+  }
+
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final currentDestination = resolveDestination(widget.location);
     final auth = ref.watch(authControllerProvider);
 
-    return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              tokens.background.body,
-              tokens.background.canvas,
-              tokens.background.body,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) {
+          return;
+        }
+        _handleBackPressed(context, currentDestination);
+      },
+      child: Scaffold(
+        body: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                tokens.background.body,
+                tokens.background.canvas,
+                tokens.background.body,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  AnimatedSize(
-                    duration: tokens.motion.normal,
-                    curve: Curves.easeOutCubic,
-                    alignment: Alignment.topCenter,
-                    child: ClipRect(
-                      child: Align(
-                        heightFactor: _isHeaderVisible ? 1 : 0,
-                        child: AnimatedSlide(
-                          offset: _isHeaderVisible
-                              ? Offset.zero
-                              : const Offset(0, -0.18),
-                          duration: tokens.motion.normal,
-                          curve: Curves.easeOutCubic,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-                            child: _ShellHeader(
-                              user: auth.user,
-                              onLogout: auth.isSubmitting
-                                  ? null
-                                  : () => ref
-                                        .read(authControllerProvider)
-                                        .logout(),
+          child: SafeArea(
+            bottom: false,
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    AnimatedSize(
+                      duration: tokens.motion.normal,
+                      curve: Curves.easeOutCubic,
+                      alignment: Alignment.topCenter,
+                      child: ClipRect(
+                        child: Align(
+                          heightFactor: _isHeaderVisible ? 1 : 0,
+                          child: AnimatedSlide(
+                            offset: _isHeaderVisible
+                                ? Offset.zero
+                                : const Offset(0, -0.18),
+                            duration: tokens.motion.normal,
+                            curve: Curves.easeOutCubic,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                              child: _ShellHeader(
+                                user: auth.user,
+                                onLogout: auth.isSubmitting
+                                    ? null
+                                    : () => ref
+                                          .read(authControllerProvider)
+                                          .logout(),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 52,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        final destination = appPrimaryDestinations[index];
-                        final selected =
-                            destination.route == currentDestination.route;
-                        final palette = context.pagePalette(
-                          destination.paletteKey,
-                        );
+                    SizedBox(
+                      height: 52,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final destination = appPrimaryDestinations[index];
+                          final selected =
+                              destination.route == currentDestination.route;
+                          final palette = context.pagePalette(
+                            destination.paletteKey,
+                          );
 
-                        return Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(
-                              tokens.radius.hero,
-                            ),
-                            onTap: () => context.go(destination.route),
-                            child: AnimatedContainer(
-                              duration: tokens.motion.normal,
-                              curve: Curves.easeOutCubic,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 10,
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(
+                                tokens.radius.hero,
                               ),
-                              decoration: BoxDecoration(
-                                color: selected
-                                    ? palette.accent.withValues(alpha: 0.16)
-                                    : tokens.background.mobileDrawer,
-                                borderRadius: BorderRadius.circular(
-                                  tokens.radius.hero,
+                              onTap: () => context.go(destination.route),
+                              child: AnimatedContainer(
+                                duration: tokens.motion.normal,
+                                curve: Curves.easeOutCubic,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 10,
                                 ),
-                                border: Border.all(
+                                decoration: BoxDecoration(
                                   color: selected
-                                      ? palette.accent.withValues(alpha: 0.42)
-                                      : tokens.border.subtle,
+                                      ? palette.accent.withValues(alpha: 0.16)
+                                      : tokens.background.mobileDrawer,
+                                  borderRadius: BorderRadius.circular(
+                                    tokens.radius.hero,
+                                  ),
+                                  border: Border.all(
+                                    color: selected
+                                        ? palette.accent.withValues(alpha: 0.42)
+                                        : tokens.border.subtle,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      destination.icon,
+                                      size: 18,
+                                      color: selected
+                                          ? palette.accent
+                                          : tokens.text.secondary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      context.tr(destination.labelKey),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.copyWith(
+                                            color: selected
+                                                ? tokens.text.primary
+                                                : tokens.text.secondary,
+                                          ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    destination.icon,
-                                    size: 18,
-                                    color: selected
-                                        ? palette.accent
-                                        : tokens.text.secondary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    context.tr(destination.labelKey),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelLarge
-                                        ?.copyWith(
-                                          color: selected
-                                              ? tokens.text.primary
-                                              : tokens.text.secondary,
-                                        ),
-                                  ),
-                                ],
-                              ),
                             ),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 10),
-                      itemCount: appPrimaryDestinations.length,
+                          );
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 10),
+                        itemCount: appPrimaryDestinations.length,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: _handleScrollNotification,
-                      child: widget.child,
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: _handleScrollNotification,
+                        child: widget.child,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const NotificationToastHost(),
-              const ForegroundPushBanner(),
-            ],
+                  ],
+                ),
+                const NotificationToastHost(),
+                const ForegroundPushBanner(),
+              ],
+            ),
           ),
         ),
       ),

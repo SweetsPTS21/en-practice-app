@@ -42,7 +42,7 @@ class SpeakingListController
         state.valueOrNull?.query ?? const SpeakingTopicQueryParams();
     state = const AsyncLoading();
     state = AsyncData(
-      await _load(current.copyWith(part: part == 'ALL' ? null : part)),
+      await _load(current.copyWith(part: part == 'ALL' ? null : part, page: 0)),
     );
   }
 
@@ -52,7 +52,10 @@ class SpeakingListController
     state = const AsyncLoading();
     state = AsyncData(
       await _load(
-        current.copyWith(difficulty: difficulty == 'ALL' ? null : difficulty),
+        current.copyWith(
+          difficulty: difficulty == 'ALL' ? null : difficulty,
+          page: 0,
+        ),
       ),
     );
   }

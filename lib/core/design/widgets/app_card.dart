@@ -19,6 +19,7 @@ class AppCard extends StatelessWidget {
     final tokens = context.tokens;
 
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: strong ? tokens.background.panelStrong : tokens.background.panel,
         borderRadius: BorderRadius.circular(tokens.radius.xl),
