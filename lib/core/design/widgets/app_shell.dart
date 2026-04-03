@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../app/navigation/app_destinations.dart';
 import '../../../features/auth/auth_providers.dart';
 import '../../../features/auth/models/auth_models.dart';
+import '../../../features/notifications/presentation/widgets/notification_bell_button.dart';
+import '../../../features/notifications/presentation/widgets/notification_toast_host.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/page_palettes.dart';
 import '../../theme/theme_extensions.dart';
@@ -104,99 +106,104 @@ class _AppShellState extends ConsumerState<AppShell> {
         ),
         child: SafeArea(
           bottom: false,
-          child: Column(
+          child: Stack(
             children: [
-              AnimatedSize(
-                duration: tokens.motion.normal,
-                curve: Curves.easeOutCubic,
-                alignment: Alignment.topCenter,
-                child: ClipRect(
-                  child: Align(
-                    heightFactor: _isHeaderVisible ? 1 : 0,
-                    child: AnimatedSlide(
-                      offset: _isHeaderVisible ? Offset.zero : const Offset(0, -0.18),
-                      duration: tokens.motion.normal,
-                      curve: Curves.easeOutCubic,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-                        child: _ShellHeader(
-                          user: auth.user,
-                          onLogout: auth.isSubmitting
-                              ? null
-                              : () => ref.read(authControllerProvider).logout(),
+              Column(
+                children: [
+                  AnimatedSize(
+                    duration: tokens.motion.normal,
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.topCenter,
+                    child: ClipRect(
+                      child: Align(
+                        heightFactor: _isHeaderVisible ? 1 : 0,
+                        child: AnimatedSlide(
+                          offset: _isHeaderVisible ? Offset.zero : const Offset(0, -0.18),
+                          duration: tokens.motion.normal,
+                          curve: Curves.easeOutCubic,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                            child: _ShellHeader(
+                              user: auth.user,
+                              onLogout: auth.isSubmitting
+                                  ? null
+                                  : () => ref.read(authControllerProvider).logout(),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(
-                height: 52,
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final destination = appPrimaryDestinations[index];
-                    final selected = destination.route == currentDestination.route;
-                    final palette = context.pagePalette(destination.paletteKey);
+                  SizedBox(
+                    height: 52,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        final destination = appPrimaryDestinations[index];
+                        final selected = destination.route == currentDestination.route;
+                        final palette = context.pagePalette(destination.paletteKey);
 
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(tokens.radius.hero),
-                        onTap: () => context.go(destination.route),
-                        child: AnimatedContainer(
-                          duration: tokens.motion.normal,
-                          curve: Curves.easeOutCubic,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? palette.accent.withValues(alpha: 0.16)
-                                : tokens.background.mobileDrawer,
+                        return Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             borderRadius: BorderRadius.circular(tokens.radius.hero),
-                            border: Border.all(
-                              color: selected
-                                  ? palette.accent.withValues(alpha: 0.42)
-                                  : tokens.border.subtle,
+                            onTap: () => context.go(destination.route),
+                            child: AnimatedContainer(
+                              duration: tokens.motion.normal,
+                              curve: Curves.easeOutCubic,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? palette.accent.withValues(alpha: 0.16)
+                                    : tokens.background.mobileDrawer,
+                                borderRadius: BorderRadius.circular(tokens.radius.hero),
+                                border: Border.all(
+                                  color: selected
+                                      ? palette.accent.withValues(alpha: 0.42)
+                                      : tokens.border.subtle,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    destination.icon,
+                                    size: 18,
+                                    color: selected ? palette.accent : tokens.text.secondary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    context.tr(destination.labelKey),
+                                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                          color: selected
+                                              ? tokens.text.primary
+                                              : tokens.text.secondary,
+                                        ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                destination.icon,
-                                size: 18,
-                                color: selected ? palette.accent : tokens.text.secondary,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                context.tr(destination.labelKey),
-                                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                      color: selected
-                                          ? tokens.text.primary
-                                          : tokens.text.secondary,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) => const SizedBox(width: 10),
-                  itemCount: appPrimaryDestinations.length,
-                ),
+                        );
+                      },
+                      separatorBuilder: (context, index) => const SizedBox(width: 10),
+                      itemCount: appPrimaryDestinations.length,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: _handleScrollNotification,
+                      child: widget.child,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: _handleScrollNotification,
-                  child: widget.child,
-                ),
-              ),
+              const NotificationToastHost(),
             ],
           ),
         ),
@@ -236,6 +243,8 @@ class _ShellHeader extends StatelessWidget {
         children: [
           const _HeaderBrand(),
           const Spacer(),
+          const NotificationBellButton(),
+          const SizedBox(width: 10),
           _AvatarMenu(
             user: user,
             onLogout: onLogout,

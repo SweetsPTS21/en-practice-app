@@ -185,6 +185,52 @@ class ProgressSnapshot {
   }
 }
 
+class ReminderBanner {
+  const ReminderBanner({
+    required this.type,
+    required this.title,
+    required this.description,
+    required this.ctaLabel,
+    required this.actionUrl,
+    required this.reason,
+    this.priority,
+    this.estimatedMinutes,
+    this.referenceType,
+    this.referenceId,
+    this.metadata = const <String, dynamic>{},
+  });
+
+  final String type;
+  final String title;
+  final String description;
+  final String ctaLabel;
+  final String actionUrl;
+  final String reason;
+  final int? priority;
+  final int? estimatedMinutes;
+  final String? referenceType;
+  final String? referenceId;
+  final Map<String, dynamic> metadata;
+
+  factory ReminderBanner.fromJson(Map<String, dynamic> json) {
+    return ReminderBanner(
+      type: json['type']?.toString() ?? 'GENERAL',
+      title: json['title']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      ctaLabel: json['ctaLabel']?.toString() ?? 'Open',
+      actionUrl: json['actionUrl']?.toString() ?? '/home',
+      reason: json['reason']?.toString() ?? 'REENGAGEMENT',
+      priority: _readInt(json['priority']),
+      estimatedMinutes: _readInt(json['estimatedMinutes']),
+      referenceType: json['referenceType']?.toString(),
+      referenceId: json['referenceId']?.toString(),
+      metadata: json['metadata'] is Map
+          ? jsonMap(json['metadata'])
+          : const <String, dynamic>{},
+    );
+  }
+}
+
 int? _readInt(Object? value) {
   return switch (value) {
     int value => value,

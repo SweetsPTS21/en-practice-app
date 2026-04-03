@@ -8,13 +8,18 @@ import '../../core/theme/page_palettes.dart';
 import '../../features/auth/auth_providers.dart';
 import '../../features/auth/models/auth_models.dart';
 import '../../features/auth/view/auth_loading_page.dart';
+import '../../features/challenges/presentation/weekly_challenge_page.dart';
 import '../../features/auth/view/login_page.dart';
 import '../../features/dictionary/dictionary_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/ielts/ielts_page.dart';
 import '../../features/leaderboard/leaderboard_page.dart';
 import '../../features/learning/learning_session_placeholder_page.dart';
+import '../../features/notifications/presentation/notification_inbox_page.dart';
 import '../../features/profile/profile_page.dart';
+import '../../features/reports/presentation/weekly_report_page.dart';
+import '../../features/results/data/result_snapshot_request.dart';
+import '../../features/results/presentation/result_journey_page.dart';
 import '../../features/settings/settings_page.dart';
 import '../../features/shared/route_placeholder_page.dart';
 import '../../features/speaking/speaking_page.dart';
@@ -115,6 +120,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   module: 'DICTIONARY',
                   paletteKey: AppPagePaletteKey.dictionary,
                 ),
+                routes: [
+                  GoRoute(
+                    path: 'result/:sessionId',
+                    builder: (context, state) => ResultJourneyPage(
+                      request: ResultSnapshotRequest(
+                        module: ResultSnapshotModule.vocabulary,
+                        referenceId: state.pathParameters['sessionId'] ?? '',
+                      ),
+                      title: 'Dictionary Review Result',
+                      subtitle: 'Shared completion snapshot and next-step routing now land here.',
+                      paletteKey: AppPagePaletteKey.dictionary,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -146,14 +165,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: 'result/:attemptId',
-                builder: (context, state) => const RoutePlaceholderPage(
+                builder: (context, state) => ResultJourneyPage(
+                  request: ResultSnapshotRequest(
+                    module: ResultSnapshotModule.ielts,
+                    referenceId: state.pathParameters['attemptId'] ?? '',
+                  ),
                   title: 'IELTS Result',
-                  subtitle: 'Result journey and next actions will connect here.',
+                  subtitle: 'Shared completion snapshot, review actions and next-step routing now live here.',
                   paletteKey: AppPagePaletteKey.ielts,
-                  highlights: [
-                    'Review route kept for web parity.',
-                    'Ready for result CTA and follow-up recommendations.',
-                  ],
                 ),
               ),
             ],
@@ -201,14 +220,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: 'submission/:submissionId',
-                builder: (context, state) => const RoutePlaceholderPage(
+                builder: (context, state) => ResultJourneyPage(
+                  request: ResultSnapshotRequest(
+                    module: ResultSnapshotModule.writing,
+                    referenceId: state.pathParameters['submissionId'] ?? '',
+                  ),
                   title: 'Writing Submission',
-                  subtitle: 'Submission review and feedback screen will land here.',
+                  subtitle: 'Submission review, recap and next actions now share the result journey contract.',
                   paletteKey: AppPagePaletteKey.writing,
-                  highlights: [
-                    'Review route aligned with web aliases.',
-                    'Reserved for feedback actions and reattempt flow.',
-                  ],
                 ),
               ),
             ],
@@ -229,14 +248,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: 'result/:id',
-                builder: (context, state) => const RoutePlaceholderPage(
+                builder: (context, state) => ResultJourneyPage(
+                  request: ResultSnapshotRequest(
+                    module: ResultSnapshotModule.speaking,
+                    referenceId: state.pathParameters['id'] ?? '',
+                  ),
                   title: 'Speaking Result',
-                  subtitle: 'Result review and retry decisions will plug in here.',
+                  subtitle: 'Result review and retry decisions now run through the shared completion snapshot contract.',
                   paletteKey: AppPagePaletteKey.speaking,
-                  highlights: [
-                    'Review route kept for deep links.',
-                    'Ready for result CTA and follow-up practice.',
-                  ],
                 ),
               ),
               GoRoute(
@@ -302,53 +321,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: 'result/:id',
-                builder: (context, state) => const RoutePlaceholderPage(
+                builder: (context, state) => ResultJourneyPage(
+                  request: ResultSnapshotRequest(
+                    module: ResultSnapshotModule.customSpeaking,
+                    referenceId: state.pathParameters['id'] ?? '',
+                  ),
                   title: 'Custom Speaking Result',
-                  subtitle: 'Conversation result review route is ready for later phases.',
+                  subtitle: 'Conversation result review now uses the same result journey loop as other modules.',
                   paletteKey: AppPagePaletteKey.speaking,
-                  highlights: [
-                    'Web-compatible result route.',
-                    'Fallback target available for recommendation flows.',
-                  ],
                 ),
               ),
             ],
           ),
           GoRoute(
             path: '/weekly-report',
-            builder: (context, state) => const RoutePlaceholderPage(
-              title: 'Weekly Report',
-              subtitle: 'Weekly learning summary will be connected in a later phase.',
-              paletteKey: AppPagePaletteKey.dashboard,
-              highlights: [
-                'Route reserved for retention surfaces.',
-                'Deep link ready from future recommendations.',
-              ],
-            ),
+            builder: (context, state) => const WeeklyReportPage(),
           ),
           GoRoute(
             path: '/challenges',
-            builder: (context, state) => const RoutePlaceholderPage(
-              title: 'Challenges',
-              subtitle: 'Challenge and gamification loop will appear here.',
-              paletteKey: AppPagePaletteKey.leaderboard,
-              highlights: [
-                'Placeholder keeps route contract stable.',
-                'Ready for future reward systems.',
-              ],
-            ),
+            builder: (context, state) => const WeeklyChallengePage(),
           ),
           GoRoute(
             path: '/notifications',
-            builder: (context, state) => const RoutePlaceholderPage(
-              title: 'Notifications',
-              subtitle: 'Notification center is reserved for a later delivery slice.',
-              paletteKey: AppPagePaletteKey.profile,
-              highlights: [
-                'Keeps future notification deep links stable.',
-                'Pairs with notification-to-session analytics flow.',
-              ],
-            ),
+            builder: (context, state) => const NotificationInboxPage(),
           ),
           GoRoute(
             path: '/profile',

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../core/network/api_error.dart';
 import '../../../core/network/json_helpers.dart';
+import '../../../core/retention/flagship_retention_models.dart';
 import 'home_launchpad_models.dart';
 
 class DashboardApi {
@@ -50,6 +51,50 @@ class DashboardApi {
       final response = await _client.get<Object?>('/user/dashboard/progress-snapshot');
       return ProgressSnapshot.fromJson(jsonMap(response.data));
     } on DioException catch (error) {
+      throw ApiError.fromDioException(error);
+    }
+  }
+
+  Future<ReminderBanner?> getReminderBanner() async {
+    try {
+      final response = await _client.get<Object?>('/user/dashboard/reminder-banner');
+      if (response.data == null) {
+        return null;
+      }
+
+      final data = jsonMap(response.data);
+      if (data.isEmpty) {
+        return null;
+      }
+
+      return ReminderBanner.fromJson(data);
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 404) {
+        return null;
+      }
+
+      throw ApiError.fromDioException(error);
+    }
+  }
+
+  Future<FlagshipRetention?> getFlagshipRetention() async {
+    try {
+      final response = await _client.get<Object?>('/user/dashboard/flagship-retention');
+      if (response.data == null) {
+        return null;
+      }
+
+      final data = jsonMap(response.data);
+      if (data.isEmpty) {
+        return null;
+      }
+
+      return FlagshipRetention.fromJson(data);
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 404) {
+        return null;
+      }
+
       throw ApiError.fromDioException(error);
     }
   }

@@ -32,17 +32,21 @@ class HomeLaunchpadController extends AsyncNotifier<HomeLaunchpadState> {
 
     final results = await Future.wait<dynamic>([
       attempt(_repository.loadContinueLearning),
+      attempt(_repository.loadReminderBanner),
       attempt(_repository.loadDailyLearningPlan),
       attempt(_repository.loadQuickPractice),
       attempt(_repository.loadProgressSnapshot),
+      attempt(_repository.loadFlagshipRetention),
     ]);
 
     return HomeLaunchpadState(
       continueLearning: results[0] as dynamic,
-      dailyPlan: results[1] as dynamic,
-      quickPractice: (results[2] as List?)?.whereType<dynamic>().toList().cast() ??
+      reminderBanner: results[1] as dynamic,
+      dailyPlan: results[2] as dynamic,
+      quickPractice: (results[3] as List?)?.whereType<dynamic>().toList().cast() ??
           const [],
-      progressSnapshot: results[3] as dynamic,
+      progressSnapshot: results[4] as dynamic,
+      flagshipRetention: results[5] as dynamic,
       hasRecoverableError: hasRecoverableError,
     );
   }

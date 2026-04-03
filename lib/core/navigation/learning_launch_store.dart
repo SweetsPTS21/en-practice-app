@@ -15,6 +15,7 @@ class LearningLaunchContext {
     this.taskTitle,
     this.reason,
     this.estimatedMinutes,
+    this.priority,
     this.metadata,
     this.startedAt,
   });
@@ -28,6 +29,7 @@ class LearningLaunchContext {
   final String? taskTitle;
   final String? reason;
   final int? estimatedMinutes;
+  final int? priority;
   final Map<String, dynamic>? metadata;
   final bool started;
   final DateTime launchedAt;
@@ -47,6 +49,7 @@ class LearningLaunchContext {
       taskTitle: taskTitle,
       reason: reason,
       estimatedMinutes: estimatedMinutes,
+      priority: priority,
       metadata: metadata,
       started: started ?? this.started,
       launchedAt: launchedAt,
@@ -65,6 +68,7 @@ class LearningLaunchContext {
       'taskTitle': taskTitle,
       'reason': reason,
       'estimatedMinutes': estimatedMinutes,
+      'priority': priority,
       'metadata': metadata,
       'started': started,
       'launchedAt': launchedAt.toIso8601String(),
@@ -83,6 +87,11 @@ class LearningLaunchContext {
       taskTitle: json['taskTitle']?.toString(),
       reason: json['reason']?.toString(),
       estimatedMinutes: switch (json['estimatedMinutes']) {
+        int value => value,
+        num value => value.toInt(),
+        _ => null,
+      },
+      priority: switch (json['priority']) {
         int value => value,
         num value => value.toInt(),
         _ => null,

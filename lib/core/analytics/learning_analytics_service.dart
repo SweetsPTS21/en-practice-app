@@ -12,7 +12,19 @@ enum LearningEventName {
   learningCompleted('LEARNING_COMPLETED'),
   learningAbandoned('LEARNING_ABANDONED'),
   resumeStarted('RESUME_STARTED'),
-  notificationToSessionStarted('NOTIFICATION_TO_SESSION_STARTED');
+  recommendationClicked('RECOMMENDATION_CLICKED'),
+  recommendationCompleted('RECOMMENDATION_COMPLETED'),
+  speakingPromptStarted('SPEAKING_PROMPT_STARTED'),
+  speakingPromptCompleted('SPEAKING_PROMPT_COMPLETED'),
+  vocabMicroSessionStarted('VOCAB_MICRO_SESSION_STARTED'),
+  vocabMicroSessionCompleted('VOCAB_MICRO_SESSION_COMPLETED'),
+  notificationToSessionStarted('NOTIFICATION_TO_SESSION_STARTED'),
+  resultNextActionClicked('RESULT_NEXT_ACTION_CLICKED'),
+  errorReviewOpened('ERROR_REVIEW_OPENED'),
+  reviewAgainClicked('REVIEW_AGAIN_CLICKED'),
+  notificationOpened('NOTIFICATION_OPENED'),
+  notificationClicked('NOTIFICATION_CLICKED'),
+  reminderBannerClicked('REMINDER_BANNER_CLICKED');
 
   const LearningEventName(this.value);
 
@@ -119,6 +131,38 @@ class LearningAnalyticsService {
       );
     }
 
+    if (launchContext.metadata?['specialEvent'] == 'SPEAKING_PROMPT') {
+      await trackEvent(
+        LearningEventPayload(
+          eventName: LearningEventName.speakingPromptStarted,
+          source: launchContext.source,
+          module: 'SPEAKING',
+          route: normalizedRoute,
+          referenceType: launchContext.referenceType ?? 'DAILY_SPEAKING_PROMPT',
+          referenceId: launchContext.referenceId,
+          metadata: {
+            'resumeState': launchContext.metadata?['resumeState'],
+          },
+        ),
+      );
+    }
+
+    if (launchContext.metadata?['specialEvent'] == 'VOCAB_MICRO_SESSION') {
+      await trackEvent(
+        LearningEventPayload(
+          eventName: LearningEventName.vocabMicroSessionStarted,
+          source: launchContext.source,
+          module: 'VOCAB',
+          route: normalizedRoute,
+          referenceType: launchContext.referenceType ?? 'VOCAB_MICRO_SESSION',
+          referenceId: launchContext.referenceId,
+          metadata: {
+            'targetWordCount': launchContext.metadata?['targetWordCount'],
+          },
+        ),
+      );
+    }
+
     return launchContext;
   }
 
@@ -172,6 +216,59 @@ class LearningAnalyticsService {
             'reason': effectiveContext.reason,
             'estimatedMinutes': effectiveContext.estimatedMinutes,
             'xpEarned': xpEarned,
+          },
+        ),
+      );
+    }
+
+    if (effectiveContext.metadata?['entryPoint'] == 'recommendation') {
+      await trackEvent(
+        LearningEventPayload(
+          eventName: LearningEventName.recommendationCompleted,
+          source: effectiveContext.source,
+          module: effectiveContext.module,
+          route: normalizedRoute,
+          referenceType: effectiveContext.referenceType,
+          referenceId: effectiveContext.referenceId,
+          metadata: {
+            'sourceSurface': effectiveContext.metadata?['sourceSurface'],
+            'sourceRecommendationKey': effectiveContext.metadata?['sourceRecommendationKey'],
+            'xpEarned': xpEarned,
+            ...?metadata,
+          },
+        ),
+      );
+    }
+
+    if (effectiveContext.metadata?['specialEvent'] == 'SPEAKING_PROMPT') {
+      await trackEvent(
+        LearningEventPayload(
+          eventName: LearningEventName.speakingPromptCompleted,
+          source: effectiveContext.source,
+          module: 'SPEAKING',
+          route: normalizedRoute,
+          referenceType: effectiveContext.referenceType ?? 'DAILY_SPEAKING_PROMPT',
+          referenceId: effectiveContext.referenceId,
+          metadata: {
+            'resumeState': effectiveContext.metadata?['resumeState'],
+          },
+        ),
+      );
+    }
+
+    if (effectiveContext.metadata?['specialEvent'] == 'VOCAB_MICRO_SESSION') {
+      await trackEvent(
+        LearningEventPayload(
+          eventName: LearningEventName.vocabMicroSessionCompleted,
+          source: effectiveContext.source,
+          module: 'VOCAB',
+          route: normalizedRoute,
+          referenceType: effectiveContext.referenceType ?? 'VOCAB_MICRO_SESSION',
+          referenceId: effectiveContext.referenceId,
+          metadata: {
+            'targetWordCount': effectiveContext.metadata?['targetWordCount'],
+            'completedWordCount':
+                metadata?['completedWordCount'] ?? effectiveContext.metadata?['targetWordCount'],
           },
         ),
       );

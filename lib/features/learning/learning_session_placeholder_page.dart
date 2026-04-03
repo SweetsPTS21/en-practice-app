@@ -7,7 +7,7 @@ import '../../core/design/widgets/app_card.dart';
 import '../../core/design/widgets/app_page_scaffold.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/theme/page_palettes.dart';
-import '../home/home_providers.dart';
+import '../../core/learning_journey/learning_journey_providers.dart';
 
 class LearningSessionPlaceholderPage extends ConsumerStatefulWidget {
   const LearningSessionPlaceholderPage({
@@ -131,8 +131,43 @@ class _LearningSessionPlaceholderPageState
         );
 
     if (mounted) {
-      context.go('/home?refresh=${DateTime.now().millisecondsSinceEpoch}');
+      context.go(_resultRouteFor(widget.route));
     }
+  }
+
+  String _resultRouteFor(String route) {
+    final uri = Uri.tryParse(route);
+    final path = uri?.path ?? route;
+
+    final ieltsMatch = RegExp(r'^/ielts/take/([^/?#]+)$').firstMatch(path);
+    if (ieltsMatch != null) {
+      return '/ielts/result/${ieltsMatch.group(1)}';
+    }
+
+    final writingMatch =
+        RegExp(r'^/writing/task/([^/?#]+)/take$').firstMatch(path);
+    if (writingMatch != null) {
+      return '/writing/submission/${writingMatch.group(1)}';
+    }
+
+    final speakingMatch =
+        RegExp(r'^/speaking/practice/([^/?#]+)$').firstMatch(path);
+    if (speakingMatch != null) {
+      return '/speaking/result/${speakingMatch.group(1)}';
+    }
+
+    final customSpeakingMatch =
+        RegExp(r'^/custom-speaking/conversation/([^/?#]+)$').firstMatch(path);
+    if (customSpeakingMatch != null) {
+      return '/custom-speaking/result/${customSpeakingMatch.group(1)}';
+    }
+
+    if (path == '/dictionary/review') {
+      final sessionId = DateTime.now().millisecondsSinceEpoch;
+      return '/dictionary/review/result/$sessionId';
+    }
+
+    return '/home?refresh=${DateTime.now().millisecondsSinceEpoch}';
   }
 }
 

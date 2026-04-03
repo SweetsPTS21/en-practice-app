@@ -6,8 +6,11 @@ import '../../../core/analytics/learning_analytics_service.dart';
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/learning_journey/learning_journey_action_service.dart';
 import '../../../core/navigation/learning_action_resolver.dart';
 import '../../../core/navigation/learning_launch_store.dart';
+import '../../../core/recommendation/recommendation_surface.dart';
+import '../../../core/retention/flagship_retention_models.dart';
 import '../../../core/theme/page_palettes.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../auth/auth_providers.dart';
@@ -15,6 +18,9 @@ import '../application/home_launchpad_state.dart';
 import '../data/home_launchpad_models.dart';
 import '../home_providers.dart';
 import 'widgets/daily_plan_sheet.dart';
+import 'widgets/flagship_retention_panel.dart';
+import 'widgets/reminder_banner.dart';
+import '../../recommendation/presentation/widgets/recommendation_surface_slot.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -71,9 +77,19 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: _HomeContent(
             state: value,
             onContinueLearning: () => _handleContinueLearning(value.continueLearning),
+            onReminderBanner: value.reminderBanner == null
+                ? null
+                : () => _handleReminderBanner(value.reminderBanner!),
             onOpenDailyPlan: () => _openDailyPlanSheet(value.dailyPlan),
             onDailyTask: _handleDailyTask,
             onQuickPractice: _handleQuickPractice,
+            onOpenSpeakingPrompt: value.flagshipRetention?.dailySpeakingPrompt == null
+                ? null
+                : () => _handleDailySpeakingPrompt(value.flagshipRetention!.dailySpeakingPrompt!),
+            onOpenVocabMicroLearning: value.flagshipRetention?.vocabMicroLearning == null
+                ? null
+                : () => _handleVocabMicroLearning(value.flagshipRetention!.vocabMicroLearning!),
+            onOpenChallenge: () => context.go('/challenges'),
           ),
         ),
       AsyncError() => _HomeErrorState(
@@ -237,6 +253,99 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
+  Future<void> _handleReminderBanner(ReminderBanner banner) async {
+    final outcome = await ref.read(learningJourneyActionServiceProvider).prepareAction(
+          JourneyActionRequest(
+            source: 'HOME_REMINDER_BANNER',
+            analyticsEvents: const [LearningEventName.reminderBannerClicked],
+            module: banner.type,
+            actionUrl: banner.actionUrl,
+            referenceType: banner.referenceType,
+            referenceId: banner.referenceId,
+            taskTitle: banner.title,
+            reason: banner.reason,
+            estimatedMinutes: banner.estimatedMinutes,
+            priority: banner.priority,
+            metadata: banner.metadata,
+          ),
+        );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (outcome.target.kind == LearningActionKind.external) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('home.common.externalRouteUnsupported'))),
+      );
+      return;
+    }
+
+    context.go(outcome.target.href);
+  }
+
+  Future<void> _handleDailySpeakingPrompt(DailySpeakingPrompt prompt) async {
+    final target = resolveLearningActionTarget(
+      LearningActionInput(
+        actionUrl: prompt.actionUrl,
+        referenceType: 'DAILY_SPEAKING_PROMPT',
+        referenceId: prompt.promptId,
+        module: 'SPEAKING',
+        metadata: const <String, dynamic>{},
+      ),
+    );
+
+    await _navigateToLearningTarget(
+      target: target,
+      contextData: LearningLaunchContext(
+        source: 'FLAGSHIP_RETENTION',
+        module: 'SPEAKING',
+        route: target.href,
+        referenceType: 'DAILY_SPEAKING_PROMPT',
+        referenceId: prompt.promptId,
+        taskTitle: prompt.topic,
+        reason: prompt.reason,
+        estimatedMinutes: prompt.estimatedMinutes,
+        metadata: {
+          'specialEvent': 'SPEAKING_PROMPT',
+          'resumeState': prompt.resumeState,
+        },
+        started: false,
+        launchedAt: DateTime.now(),
+      ),
+    );
+  }
+
+  Future<void> _handleVocabMicroLearning(VocabMicroLearning item) async {
+    final target = resolveLearningActionTarget(
+      LearningActionInput(
+        actionUrl: item.actionUrl,
+        referenceType: 'VOCAB_MICRO_SESSION',
+        module: 'VOCAB',
+        metadata: const <String, dynamic>{},
+      ),
+    );
+
+    await _navigateToLearningTarget(
+      target: target,
+      contextData: LearningLaunchContext(
+        source: 'FLAGSHIP_RETENTION',
+        module: 'VOCAB',
+        route: target.href,
+        referenceType: 'VOCAB_MICRO_SESSION',
+        taskTitle: item.title,
+        reason: item.reason,
+        estimatedMinutes: item.estimatedMinutes,
+        metadata: {
+          'specialEvent': 'VOCAB_MICRO_SESSION',
+          'targetWordCount': item.targetWordCount ?? item.dueWordCount,
+        },
+        started: false,
+        launchedAt: DateTime.now(),
+      ),
+    );
+  }
+
   Future<void> _navigateToLearningTarget({
     required LearningActionTarget target,
     required LearningLaunchContext contextData,
@@ -295,16 +404,24 @@ class _HomeContent extends ConsumerWidget {
   const _HomeContent({
     required this.state,
     required this.onContinueLearning,
+    required this.onReminderBanner,
     required this.onOpenDailyPlan,
     required this.onDailyTask,
     required this.onQuickPractice,
+    required this.onOpenSpeakingPrompt,
+    required this.onOpenVocabMicroLearning,
+    required this.onOpenChallenge,
   });
 
   final HomeLaunchpadState state;
   final VoidCallback onContinueLearning;
+  final VoidCallback? onReminderBanner;
   final VoidCallback onOpenDailyPlan;
   final ValueChanged<DailyLearningPlanItem> onDailyTask;
   final ValueChanged<QuickPracticeItem> onQuickPractice;
+  final VoidCallback? onOpenSpeakingPrompt;
+  final VoidCallback? onOpenVocabMicroLearning;
+  final VoidCallback onOpenChallenge;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -328,6 +445,39 @@ class _HomeContent extends ConsumerWidget {
             ),
           ),
         ),
+        const SliverPadding(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
+          sliver: SliverToBoxAdapter(
+            child: RecommendationSurfaceSlot(
+              surface: RecommendationSurface.home,
+              source: 'HOME_RECOMMENDATION',
+              hero: true,
+              showFeedbackActions: true,
+            ),
+          ),
+        ),
+        if (state.flagshipRetention?.hasAnyBlock == true)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            sliver: SliverToBoxAdapter(
+              child: FlagshipRetentionPanel(
+                flagship: state.flagshipRetention!,
+                onOpenSpeakingPrompt: onOpenSpeakingPrompt,
+                onOpenVocabMicroLearning: onOpenVocabMicroLearning,
+                onOpenChallenge: onOpenChallenge,
+              ),
+            ),
+          ),
+        if (state.reminderBanner != null && onReminderBanner != null)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            sliver: SliverToBoxAdapter(
+              child: ReminderBannerCard(
+                banner: state.reminderBanner!,
+                onPressed: onReminderBanner!,
+              ),
+            ),
+          ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
           sliver: SliverToBoxAdapter(

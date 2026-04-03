@@ -18,6 +18,7 @@ const supportedAppRoutePatterns = <String>[
   '/home',
   '/dictionary',
   '/dictionary/review',
+  '/dictionary/review/result/:sessionId',
   '/ielts',
   '/ielts/test/:testId',
   '/ielts/take/:attemptId',
@@ -39,6 +40,9 @@ const supportedAppRoutePatterns = <String>[
   '/weekly-report',
   '/challenges',
   '/notifications',
+  '/profile',
+  '/leaderboard',
+  '/preview',
   '/settings',
 ];
 
@@ -51,6 +55,7 @@ const learningSessionRoutePatterns = <String>[
 ];
 
 const reviewRoutePatterns = <String>[
+  '/dictionary/review/result/:sessionId',
   '/ielts/result/:attemptId',
   '/writing/submission/:submissionId',
   '/speaking/result/:id',
@@ -86,6 +91,10 @@ final _routeAliases = <MapEntry<RegExp, String>>[
   MapEntry(
     RegExp(r'^/custom-speaking-conversations/([^/?#]+)', caseSensitive: false),
     '/custom-speaking/result/\$1',
+  ),
+  MapEntry(
+    RegExp(r'^/reports/weekly/latest(?=/|$)', caseSensitive: false),
+    '/weekly-report',
   ),
 ];
 

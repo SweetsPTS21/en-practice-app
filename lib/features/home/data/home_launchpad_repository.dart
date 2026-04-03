@@ -1,4 +1,5 @@
 import 'home_launchpad_models.dart';
+import '../../../core/retention/flagship_retention_models.dart';
 import 'dashboard_api.dart';
 
 class HomeLaunchpadRepository {
@@ -20,5 +21,13 @@ class HomeLaunchpadRepository {
 
   Future<ProgressSnapshot?> loadProgressSnapshot() async {
     return _dashboardApi.getProgressSnapshot();
+  }
+
+  Future<ReminderBanner?> loadReminderBanner() async {
+    return _dashboardApi.getReminderBanner();
+  }
+
+  Future<FlagshipRetention?> loadFlagshipRetention() async {
+    return _dashboardApi.getFlagshipRetention();
   }
 }

@@ -6,8 +6,10 @@ import '../../core/design/widgets/app_button.dart';
 import '../../core/design/widgets/app_card.dart';
 import '../../core/design/widgets/app_page_scaffold.dart';
 import '../../core/l10n/app_localizations.dart';
+import '../../core/recommendation/recommendation_surface.dart';
 import '../../core/theme/page_palettes.dart';
 import '../../core/theme/theme_extensions.dart';
+import '../recommendation/presentation/widgets/recommendation_feed_section.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -77,6 +79,12 @@ class ProfilePage extends ConsumerWidget {
               _Pill(label: context.tr('pages.profile.focus.preferences')),
             ],
           ),
+        ),
+        const RecommendationFeedSection(
+          surface: RecommendationSurface.profile,
+          source: 'PROFILE_RECOMMENDATION',
+          title: 'Recommended next',
+          subtitle: 'Profile keeps a short feed of what to practice next.',
         ),
       ],
     );
