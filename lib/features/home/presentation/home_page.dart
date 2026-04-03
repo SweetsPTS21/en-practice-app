@@ -21,6 +21,10 @@ import 'widgets/daily_plan_sheet.dart';
 import 'widgets/flagship_retention_panel.dart';
 import 'widgets/reminder_banner.dart';
 import '../../recommendation/presentation/widgets/recommendation_surface_slot.dart';
+import '../../leaderboard/presentation/widgets/leaderboard_summary_widget.dart';
+import '../../notifications/application/push_entry_controller.dart';
+import '../../notifications/presentation/widgets/push_permission_sheet.dart';
+import '../../../core/push/push_providers.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -432,6 +436,7 @@ class _HomeContent extends ConsumerWidget {
             .watch(learningLaunchStoreProvider)
             .getCompletedDailyTaskIds(date: plan.date)
             .toSet();
+    final pushEntry = ref.watch(pushEntryControllerProvider);
 
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -456,6 +461,12 @@ class _HomeContent extends ConsumerWidget {
             ),
           ),
         ),
+        const SliverPadding(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
+          sliver: SliverToBoxAdapter(
+            child: LeaderboardSummaryWidget(),
+          ),
+        ),
         if (state.flagshipRetention?.hasAnyBlock == true)
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -475,6 +486,17 @@ class _HomeContent extends ConsumerWidget {
               child: ReminderBannerCard(
                 banner: state.reminderBanner!,
                 onPressed: onReminderBanner!,
+              ),
+            ),
+          ),
+        if (pushEntry.shouldShowHomePrompt(weeklyXp: state.progressSnapshot?.weeklyXp ?? 0))
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            sliver: SliverToBoxAdapter(
+              child: _PushPermissionPromptCard(
+                statusLabel: pushEntry.permissionSnapshot?.label ?? 'Not requested yet',
+                onEnable: () => PushPermissionSheet.show(context),
+                onDismiss: () => ref.read(pushLifecycleControllerProvider).dismissContextualPrompt(),
               ),
             ),
           ),
@@ -866,6 +888,70 @@ class _QuickPracticeRow extends StatelessWidget {
   }
 }
 
+class _PushPermissionPromptCard extends StatelessWidget {
+  const _PushPermissionPromptCard({
+    required this.statusLabel,
+    required this.onEnable,
+    required this.onDismiss,
+  });
+
+  final String statusLabel;
+  final VoidCallback onEnable;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Stay in the loop', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Text(
+            'Ask for push permission after the learner already has momentum. This prompt is gated by actual weekly XP, not by first app launch.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: tokens.text.secondary,
+                ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: tokens.background.panelStrong,
+              borderRadius: BorderRadius.circular(tokens.radius.xl),
+              border: Border.all(color: tokens.border.subtle),
+            ),
+            child: Text('Device push status: $statusLabel'),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: AppButton(
+                  label: 'Not now',
+                  variant: AppButtonVariant.outline,
+                  onPressed: onDismiss,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppButton(
+                  label: 'Enable push',
+                  icon: Icons.notifications_active_rounded,
+                  onPressed: onEnable,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ProgressSnapshotCard extends StatelessWidget {
   const _ProgressSnapshotCard({
     required this.snapshot,
@@ -1149,3 +1235,4 @@ class _LoadingBlock extends StatelessWidget {
     );
   }
 }
+

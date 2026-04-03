@@ -85,4 +85,23 @@ class AuthApi {
       throw ApiError.fromDioException(error);
     }
   }
+
+  Future<void> saveFcmToken({
+    required String fcmToken,
+    required String os,
+    String? browser,
+  }) async {
+    try {
+      await _client.post<Object?>(
+        '/auth/fcm-token',
+        data: {
+          'fcmToken': fcmToken,
+          'os': os,
+          'browser': browser,
+        },
+      );
+    } on DioException catch (error) {
+      throw ApiError.fromDioException(error);
+    }
+  }
 }

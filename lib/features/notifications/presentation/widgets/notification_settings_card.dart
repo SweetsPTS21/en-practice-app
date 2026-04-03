@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/design/widgets/app_button.dart';
 import '../../../../core/design/widgets/app_card.dart';
 import '../../../../core/notifications/notification_preferences_models.dart';
+import '../../../../core/push/push_providers.dart';
 import '../../application/notification_settings_controller.dart';
+import 'push_permission_sheet.dart';
 
 class NotificationSettingsCard extends ConsumerWidget {
   const NotificationSettingsCard({super.key});
@@ -11,6 +14,7 @@ class NotificationSettingsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(notificationSettingsControllerProvider);
+    final pushLifecycle = ref.watch(pushLifecycleControllerProvider);
 
     if (controller.isLoading) {
       return const AppCard(
@@ -31,7 +35,11 @@ class NotificationSettingsCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Notification settings', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
+          Text(
+            'Backend preferences and device permission are separate concerns, so both need to be visible in this phase.',
+          ),
+          const SizedBox(height: 16),
           _ToggleTile(
             label: 'Push notifications',
             value: preferences.allowPush,
@@ -70,6 +78,30 @@ class NotificationSettingsCard extends ConsumerWidget {
             onChanged: (value) => _save(
               ref,
               preferences.copyWith(allowAdminBroadcast: value),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Device push permission', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 6),
+                Text(pushLifecycle.permissionSnapshot?.label ?? 'Checking...'),
+                const SizedBox(height: 12),
+                AppButton(
+                  label: 'Manage push permission',
+                  icon: Icons.notifications_active_rounded,
+                  variant: AppButtonVariant.outline,
+                  onPressed: () => PushPermissionSheet.show(context),
+                ),
+              ],
             ),
           ),
           if (controller.isSaving) ...[

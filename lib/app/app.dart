@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/l10n/app_locale_controller.dart';
 import '../core/l10n/app_localizations.dart';
+import '../core/push/push_providers.dart';
 import '../core/theme/app_theme_controller.dart';
 import '../core/theme/theme_resolver.dart';
 import '../features/auth/auth_providers.dart';
@@ -44,6 +45,16 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     final themeState = ref.watch(appThemeControllerProvider);
     ref.watch(authControllerProvider);
     final router = ref.watch(appRouterProvider);
+    final push = ref.watch(pushLifecycleControllerProvider);
+
+    if (push.pendingRoute != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final route = ref.read(pushLifecycleControllerProvider).consumePendingRoute();
+        if (route != null) {
+          router.go(route);
+        }
+      });
+    }
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

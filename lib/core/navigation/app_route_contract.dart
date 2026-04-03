@@ -17,8 +17,14 @@ class AppResolvedRoute {
 const supportedAppRoutePatterns = <String>[
   '/home',
   '/dictionary',
+  '/dictionary/word/:wordId',
   '/dictionary/review',
   '/dictionary/review/result/:sessionId',
+  '/vocabulary/check',
+  '/vocabulary-tests',
+  '/vocabulary-tests/:testId',
+  '/vocabulary-tests/attempts/:attemptId',
+  '/vocabulary-tests/history',
   '/ielts',
   '/ielts/test/:testId',
   '/ielts/take/:attemptId',
@@ -42,12 +48,14 @@ const supportedAppRoutePatterns = <String>[
   '/notifications',
   '/profile',
   '/leaderboard',
+  '/xp-history',
   '/preview',
   '/settings',
 ];
 
 const learningSessionRoutePatterns = <String>[
   '/dictionary/review',
+  '/vocabulary-tests/attempts/:attemptId',
   '/ielts/take/:attemptId',
   '/writing/task/:taskId/take',
   '/speaking/practice/:id',
@@ -64,6 +72,9 @@ const reviewRoutePatterns = <String>[
 
 final _routeAliases = <MapEntry<RegExp, String>>[
   MapEntry(RegExp(r'^/dashboard(?=/|$)', caseSensitive: false), '/home'),
+  MapEntry(RegExp(r'^/vocabulary$', caseSensitive: false), '/vocabulary-tests'),
+  MapEntry(RegExp(r'^/history(?=/|$)', caseSensitive: false), '/vocabulary-tests/history'),
+  MapEntry(RegExp(r'^/review(?=/|$)', caseSensitive: false), '/dictionary/review'),
   MapEntry(
     RegExp(r'^/writing/submissions/([^/?#]+)', caseSensitive: false),
     '/writing/submission/\$1',
@@ -95,6 +106,10 @@ final _routeAliases = <MapEntry<RegExp, String>>[
   MapEntry(
     RegExp(r'^/reports/weekly/latest(?=/|$)', caseSensitive: false),
     '/weekly-report',
+  ),
+  MapEntry(
+    RegExp(r'^/xp/history(?=/|$)', caseSensitive: false),
+    '/xp-history',
   ),
 ];
 

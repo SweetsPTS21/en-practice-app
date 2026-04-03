@@ -5,11 +5,11 @@ import '../auth/auth_providers.dart';
 import '../../core/design/widgets/app_button.dart';
 import '../../core/design/widgets/app_card.dart';
 import '../../core/design/widgets/app_page_scaffold.dart';
-import '../../core/l10n/app_localizations.dart';
-import '../../core/recommendation/recommendation_surface.dart';
 import '../../core/theme/page_palettes.dart';
 import '../../core/theme/theme_extensions.dart';
+import '../leaderboard/presentation/widgets/profile_leaderboard_snapshot.dart';
 import '../recommendation/presentation/widgets/recommendation_feed_section.dart';
+import '../../core/recommendation/recommendation_surface.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -21,8 +21,8 @@ class ProfilePage extends ConsumerWidget {
     final tokens = context.tokens;
 
     return AppPageScaffold(
-      title: context.tr('pages.profile.hero.title'),
-      subtitle: context.tr('pages.profile.hero.subtitle'),
+      title: 'Profile',
+      subtitle: 'Identity, competitive context and recommendation carry-over now share the same profile surface.',
       paletteKey: AppPagePaletteKey.profile,
       children: [
         AppCard(
@@ -31,27 +31,27 @@ class ProfilePage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                context.tr('pages.profile.account.title'),
+                'Account',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
-              Text(context.tr('pages.profile.account.subtitle')),
+              Text('Basic account state stays simple here while deeper profile surfaces arrive later.'),
               SizedBox(height: tokens.density.regularGap),
               _ProfileRow(
-                label: context.tr('pages.profile.account.name'),
+                label: 'Name',
                 value: user?.displayName ?? '-',
               ),
               _ProfileRow(
-                label: context.tr('pages.profile.account.email'),
+                label: 'Email',
                 value: user?.email ?? '-',
               ),
-              _ProfileRow(
-                label: context.tr('pages.profile.account.status'),
-                value: context.tr('pages.profile.account.statusActive'),
+              const _ProfileRow(
+                label: 'Status',
+                value: 'Active',
               ),
               SizedBox(height: tokens.density.regularGap),
               AppButton(
-                label: context.tr('pages.profile.account.logout'),
+                label: 'Log out',
                 icon: Icons.logout_rounded,
                 variant: AppButtonVariant.outline,
                 onPressed: auth.isSubmitting
@@ -66,20 +66,21 @@ class ProfilePage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                context.tr('featureHub.sections.scope'),
+                'Profile scope',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
-              Text(context.tr('featureHub.copy.scope')),
+              Text('This surface now connects identity, progress visibility and downstream motivation loops.'),
               SizedBox(height: tokens.density.regularGap),
-              _Pill(label: context.tr('pages.profile.focus.identity')),
+              const _Pill(label: 'Identity'),
               SizedBox(height: tokens.density.compactGap),
-              _Pill(label: context.tr('pages.profile.focus.progress')),
+              const _Pill(label: 'Progress'),
               SizedBox(height: tokens.density.compactGap),
-              _Pill(label: context.tr('pages.profile.focus.preferences')),
+              const _Pill(label: 'Preferences'),
             ],
           ),
         ),
+        const ProfileLeaderboardSnapshot(),
         const RecommendationFeedSection(
           surface: RecommendationSurface.profile,
           source: 'PROFILE_RECOMMENDATION',

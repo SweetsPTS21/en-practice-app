@@ -48,6 +48,8 @@ const _referenceFallbacks = <String, String>{
   'VOCAB_REVIEW': '/dictionary',
   'VOCAB_REVIEW_SESSION': '/dictionary',
   'VOCAB_MICRO_SESSION': '/dictionary/review?mode=micro',
+  'VOCABULARY_TEST': '/vocabulary-tests',
+  'VOCABULARY_CHECK': '/vocabulary/check',
   'READING_DRILL': '/ielts?mode=mini&skill=READING',
   'DAILY_PLAN_ITEM': '/home',
   'STREAK': '/home',
@@ -60,6 +62,7 @@ const _moduleFallbacks = <String, String>{
   'VOCABULARY': '/dictionary',
   'DICTIONARY': '/dictionary',
   'VOCAB': '/dictionary',
+  'VOCAB_TEST': '/vocabulary-tests',
 };
 
 LearningActionTarget resolveLearningActionTarget(LearningActionInput input) {

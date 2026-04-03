@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/navigation/app_destinations.dart';
 import '../../../features/auth/auth_providers.dart';
 import '../../../features/auth/models/auth_models.dart';
+import '../../../features/notifications/presentation/widgets/foreground_push_banner.dart';
 import '../../../features/notifications/presentation/widgets/notification_bell_button.dart';
 import '../../../features/notifications/presentation/widgets/notification_toast_host.dart';
 import '../../l10n/app_localizations.dart';
@@ -204,6 +205,7 @@ class _AppShellState extends ConsumerState<AppShell> {
                 ],
               ),
               const NotificationToastHost(),
+              const ForegroundPushBanner(),
             ],
           ),
         ),
