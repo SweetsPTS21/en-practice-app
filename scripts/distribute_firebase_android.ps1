@@ -6,6 +6,7 @@ param(
     [string]$BuildMode = "release",
 
     [string]$EnvFile = ".env.firebase",
+    [string]$AppEnvFile = ".env.app",
     [string]$ArtifactPath,
     [switch]$SkipBuild
 )
@@ -15,6 +16,23 @@ $ErrorActionPreference = "Stop"
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $scriptDir ".."))
+
+function Get-LocalProperties {
+    $localPropertiesPath = Join-Path $repoRoot "android/local.properties"
+    $properties = @{}
+
+    if (-not (Test-Path -LiteralPath $localPropertiesPath)) {
+        return $properties
+    }
+
+    foreach ($line in Get-Content -LiteralPath $localPropertiesPath) {
+        if ($line -match "^\s*([^#][^=]+?)\s*=\s*(.+?)\s*$") {
+            $properties[$matches[1]] = $matches[2]
+        }
+    }
+
+    return $properties
+}
 
 function Import-DotEnv {
     param([string]$Path)
@@ -62,12 +80,49 @@ function Resolve-RepoPath {
     return [System.IO.Path]::GetFullPath((Join-Path $repoRoot $PathValue))
 }
 
-function Assert-Command {
-    param([string]$Name)
+function Resolve-Executable {
+    param(
+        [string[]]$Candidates,
+        [string]$Label
+    )
 
-    if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
-        throw "Required command '$Name' was not found on PATH."
+    foreach ($candidate in $Candidates) {
+        if ([string]::IsNullOrWhiteSpace($candidate)) {
+            continue
+        }
+
+        try {
+            if (Test-Path -LiteralPath $candidate) {
+                return (Resolve-Path -LiteralPath $candidate).Path
+            }
+        } catch {
+            continue
+        }
+
+        $command = Get-Command $candidate -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($command) {
+            return $command.Source
+        }
     }
+
+    throw "$Label was not found. Install it first or expose it via PATH."
+}
+
+function Get-NpmGlobalPrefix {
+    $npm = Get-Command "npm.cmd" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $npm) {
+        $npm = Get-Command "npm" -ErrorAction SilentlyContinue | Select-Object -First 1
+    }
+    if (-not $npm) {
+        return $null
+    }
+
+    $prefix = & $npm.Source prefix -g 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        return $null
+    }
+
+    return $prefix.Trim()
 }
 
 function Add-FileOption {
@@ -90,13 +145,48 @@ function Add-FileOption {
     $Arguments.Add($resolvedPath)
 }
 
+function Add-DartDefineOption {
+    param(
+        [System.Collections.Generic.List[string]]$Arguments,
+        [string]$Name,
+        [string]$Value
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return
+    }
+
+    $Arguments.Add("--dart-define=$Name=$Value")
+}
+
 Push-Location $repoRoot
 try {
     $resolvedEnvFile = Resolve-RepoPath $EnvFile
     Import-DotEnv -Path $resolvedEnvFile
+    $resolvedAppEnvFile = Resolve-RepoPath $AppEnvFile
+    Import-DotEnv -Path $resolvedAppEnvFile
 
-    Assert-Command "flutter"
-    Assert-Command "firebase"
+    $localProperties = Get-LocalProperties
+    $flutterSdk = if ($localProperties.ContainsKey("flutter.sdk")) {
+        $localProperties["flutter.sdk"]
+    } else {
+        $env:FLUTTER_ROOT
+    }
+    $npmGlobalPrefix = Get-NpmGlobalPrefix
+
+    $flutter = Resolve-Executable -Label "Flutter SDK" -Candidates @(
+        $(if ($flutterSdk) { Join-Path $flutterSdk "bin/flutter.bat" }),
+        $(if ($flutterSdk) { Join-Path $flutterSdk "bin/flutter" }),
+        "flutter.bat",
+        "flutter"
+    )
+    $firebase = Resolve-Executable -Label "Firebase CLI" -Candidates @(
+        $env:FIREBASE_CLI,
+        $(if ($npmGlobalPrefix) { Join-Path $npmGlobalPrefix "firebase.cmd" }),
+        (Join-Path $repoRoot "node_modules/.bin/firebase.cmd"),
+        "firebase.cmd",
+        "firebase"
+    )
 
     $appId = if (-not [string]::IsNullOrWhiteSpace($env:FIREBASE_APP_ID_ANDROID)) {
         $env:FIREBASE_APP_ID_ANDROID
@@ -112,11 +202,21 @@ try {
     }
 
     if (-not $SkipBuild) {
-        if ($Artifact -eq "apk") {
-            & flutter build apk "--$BuildMode"
-        } else {
-            & flutter build appbundle --release
+        if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL)) {
+            throw "API_BASE_URL is required for distribution builds. Set it in .env.app or the current environment."
         }
+
+        $flutterBuildArgs = [System.Collections.Generic.List[string]]::new()
+        if ($Artifact -eq "apk") {
+            $flutterBuildArgs.AddRange([string[]]@("build", "apk", "--$BuildMode"))
+        } else {
+            $flutterBuildArgs.AddRange([string[]]@("build", "appbundle", "--release"))
+        }
+
+        Add-DartDefineOption -Arguments $flutterBuildArgs -Name "API_BASE_URL" -Value $env:API_BASE_URL
+        Add-DartDefineOption -Arguments $flutterBuildArgs -Name "INTERNAL_KEY" -Value $env:INTERNAL_KEY
+
+        & $flutter @flutterBuildArgs
 
         if ($LASTEXITCODE -ne 0) {
             throw "Flutter build failed."
@@ -160,7 +260,7 @@ try {
         $firebaseArgs.Add($env:FIREBASE_TOKEN)
     }
 
-    & firebase @firebaseArgs
+    & $firebase @firebaseArgs
     if ($LASTEXITCODE -ne 0) {
         throw "Firebase App Distribution upload failed."
     }

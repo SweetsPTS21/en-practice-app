@@ -105,14 +105,31 @@ flutter doctor -v
 The repo now includes a CLI-based Firebase App Distribution scaffold for Android and iOS:
 
 - [docs/firebase_app_distribution.md](docs/firebase_app_distribution.md)
+- `scripts/generate_app_icons.ps1`
 - `scripts/configure_flutterfire.ps1`
 - `scripts/distribute_firebase_android.ps1`
 - `scripts/distribute_firebase_ios.sh`
+- `.env.app.example`
 - `.env.firebase.example`
 
 Current Firebase identity for mobile:
 
 - Android application ID: `com.swpts.enpractice`
 - iOS bundle identifier: `com.swpts.enpractice`
+
+Useful setup sequence:
+
+```powershell
+.\scripts\generate_app_icons.ps1
+firebase login
+.\scripts\configure_flutterfire.ps1
+.\scripts\distribute_firebase_android.ps1
+```
+
+Runtime backend config for release builds lives in `.env.app` and is injected through `--dart-define` by the distribution scripts. At minimum, set:
+
+```txt
+API_BASE_URL=https://your-backend-domain/api
+```
 
 Update those identifiers first, then register the Android and iOS apps in Firebase with the exact same IDs.

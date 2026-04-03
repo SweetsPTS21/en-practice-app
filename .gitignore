@@ -47,6 +47,7 @@ app.*.map.json
 /android/local.properties
 local.properties
 .env.firebase
+.env.app
 firebase-service-account*.json
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
