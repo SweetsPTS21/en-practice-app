@@ -112,10 +112,7 @@ class ThemePreviewPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               SizedBox(height: tokens.density.regularGap),
-              Text(
-                'Aa',
-                style: Theme.of(context).textTheme.displayMedium,
-              ),
+              Text('Aa', style: Theme.of(context).textTheme.displayMedium),
               const SizedBox(height: 8),
               Text(
                 '${context.tr('themePreview.labels.fast')}: ${tokens.motion.fast.inMilliseconds}ms',
@@ -198,9 +195,9 @@ class ThemePreviewPage extends StatelessWidget {
                     ),
                     child: Text(
                       context.tr('app.pagePalettes.${key.name}'),
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleMedium?.copyWith(color: Colors.white),
                     ),
                   );
                 }).toList(),
@@ -214,10 +211,7 @@ class ThemePreviewPage extends StatelessWidget {
 }
 
 class _ColorTile extends StatelessWidget {
-  const _ColorTile({
-    required this.label,
-    required this.color,
-  });
+  const _ColorTile({required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -252,10 +246,7 @@ class _ColorTile extends StatelessWidget {
 }
 
 class _MetricRow extends StatelessWidget {
-  const _MetricRow({
-    required this.label,
-    required this.value,
-  });
+  const _MetricRow({required this.label, required this.value});
 
   final String label;
   final double value;

@@ -2,7 +2,11 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:enpractice/core/dictionary/review_api.dart';
+import 'package:enpractice/core/speaking/speaking_api.dart';
+import 'package:enpractice/core/speaking/speaking_query_params.dart';
 import 'package:enpractice/core/vocabulary_test/vocabulary_test_api.dart';
+import 'package:enpractice/core/writing/writing_api.dart';
+import 'package:enpractice/core/writing/writing_query_params.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -10,7 +14,8 @@ void main() {
     test('review api does not duplicate the /api prefix', () async {
       final adapter = _RecordingAdapter(
         responses: {
-          '/records/review-counts': '{"today":1,"week":2,"month":3,"wrong":4,"all":5}',
+          '/records/review-counts':
+              '{"today":1,"week":2,"month":3,"wrong":4,"all":5}',
         },
       );
       final client = Dio(BaseOptions(baseUrl: 'http://localhost:8080/api'))
@@ -27,11 +32,7 @@ void main() {
     });
 
     test('vocabulary test api uses the base /api prefix only once', () async {
-      final adapter = _RecordingAdapter(
-        responses: {
-          '/vocabulary-tests': '[]',
-        },
-      );
+      final adapter = _RecordingAdapter(responses: {'/vocabulary-tests': '[]'});
       final client = Dio(BaseOptions(baseUrl: 'http://localhost:8080/api'))
         ..httpClientAdapter = adapter;
 
@@ -42,6 +43,46 @@ void main() {
       expect(
         adapter.requestedUris.single.toString(),
         'http://localhost:8080/api/vocabulary-tests',
+      );
+    });
+
+    test('writing api uses the base /api prefix only once', () async {
+      final adapter = _RecordingAdapter(
+        responses: {
+          '/writing/tasks':
+              '{"page":0,"size":20,"totalElements":0,"totalPages":0,"items":[]}',
+        },
+      );
+      final client = Dio(BaseOptions(baseUrl: 'http://localhost:8080/api'))
+        ..httpClientAdapter = adapter;
+
+      final api = WritingApi(client);
+      final tasks = await api.getTasks(const WritingTaskQueryParams());
+
+      expect(tasks.items, isEmpty);
+      expect(
+        adapter.requestedUris.single.toString(),
+        'http://localhost:8080/api/writing/tasks?page=0&size=20',
+      );
+    });
+
+    test('speaking api uses the base /api prefix only once', () async {
+      final adapter = _RecordingAdapter(
+        responses: {
+          '/speaking/topics':
+              '{"page":0,"size":20,"totalElements":0,"totalPages":0,"items":[]}',
+        },
+      );
+      final client = Dio(BaseOptions(baseUrl: 'http://localhost:8080/api'))
+        ..httpClientAdapter = adapter;
+
+      final api = SpeakingApi(client);
+      final topics = await api.getTopics(const SpeakingTopicQueryParams());
+
+      expect(topics.items, isEmpty);
+      expect(
+        adapter.requestedUris.single.toString(),
+        'http://localhost:8080/api/speaking/topics?page=0&size=20',
       );
     });
   });

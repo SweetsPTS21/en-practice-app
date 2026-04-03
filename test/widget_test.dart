@@ -7,7 +7,9 @@ import 'package:enpractice/core/storage/secure_store.dart';
 import 'package:enpractice/core/storage/shared_preferences_provider.dart';
 
 void main() {
-  testWidgets('Bootstraps login flow when no auth session is stored', (WidgetTester tester) async {
+  testWidgets('Bootstraps login flow when no auth session is stored', (
+    WidgetTester tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
 

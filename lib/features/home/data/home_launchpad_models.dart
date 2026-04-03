@@ -57,17 +57,15 @@ class DailyLearningPlan {
   factory DailyLearningPlan.fromJson(Map<String, dynamic> json) {
     final rawItems = json['items'];
     return DailyLearningPlan(
-      date: json['date']?.toString() ?? DateTime.now().toIso8601String().split('T').first,
+      date:
+          json['date']?.toString() ??
+          DateTime.now().toIso8601String().split('T').first,
       goalMinutes: _readInt(json['goalMinutes']),
       items: rawItems is List
           ? rawItems
-              .whereType<Object?>()
-              .map(
-                (item) => DailyLearningPlanItem.fromJson(
-                  jsonMap(item),
-                ),
-              )
-              .toList(growable: false)
+                .whereType<Object?>()
+                .map((item) => DailyLearningPlanItem.fromJson(jsonMap(item)))
+                .toList(growable: false)
           : const <DailyLearningPlanItem>[],
     );
   }

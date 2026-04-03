@@ -16,11 +16,11 @@ class PushLifecycleController extends ChangeNotifier {
     required PushTokenService tokenService,
     required PushOpenRouter openRouter,
     required bool isAuthenticated,
-  })  : _adapter = adapter,
-        _permissionService = permissionService,
-        _tokenService = tokenService,
-        _openRouter = openRouter,
-        _isAuthenticated = isAuthenticated {
+  }) : _adapter = adapter,
+       _permissionService = permissionService,
+       _tokenService = tokenService,
+       _openRouter = openRouter,
+       _isAuthenticated = isAuthenticated {
     unawaited(_initialize());
   }
 
@@ -90,7 +90,8 @@ class PushLifecycleController extends ChangeNotifier {
       if (_isDisposed) {
         return;
       }
-      if (_isAuthenticated && permissionSnapshot?.status == PushPermissionStatus.granted) {
+      if (_isAuthenticated &&
+          permissionSnapshot?.status == PushPermissionStatus.granted) {
         await syncToken(force: true);
       }
     } finally {

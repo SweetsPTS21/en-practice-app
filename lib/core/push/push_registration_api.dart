@@ -15,11 +15,7 @@ class PushRegistrationApi {
     try {
       await _client.post<Object?>(
         '/auth/fcm-token',
-        data: {
-          'fcmToken': token,
-          'os': os,
-          'browser': browser,
-        },
+        data: {'fcmToken': token, 'os': os, 'browser': browser},
       );
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);

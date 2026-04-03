@@ -66,7 +66,9 @@ class VocabularyTestListController
     final current = state.requireValue;
     state = AsyncData(current.copyWith(isGenerating: true));
     try {
-      final detail = await ref.read(vocabularyTestApiProvider).generate(
+      final detail = await ref
+          .read(vocabularyTestApiProvider)
+          .generate(
             VocabularyTestGeneratePayload(
               questionCount: current.questionCount,
               sources: current.selectedSources.isEmpty
@@ -86,7 +88,9 @@ class VocabularyTestListController
   Future<VocabularyTestListState> _load() async {
     final api = ref.read(vocabularyTestApiProvider);
     final tests = await api.getTests();
-    final attempts = await api.getAttemptHistory(const VocabularyTestAttemptQueryParams());
+    final attempts = await api.getAttemptHistory(
+      const VocabularyTestAttemptQueryParams(),
+    );
     return VocabularyTestListState(
       tests: tests,
       attempts: attempts,
@@ -96,17 +100,18 @@ class VocabularyTestListController
   }
 }
 
-final vocabularyTestListControllerProvider = AutoDisposeAsyncNotifierProvider<
-    VocabularyTestListController, VocabularyTestListState>(
-  VocabularyTestListController.new,
-);
+final vocabularyTestListControllerProvider =
+    AutoDisposeAsyncNotifierProvider<
+      VocabularyTestListController,
+      VocabularyTestListState
+    >(VocabularyTestListController.new);
 
-final vocabularyTestDetailProvider =
-    FutureProvider.autoDispose.family<VocabularyTestDetail, String>((ref, testId) async {
-  return ref.watch(vocabularyTestApiProvider).getTestDetail(testId);
-});
+final vocabularyTestDetailProvider = FutureProvider.autoDispose
+    .family<VocabularyTestDetail, String>((ref, testId) async {
+      return ref.watch(vocabularyTestApiProvider).getTestDetail(testId);
+    });
 
-final vocabularyTestAttemptDetailProvider =
-    FutureProvider.autoDispose.family<VocabularyTestAttemptResult, String>((ref, attemptId) async {
-  return ref.watch(vocabularyTestApiProvider).getAttemptDetail(attemptId);
-});
+final vocabularyTestAttemptDetailProvider = FutureProvider.autoDispose
+    .family<VocabularyTestAttemptResult, String>((ref, attemptId) async {
+      return ref.watch(vocabularyTestApiProvider).getAttemptDetail(attemptId);
+    });

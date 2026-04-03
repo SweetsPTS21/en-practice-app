@@ -55,7 +55,9 @@ class AppThemeController extends Notifier<AppThemeState> {
     );
   }
 
-  Future<void> setThemeProfilePreference(AppThemeProfilePreference value) async {
+  Future<void> setThemeProfilePreference(
+    AppThemeProfilePreference value,
+  ) async {
     await _storage.writeThemeProfilePreference(value);
     state = resolveAppThemeState(
       themePreference: state.themePreference,

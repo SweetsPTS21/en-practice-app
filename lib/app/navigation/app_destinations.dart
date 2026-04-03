@@ -95,7 +95,15 @@ const appSecondaryDestinations = <AppDestination>[
 ];
 
 AppDestination resolveDestination(String location) {
-  for (final destination in [...appPrimaryDestinations, ...appSecondaryDestinations]) {
+  if (location == '/custom-speaking' ||
+      location.startsWith('/custom-speaking/')) {
+    return speakingDestination;
+  }
+
+  for (final destination in [
+    ...appPrimaryDestinations,
+    ...appSecondaryDestinations,
+  ]) {
     if (destination.route == '/') {
       if (location == '/') {
         return destination;
@@ -103,7 +111,8 @@ AppDestination resolveDestination(String location) {
       continue;
     }
 
-    if (location == destination.route || location.startsWith('${destination.route}/')) {
+    if (location == destination.route ||
+        location.startsWith('${destination.route}/')) {
       return destination;
     }
   }

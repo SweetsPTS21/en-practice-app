@@ -11,21 +11,20 @@ final learningLaunchStoreProvider = Provider<LearningLaunchStore>((ref) {
   return LearningLaunchStore(preferences);
 });
 
-final learningAnalyticsServiceProvider = Provider<LearningAnalyticsService>((ref) {
+final learningAnalyticsServiceProvider = Provider<LearningAnalyticsService>((
+  ref,
+) {
   final client = ref.watch(apiClientProvider);
   final launchStore = ref.watch(learningLaunchStoreProvider);
-  return LearningAnalyticsService(
-    client: client,
-    launchStore: launchStore,
-  );
+  return LearningAnalyticsService(client: client, launchStore: launchStore);
 });
 
 final learningJourneyActionServiceProvider =
     Provider<LearningJourneyActionService>((ref) {
-  final analyticsService = ref.watch(learningAnalyticsServiceProvider);
-  final launchStore = ref.watch(learningLaunchStoreProvider);
-  return LearningJourneyActionService(
-    analyticsService: analyticsService,
-    launchStore: launchStore,
-  );
-});
+      final analyticsService = ref.watch(learningAnalyticsServiceProvider);
+      final launchStore = ref.watch(learningLaunchStoreProvider);
+      return LearningJourneyActionService(
+        analyticsService: analyticsService,
+        launchStore: launchStore,
+      );
+    });

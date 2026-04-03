@@ -12,9 +12,5 @@ Map<String, dynamic> jsonMap(
     return value.map((key, data) => MapEntry(key.toString(), data));
   }
 
-  throw ApiError(
-    message: fallbackMessage,
-    status: 500,
-    data: value,
-  );
+  throw ApiError(message: fallbackMessage, status: 500, data: value);
 }

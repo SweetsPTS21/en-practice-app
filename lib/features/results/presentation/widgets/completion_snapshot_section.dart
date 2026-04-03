@@ -20,7 +20,8 @@ class CompletionSnapshotSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final progress = snapshot.todayGoalProgress?.progressPercent?.clamp(0, 100) ?? 0;
+    final progress =
+        snapshot.todayGoalProgress?.progressPercent?.clamp(0, 100) ?? 0;
     final primaryScoreDisplay = snapshot.primaryScoreDisplay;
     final nextAction = snapshot.nextAction;
     final secondaryAction = snapshot.secondaryAction;
@@ -41,16 +42,16 @@ class CompletionSnapshotSection extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   snapshot.primaryScoreLabel ?? 'Score',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: tokens.text.secondary,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   primaryScoreDisplay ?? '',
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        color: tokens.primary,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.displaySmall?.copyWith(color: tokens.primary),
                 ),
               ],
               const SizedBox(height: 14),
@@ -64,14 +65,8 @@ class CompletionSnapshotSection extends StatelessWidget {
                       color: tokens.secondary,
                     ),
                   if (snapshot.streakKept == true)
-                    _BadgeChip(
-                      label: 'Streak kept',
-                      color: tokens.warning,
-                    ),
-                  _BadgeChip(
-                    label: snapshot.module,
-                    color: tokens.primary,
-                  ),
+                    _BadgeChip(label: 'Streak kept', color: tokens.warning),
+                  _BadgeChip(label: snapshot.module, color: tokens.primary),
                 ],
               ),
             ],
@@ -87,7 +82,10 @@ class CompletionSnapshotSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('What moved', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'What moved',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 14),
                 ...snapshot.deltas.map(
                   (delta) => Padding(
@@ -98,7 +96,8 @@ class CompletionSnapshotSection extends StatelessWidget {
                         const SizedBox(width: 12),
                         Text(
                           delta.displayValue ?? delta.value?.toString() ?? '-',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
                                 color: delta.positive == false
                                     ? tokens.danger
                                     : tokens.success,
@@ -118,7 +117,10 @@ class CompletionSnapshotSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Keep improving', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Keep improving',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 14),
                 ...snapshot.improvements.map(
                   (item) => Padding(
@@ -134,7 +136,10 @@ class CompletionSnapshotSection extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(item.title, style: Theme.of(context).textTheme.titleSmall),
+                          Text(
+                            item.title,
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
                           if ((item.description ?? '').isNotEmpty) ...[
                             const SizedBox(height: 6),
                             Text(item.description ?? ''),
@@ -143,9 +148,8 @@ class CompletionSnapshotSection extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               item.highlight ?? '',
-                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: tokens.primary,
-                                  ),
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(color: tokens.primary),
                             ),
                           ],
                         ],
@@ -163,7 +167,10 @@ class CompletionSnapshotSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Today goal', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Today goal',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   snapshot.todayGoalProgress?.label ??
@@ -204,10 +211,7 @@ class CompletionSnapshotSection extends StatelessWidget {
 }
 
 class _BadgeChip extends StatelessWidget {
-  const _BadgeChip({
-    required this.label,
-    required this.color,
-  });
+  const _BadgeChip({required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -222,18 +226,14 @@ class _BadgeChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: color,
-            ),
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(color: color),
       ),
     );
   }
 }
 
 class _ScoreSummaryList extends StatelessWidget {
-  const _ScoreSummaryList({
-    required this.items,
-  });
+  const _ScoreSummaryList({required this.items});
 
   final List<CompletionScoreSummary> items;
 
@@ -245,8 +245,9 @@ class _ScoreSummaryList extends StatelessWidget {
 
     for (var index = 0; index < items.length; index += useTwoColumns ? 2 : 1) {
       final first = items[index];
-      final second =
-          useTwoColumns && index + 1 < items.length ? items[index + 1] : null;
+      final second = useTwoColumns && index + 1 < items.length
+          ? items[index + 1]
+          : null;
 
       children.add(
         Row(
@@ -266,7 +267,10 @@ class _ScoreSummaryList extends StatelessWidget {
                     ? const SizedBox.shrink()
                     : CompletionMetricCard(
                         label: second.label,
-                        value: second.displayValue ?? second.value?.toString() ?? '-',
+                        value:
+                            second.displayValue ??
+                            second.value?.toString() ??
+                            '-',
                         caption: second.description,
                       ),
               ),
@@ -280,8 +284,6 @@ class _ScoreSummaryList extends StatelessWidget {
       }
     }
 
-    return Column(
-      children: children,
-    );
+    return Column(children: children);
   }
 }

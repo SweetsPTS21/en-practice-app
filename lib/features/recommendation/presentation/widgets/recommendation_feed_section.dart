@@ -37,20 +37,20 @@ class RecommendationFeedSection extends ConsumerWidget {
           Text(
             subtitle,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: context.tokens.text.secondary,
-                ),
+              color: context.tokens.text.secondary,
+            ),
           ),
           const SizedBox(height: 16),
           switch (feed) {
             AsyncLoading() => const SizedBox(
-                height: 180,
-                child: Center(child: CircularProgressIndicator()),
-              ),
+              height: 180,
+              child: Center(child: CircularProgressIndicator()),
+            ),
             AsyncData(:final value) => _FeedItems(
-                items: _extractItems(value, maxItems),
-                surface: surface,
-                source: source,
-              ),
+              items: _extractItems(value, maxItems),
+              surface: surface,
+              source: source,
+            ),
             _ => const Text('No recommendations right now.'),
           },
         ],
@@ -58,7 +58,10 @@ class RecommendationFeedSection extends ConsumerWidget {
     );
   }
 
-  List<RecommendationCardModel> _extractItems(RecommendationFeed? feed, int maxItems) {
+  List<RecommendationCardModel> _extractItems(
+    RecommendationFeed? feed,
+    int maxItems,
+  ) {
     if (feed == null) {
       return const <RecommendationCardModel>[];
     }
@@ -66,8 +69,8 @@ class RecommendationFeedSection extends ConsumerWidget {
     final items = feed.items.isNotEmpty
         ? feed.items
         : feed.primary == null
-            ? const <RecommendationCardModel>[]
-            : <RecommendationCardModel>[feed.primary!];
+        ? const <RecommendationCardModel>[]
+        : <RecommendationCardModel>[feed.primary!];
 
     return items.take(maxItems).toList(growable: false);
   }

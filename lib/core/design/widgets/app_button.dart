@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum AppButtonVariant {
-  filled,
-  tonal,
-  outline,
-}
+enum AppButtonVariant { filled, tonal, outline }
 
 class AppButton extends StatelessWidget {
   const AppButton({
@@ -25,10 +21,7 @@ class AppButton extends StatelessWidget {
     switch (variant) {
       case AppButtonVariant.filled:
         return icon == null
-            ? FilledButton(
-                onPressed: onPressed,
-                child: Text(label),
-              )
+            ? FilledButton(onPressed: onPressed, child: Text(label))
             : FilledButton.icon(
                 onPressed: onPressed,
                 icon: Icon(icon),
@@ -36,10 +29,7 @@ class AppButton extends StatelessWidget {
               );
       case AppButtonVariant.tonal:
         return icon == null
-            ? FilledButton.tonal(
-                onPressed: onPressed,
-                child: Text(label),
-              )
+            ? FilledButton.tonal(onPressed: onPressed, child: Text(label))
             : FilledButton.tonalIcon(
                 onPressed: onPressed,
                 icon: Icon(icon),
@@ -47,10 +37,7 @@ class AppButton extends StatelessWidget {
               );
       case AppButtonVariant.outline:
         return icon == null
-            ? OutlinedButton(
-                onPressed: onPressed,
-                child: Text(label),
-              )
+            ? OutlinedButton(onPressed: onPressed, child: Text(label))
             : OutlinedButton.icon(
                 onPressed: onPressed,
                 icon: Icon(icon),

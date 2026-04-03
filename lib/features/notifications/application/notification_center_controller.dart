@@ -8,9 +8,7 @@ import '../../../core/notifications/notification_models.dart';
 import '../../../core/notifications/notification_providers.dart';
 
 class NotificationCenterController extends ChangeNotifier {
-  NotificationCenterController({
-    required this.ref,
-  }) {
+  NotificationCenterController({required this.ref}) {
     load();
   }
 
@@ -32,9 +30,9 @@ class NotificationCenterController extends ChangeNotifier {
       ref
           .read(notificationRealtimeClientProvider)
           .acknowledgeLatestNotification(items.isEmpty ? null : items.first.id);
-      await ref.read(notificationRealtimeClientProvider).syncUnreadCount(
-            items.where((item) => !item.isRead).length,
-          );
+      await ref
+          .read(notificationRealtimeClientProvider)
+          .syncUnreadCount(items.where((item) => !item.isRead).length);
     } catch (error) {
       errorMessage = error.toString();
     } finally {
@@ -54,9 +52,9 @@ class NotificationCenterController extends ChangeNotifier {
     try {
       await ref.read(notificationApiProvider).markAsRead(item.id);
     } finally {
-      await ref.read(notificationRealtimeClientProvider).syncUnreadCount(
-            items.where((entry) => !entry.isRead).length,
-          );
+      await ref
+          .read(notificationRealtimeClientProvider)
+          .syncUnreadCount(items.where((entry) => !entry.isRead).length);
     }
   }
 
@@ -82,9 +80,9 @@ class NotificationCenterController extends ChangeNotifier {
 
     try {
       await ref.read(notificationApiProvider).deleteNotification(item.id);
-      await ref.read(notificationRealtimeClientProvider).syncUnreadCount(
-            items.where((entry) => !entry.isRead).length,
-          );
+      await ref
+          .read(notificationRealtimeClientProvider)
+          .syncUnreadCount(items.where((entry) => !entry.isRead).length);
     } catch (_) {
       items = previous;
       notifyListeners();
@@ -93,7 +91,9 @@ class NotificationCenterController extends ChangeNotifier {
 
   Future<JourneyActionOutcome> openNotification(NotificationItem item) async {
     await markAsRead(item);
-    return ref.read(learningJourneyActionServiceProvider).prepareAction(
+    return ref
+        .read(learningJourneyActionServiceProvider)
+        .prepareAction(
           JourneyActionRequest(
             source: 'NOTIFICATION_CENTER',
             analyticsEvents: const [
@@ -150,5 +150,5 @@ class NotificationCenterController extends ChangeNotifier {
 
 final notificationCenterControllerProvider =
     ChangeNotifierProvider.autoDispose<NotificationCenterController>((ref) {
-  return NotificationCenterController(ref: ref);
-});
+      return NotificationCenterController(ref: ref);
+    });

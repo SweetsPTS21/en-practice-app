@@ -22,7 +22,9 @@ class AppThemeStorage {
   final SharedPreferences _preferences;
 
   AppThemePreference readThemePreference() {
-    return parseThemePreference(_preferences.getString(appThemePreferenceStorageKey));
+    return parseThemePreference(
+      _preferences.getString(appThemePreferenceStorageKey),
+    );
   }
 
   AppThemeBackgroundPreference readThemeBackgroundPreference() {
@@ -32,7 +34,9 @@ class AppThemeStorage {
   }
 
   AppThemeProfilePreference readThemeProfilePreference() {
-    return parseThemeProfilePreference(_preferences.getString(appThemeProfileStorageKey));
+    return parseThemeProfilePreference(
+      _preferences.getString(appThemeProfileStorageKey),
+    );
   }
 
   AppThemeSolidPrimaryPreference readThemeSolidPrimaryPreference() {
@@ -51,7 +55,9 @@ class AppThemeStorage {
     await _preferences.setString(appThemeBackgroundStorageKey, value.name);
   }
 
-  Future<void> writeThemeProfilePreference(AppThemeProfilePreference value) async {
+  Future<void> writeThemeProfilePreference(
+    AppThemeProfilePreference value,
+  ) async {
     await _preferences.setString(appThemeProfileStorageKey, value.name);
   }
 

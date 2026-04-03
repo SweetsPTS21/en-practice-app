@@ -19,29 +19,29 @@ class WeeklyChallengeScreenState {
 
 final weeklyChallengeScreenControllerProvider =
     FutureProvider.autoDispose<WeeklyChallengeScreenState>((ref) async {
-  final challengeApi = ref.watch(weeklyChallengeApiProvider);
-  final achievementApi = ref.watch(achievementApiProvider);
-  final weeklyReportApi = ref.watch(weeklyReportApiProvider);
+      final challengeApi = ref.watch(weeklyChallengeApiProvider);
+      final achievementApi = ref.watch(achievementApiProvider);
+      final weeklyReportApi = ref.watch(weeklyReportApiProvider);
 
-  WeeklyChallenge? challenge;
-  WeeklyReport? report;
-  List<Achievement> achievements = const <Achievement>[];
+      WeeklyChallenge? challenge;
+      WeeklyReport? report;
+      List<Achievement> achievements = const <Achievement>[];
 
-  try {
-    challenge = await challengeApi.getCurrentWeekly();
-  } catch (_) {}
+      try {
+        challenge = await challengeApi.getCurrentWeekly();
+      } catch (_) {}
 
-  try {
-    achievements = sortAchievements(await achievementApi.getAchievements());
-  } catch (_) {}
+      try {
+        achievements = sortAchievements(await achievementApi.getAchievements());
+      } catch (_) {}
 
-  try {
-    report = await weeklyReportApi.getLatest();
-  } catch (_) {}
+      try {
+        report = await weeklyReportApi.getLatest();
+      } catch (_) {}
 
-  return WeeklyChallengeScreenState(
-    challenge: challenge,
-    achievements: achievements,
-    report: report,
-  );
-});
+      return WeeklyChallengeScreenState(
+        challenge: challenge,
+        achievements: achievements,
+        report: report,
+      );
+    });

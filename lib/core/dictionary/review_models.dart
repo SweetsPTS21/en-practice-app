@@ -1,10 +1,4 @@
-enum ReviewFilter {
-  all,
-  today,
-  week,
-  month,
-  wrong,
-}
+enum ReviewFilter { all, today, week, month, wrong }
 
 class ReviewWord {
   const ReviewWord({
@@ -29,16 +23,22 @@ class ReviewWord {
 
   factory ReviewWord.fromJson(Map<String, dynamic> json) {
     return ReviewWord(
-      id: json['id']?.toString() ??
+      id:
+          json['id']?.toString() ??
           json['wordId']?.toString() ??
           json['reviewableId']?.toString() ??
           json['englishWord']?.toString() ??
           '',
       word: json['word']?.toString() ?? json['englishWord']?.toString() ?? '',
-      meaning: json['meaning']?.toString() ?? json['correctMeaning']?.toString() ?? '',
+      meaning:
+          json['meaning']?.toString() ??
+          json['correctMeaning']?.toString() ??
+          '',
       alternatives: _strings(json['alternatives']),
       examples: _strings(json['examples']),
-      wordType: (json['wordType'] ?? json['partOfSpeech'] ?? '').toString().toUpperCase(),
+      wordType: (json['wordType'] ?? json['partOfSpeech'] ?? '')
+          .toString()
+          .toUpperCase(),
       ipa: json['ipa']?.toString() ?? json['phonetic']?.toString() ?? '',
       explanation: json['explanation']?.toString() ?? '',
     );
@@ -72,18 +72,15 @@ class ReviewCounts {
 }
 
 class ReviewWordResult {
-  const ReviewWordResult({
-    required this.englishWord,
-    required this.isCorrect,
-  });
+  const ReviewWordResult({required this.englishWord, required this.isCorrect});
 
   final String englishWord;
   final bool isCorrect;
 
   Map<String, dynamic> toJson() => {
-        'englishWord': englishWord,
-        'isCorrect': isCorrect,
-      };
+    'englishWord': englishWord,
+    'isCorrect': isCorrect,
+  };
 }
 
 class ReviewSessionPayload {
@@ -104,13 +101,13 @@ class ReviewSessionPayload {
   final List<ReviewWordResult> words;
 
   Map<String, dynamic> toJson() => {
-        'filter': filter.name,
-        'total': total,
-        'correct': correct,
-        'incorrect': incorrect,
-        'accuracy': accuracy,
-        'words': words.map((item) => item.toJson()).toList(growable: false),
-      };
+    'filter': filter.name,
+    'total': total,
+    'correct': correct,
+    'incorrect': incorrect,
+    'accuracy': accuracy,
+    'words': words.map((item) => item.toJson()).toList(growable: false),
+  };
 }
 
 class ReviewSessionSummary {

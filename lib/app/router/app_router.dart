@@ -27,14 +27,26 @@ import '../../features/results/data/result_snapshot_request.dart';
 import '../../features/results/presentation/result_journey_page.dart';
 import '../../features/settings/settings_page.dart';
 import '../../features/shared/route_placeholder_page.dart';
+import '../../features/custom_speaking/presentation/custom_speaking_chat_page.dart';
+import '../../features/custom_speaking/presentation/custom_speaking_history_page.dart';
+import '../../features/custom_speaking/presentation/custom_speaking_page.dart';
 import '../../features/speaking/speaking_page.dart';
+import '../../features/speaking/presentation/speaking_history_page.dart';
+import '../../features/speaking/presentation/speaking_practice_page.dart';
+import '../../features/speaking_conversation/presentation/speaking_conversation_history_page.dart';
+import '../../features/speaking_conversation/presentation/speaking_conversation_page.dart';
+import '../../features/speaking_conversation/presentation/speaking_conversation_result_page.dart';
 import '../../features/theme_preview/theme_preview_page.dart';
 import '../../features/vocabulary_check/presentation/vocabulary_check_page.dart';
 import '../../features/vocabulary_test/presentation/vocabulary_test_attempt_page.dart';
 import '../../features/vocabulary_test/presentation/vocabulary_test_history_page.dart';
 import '../../features/vocabulary_test/presentation/vocabulary_test_list_page.dart';
 import '../../features/vocabulary_test/presentation/vocabulary_test_preview_page.dart';
+import '../../features/writing/presentation/writing_history_page.dart';
+import '../../features/writing/presentation/writing_task_detail_page.dart';
+import '../../features/writing/presentation/writing_task_page.dart';
 import '../../features/writing/writing_page.dart';
+import '../../core/custom_speaking/custom_speaking_models.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authControllerProvider);
@@ -73,9 +85,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
         return Uri(
           path: '/login',
-          queryParameters: <String, String>{
-            'redirect': redirectTarget,
-          },
+          queryParameters: <String, String>{'redirect': redirectTarget},
         ).toString();
       }
 
@@ -97,26 +107,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(
         path: '/auth-loading',
         builder: (context, state) => const AuthLoadingPage(),
       ),
       ShellRoute(
         builder: (context, state, child) {
-          return AppShell(
-            location: state.uri.path,
-            child: child,
-          );
+          return AppShell(location: state.uri.path, child: child);
         },
         routes: [
-          GoRoute(
-            path: '/home',
-            builder: (context, state) => const HomePage(),
-          ),
+          GoRoute(path: '/home', builder: (context, state) => const HomePage()),
           GoRoute(
             path: '/dictionary',
             builder: (context, state) => const DictionaryPage(),
@@ -131,9 +132,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'review',
                 builder: (context, state) {
                   final filterName =
-                      state.uri.queryParameters['filter']?.toLowerCase().trim() ?? 'all';
+                      state.uri.queryParameters['filter']
+                          ?.toLowerCase()
+                          .trim() ??
+                      'all';
                   final parsedLimit =
-                      int.tryParse(state.uri.queryParameters['limit'] ?? '') ?? 20;
+                      int.tryParse(state.uri.queryParameters['limit'] ?? '') ??
+                      20;
                   final reviewFilter = switch (filterName) {
                     'today' => ReviewFilter.today,
                     'week' => ReviewFilter.week,
@@ -148,7 +153,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   );
                 },
                 redirect: (context, state) {
-                  final normalized = normalizeInternalRoute(state.uri.toString());
+                  final normalized = normalizeInternalRoute(
+                    state.uri.toString(),
+                  );
                   final href = normalized?.href ?? state.uri.toString();
                   return href == state.uri.toString() ? null : href;
                 },
@@ -161,7 +168,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         referenceId: state.pathParameters['sessionId'] ?? '',
                       ),
                       title: 'Dictionary Review Result',
-                      subtitle: 'Review your latest dictionary session and choose the next step.',
+                      subtitle:
+                          'Review your latest dictionary session and choose the next step.',
                       paletteKey: AppPagePaletteKey.dictionary,
                     ),
                   ),
@@ -242,36 +250,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: 'history',
-                builder: (context, state) => const RoutePlaceholderPage(
-                  title: 'Writing History',
-                  subtitle: 'Review previous writing drafts and submissions.',
-                  paletteKey: AppPagePaletteKey.writing,
-                  highlights: [
-                    'List of recent drafts and submissions.',
-                    'Quick access to continue previous work.',
-                  ],
-                ),
+                builder: (context, state) => const WritingHistoryPage(),
               ),
               GoRoute(
                 path: 'task/:taskId',
-                builder: (context, state) => const RoutePlaceholderPage(
-                  title: 'Writing Task',
-                  subtitle: 'Read the prompt and prepare before you start.',
-                  paletteKey: AppPagePaletteKey.writing,
-                  highlights: [
-                    'Task instructions and brief details.',
-                    'Preparation step before the writing session.',
-                  ],
+                builder: (context, state) => WritingTaskDetailPage(
+                  taskId: state.pathParameters['taskId'] ?? '',
                 ),
                 routes: [
                   GoRoute(
                     path: 'take',
-                    builder: (context, state) => LearningSessionPlaceholderPage(
-                      title: 'Writing Session',
-                      subtitle: 'Continue your writing task.',
-                      route: state.uri.toString(),
-                      module: 'WRITING',
-                      paletteKey: AppPagePaletteKey.writing,
+                    builder: (context, state) => WritingTaskPage(
+                      taskId: state.pathParameters['taskId'] ?? '',
                     ),
                   ),
                 ],
@@ -292,16 +282,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/speaking',
-            builder: (context, state) => const SpeakingPage(),
+            builder: (context, state) =>
+                SpeakingPage(mode: state.uri.queryParameters['mode']),
             routes: [
               GoRoute(
                 path: 'practice/:id',
-                builder: (context, state) => LearningSessionPlaceholderPage(
-                  title: 'Speaking Practice',
-                  subtitle: 'Continue your speaking practice.',
-                  route: state.uri.toString(),
-                  module: 'SPEAKING',
-                  paletteKey: AppPagePaletteKey.speaking,
+                builder: (context, state) => SpeakingPracticePage(
+                  topicId: state.pathParameters['id'] ?? '',
                 ),
               ),
               GoRoute(
@@ -312,68 +299,47 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     referenceId: state.pathParameters['id'] ?? '',
                   ),
                   title: 'Speaking Result',
-                  subtitle: 'Review your speaking result and decide what to do next.',
+                  subtitle:
+                      'Review your speaking result and decide what to do next.',
                   paletteKey: AppPagePaletteKey.speaking,
                 ),
               ),
               GoRoute(
                 path: 'history',
-                builder: (context, state) => const RoutePlaceholderPage(
-                  title: 'Speaking History',
-                  subtitle: 'Review your recent speaking attempts.',
-                  paletteKey: AppPagePaletteKey.speaking,
-                  highlights: [
-                    'Recent attempts with quick re-entry.',
-                    'Easy access to past speaking practice.',
-                  ],
+                builder: (context, state) => const SpeakingHistoryPage(),
+              ),
+              GoRoute(
+                path: 'conversation/history',
+                builder: (context, state) =>
+                    const SpeakingConversationHistoryPage(),
+              ),
+              GoRoute(
+                path: 'conversation/result/:id',
+                builder: (context, state) => SpeakingConversationResultPage(
+                  conversationId: state.pathParameters['id'] ?? '',
                 ),
               ),
               GoRoute(
                 path: 'conversation/:topicId',
-                builder: (context, state) => const RoutePlaceholderPage(
-                  title: 'Speaking Conversation',
-                  subtitle: 'Set up the conversation before you begin.',
-                  paletteKey: AppPagePaletteKey.speaking,
-                  highlights: [
-                    'Conversation topic and setup details.',
-                    'Entry point before the guided speaking flow.',
-                  ],
-                ),
-              ),
-              GoRoute(
-                path: 'conversation/result/:id',
-                builder: (context, state) => const RoutePlaceholderPage(
-                  title: 'Speaking Conversation Result',
-                  subtitle: 'Review the result of this conversation practice.',
-                  paletteKey: AppPagePaletteKey.speaking,
-                  highlights: [
-                    'Summary of the conversation result.',
-                    'Reflection and next-step actions.',
-                  ],
+                builder: (context, state) => SpeakingConversationPage(
+                  topicId: state.pathParameters['topicId'] ?? '',
                 ),
               ),
             ],
           ),
           GoRoute(
             path: '/custom-speaking',
-            builder: (context, state) => const RoutePlaceholderPage(
-              title: 'Custom Speaking',
-              subtitle: 'Build a custom speaking practice flow.',
-              paletteKey: AppPagePaletteKey.speaking,
-              highlights: [
-                'Start a personalized conversation session.',
-                'Choose the setup that matches your practice goal.',
-              ],
-            ),
+            builder: (context, state) => const CustomSpeakingPage(),
             routes: [
               GoRoute(
+                path: 'history',
+                builder: (context, state) => const CustomSpeakingHistoryPage(),
+              ),
+              GoRoute(
                 path: 'conversation/:id',
-                builder: (context, state) => LearningSessionPlaceholderPage(
-                  title: 'Custom Speaking Session',
-                  subtitle: 'Continue your custom speaking session.',
-                  route: state.uri.toString(),
-                  module: 'CUSTOM_SPEAKING',
-                  paletteKey: AppPagePaletteKey.speaking,
+                builder: (context, state) => CustomSpeakingChatPage(
+                  conversationId: state.pathParameters['id'] ?? '',
+                  bootstrap: state.extra as CustomSpeakingStep?,
                 ),
               ),
               GoRoute(
@@ -384,7 +350,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     referenceId: state.pathParameters['id'] ?? '',
                   ),
                   title: 'Custom Speaking Result',
-                  subtitle: 'Review your custom speaking result and continue practicing.',
+                  subtitle:
+                      'Review your custom speaking result and continue practicing.',
                   paletteKey: AppPagePaletteKey.speaking,
                 ),
               ),
@@ -426,11 +393,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
     errorBuilder: (context, state) {
-      return const Scaffold(
-        body: Center(
-          child: Text('Page not found'),
-        ),
-      );
+      return const Scaffold(body: Center(child: Text('Page not found')));
     },
   );
 });

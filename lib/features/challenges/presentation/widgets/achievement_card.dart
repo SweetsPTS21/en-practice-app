@@ -5,10 +5,7 @@ import '../../../../core/retention/achievement_models.dart';
 import '../../../../core/theme/theme_extensions.dart';
 
 class AchievementCard extends StatelessWidget {
-  const AchievementCard({
-    super.key,
-    required this.achievement,
-  });
+  const AchievementCard({super.key, required this.achievement});
 
   final Achievement achievement;
 
@@ -29,8 +26,12 @@ class AchievementCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(tokens.radius.lg),
             ),
             child: Icon(
-              achievement.unlocked ? Icons.workspace_premium_rounded : Icons.lock_outline_rounded,
-              color: achievement.unlocked ? tokens.warning : tokens.text.secondary,
+              achievement.unlocked
+                  ? Icons.workspace_premium_rounded
+                  : Icons.lock_outline_rounded,
+              color: achievement.unlocked
+                  ? tokens.warning
+                  : tokens.text.secondary,
             ),
           ),
           const SizedBox(width: 12),
@@ -38,13 +39,16 @@ class AchievementCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(achievement.title, style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  achievement.title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 6),
                 Text(
                   achievement.description,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: tokens.text.secondary,
-                      ),
+                    color: tokens.text.secondary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -52,8 +56,10 @@ class AchievementCard extends StatelessWidget {
                       ? _formatDateTime(achievement.unlockedAt)
                       : 'Locked',
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: achievement.unlocked ? tokens.warning : tokens.text.secondary,
-                      ),
+                    color: achievement.unlocked
+                        ? tokens.warning
+                        : tokens.text.secondary,
+                  ),
                 ),
               ],
             ),

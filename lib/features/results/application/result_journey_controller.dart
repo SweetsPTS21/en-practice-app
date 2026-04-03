@@ -11,14 +11,15 @@ final completionSnapshotApiProvider = Provider<CompletionSnapshotApi>((ref) {
   return CompletionSnapshotApi(client);
 });
 
-final resultJourneyRepositoryProvider = Provider<ResultJourneyRepository>((ref) {
+final resultJourneyRepositoryProvider = Provider<ResultJourneyRepository>((
+  ref,
+) {
   final api = ref.watch(completionSnapshotApiProvider);
   return ResultJourneyRepository(api);
 });
 
-final resultJourneyControllerProvider =
-    FutureProvider.autoDispose
-        .family<CompletionSnapshot, ResultSnapshotRequest>((ref, request) async {
-  final repository = ref.watch(resultJourneyRepositoryProvider);
-  return repository.loadSnapshot(request);
-});
+final resultJourneyControllerProvider = FutureProvider.autoDispose
+    .family<CompletionSnapshot, ResultSnapshotRequest>((ref, request) async {
+      final repository = ref.watch(resultJourneyRepositoryProvider);
+      return repository.loadSnapshot(request);
+    });

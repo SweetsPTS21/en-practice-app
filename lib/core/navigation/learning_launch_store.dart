@@ -35,10 +35,7 @@ class LearningLaunchContext {
   final DateTime launchedAt;
   final DateTime? startedAt;
 
-  LearningLaunchContext copyWith({
-    bool? started,
-    DateTime? startedAt,
-  }) {
+  LearningLaunchContext copyWith({bool? started, DateTime? startedAt}) {
     return LearningLaunchContext(
       source: source,
       module: module,
@@ -102,7 +99,8 @@ class LearningLaunchContext {
             )
           : null,
       started: json['started'] == true,
-      launchedAt: DateTime.tryParse(json['launchedAt']?.toString() ?? '') ??
+      launchedAt:
+          DateTime.tryParse(json['launchedAt']?.toString() ?? '') ??
           DateTime.now(),
       startedAt: DateTime.tryParse(json['startedAt']?.toString() ?? ''),
     );
@@ -145,7 +143,8 @@ class RecentLearningFeedback {
 
   factory RecentLearningFeedback.fromJson(Map<String, dynamic> json) {
     return RecentLearningFeedback(
-      timestamp: DateTime.tryParse(json['timestamp']?.toString() ?? '') ??
+      timestamp:
+          DateTime.tryParse(json['timestamp']?.toString() ?? '') ??
           DateTime.now(),
       taskTitle: json['taskTitle']?.toString(),
       taskId: json['taskId']?.toString(),
@@ -176,10 +175,7 @@ class LearningLaunchStore {
   static const recentFeedbackKey = 'en_practice_recent_learning_feedback';
 
   Future<void> rememberLearningLaunch(LearningLaunchContext context) async {
-    final value = context.copyWith(
-      started: false,
-      startedAt: null,
-    );
+    final value = context.copyWith(started: false, startedAt: null);
     await _writeJson(pendingLaunchKey, value.toJson());
   }
 
@@ -199,14 +195,13 @@ class LearningLaunchStore {
     bool Function(String? routeA, String? routeB) routeMatcher,
   ) async {
     final current = getPendingLearningLaunch();
-    if (current == null || current.started || !routeMatcher(current.route, route)) {
+    if (current == null ||
+        current.started ||
+        !routeMatcher(current.route, route)) {
       return null;
     }
 
-    final next = current.copyWith(
-      started: true,
-      startedAt: DateTime.now(),
-    );
+    final next = current.copyWith(started: true, startedAt: DateTime.now());
     await _writeJson(pendingLaunchKey, next.toJson());
     return next;
   }
@@ -232,8 +227,8 @@ class LearningLaunchStore {
     final completionState = _readJsonMap(dailyTaskCompletionKey);
     final currentIds = (completionState[key] is List)
         ? (completionState[key] as List<Object?>)
-            .map((value) => value.toString())
-            .toList()
+              .map((value) => value.toString())
+              .toList()
         : <String>[];
 
     if (currentIds.contains(taskId)) {
@@ -282,10 +277,7 @@ class LearningLaunchStore {
     return feedback;
   }
 
-  T? _readJson<T>(
-    String key,
-    T Function(Map<String, dynamic> json) factory,
-  ) {
+  T? _readJson<T>(String key, T Function(Map<String, dynamic> json) factory) {
     final raw = _preferences.getString(key);
     if (raw == null || raw.isEmpty) {
       return null;

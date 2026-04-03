@@ -5,10 +5,9 @@ import '../network/json_helpers.dart';
 import 'vocabulary_check_models.dart';
 
 class VocabularyCheckService {
-  VocabularyCheckService({
-    required Dio client,
-  })  : _client = client,
-        _translateClient = Dio();
+  VocabularyCheckService({required Dio client})
+    : _client = client,
+      _translateClient = Dio();
 
   final Dio _client;
   final Dio _translateClient;
@@ -34,14 +33,18 @@ class VocabularyCheckService {
     final normalizedUser = _normalizeMeaning(vietnameseMeaning);
     final normalizedCorrect = _normalizeMeaning(payload.translation);
     final alternatives = payload.alternatives;
-    final isCorrect = normalizedUser.isNotEmpty &&
+    final isCorrect =
+        normalizedUser.isNotEmpty &&
         (normalizedUser == normalizedCorrect ||
-            alternatives.any((value) => _normalizeMeaning(value) == normalizedUser) ||
+            alternatives.any(
+              (value) => _normalizeMeaning(value) == normalizedUser,
+            ) ||
             normalizedCorrect.contains(normalizedUser) ||
             normalizedUser.contains(normalizedCorrect) ||
             alternatives.any((value) {
               final normalized = _normalizeMeaning(value);
-              return normalized.contains(normalizedUser) || normalizedUser.contains(normalized);
+              return normalized.contains(normalizedUser) ||
+                  normalizedUser.contains(normalized);
             }));
 
     return VocabularyMeaningCheckResult(
@@ -61,7 +64,8 @@ class VocabularyCheckService {
       final data = jsonMap(response.data);
       return VocabularyWordExplanation(
         word: data['word']?.toString() ?? word.trim(),
-        meaning: data['meaning']?.toString() ?? data['definition']?.toString() ?? '',
+        meaning:
+            data['meaning']?.toString() ?? data['definition']?.toString() ?? '',
         ipa: data['ipa']?.toString(),
         wordType: data['wordType']?.toString(),
         sourceType: data['sourceType']?.toString() ?? 'OPEN_CLAW',
@@ -135,7 +139,9 @@ class VocabularyCheckService {
         continue;
       }
       for (final synonymGroup in group[1] as List) {
-        if (synonymGroup is! List || synonymGroup.isEmpty || synonymGroup.first is! List) {
+        if (synonymGroup is! List ||
+            synonymGroup.isEmpty ||
+            synonymGroup.first is! List) {
           continue;
         }
         for (final synonym in synonymGroup.first as List) {

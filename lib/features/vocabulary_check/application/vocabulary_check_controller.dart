@@ -48,21 +48,27 @@ class VocabularyCheckState {
       validation: identical(validation, _sentinel)
           ? this.validation
           : validation as VocabularyWordValidation?,
-      result: identical(result, _sentinel) ? this.result : result as VocabularyMeaningCheckResult?,
+      result: identical(result, _sentinel)
+          ? this.result
+          : result as VocabularyMeaningCheckResult?,
       explanation: identical(explanation, _sentinel)
           ? this.explanation
           : explanation as VocabularyWordExplanation?,
-      savedWord: identical(savedWord, _sentinel) ? this.savedWord : savedWord as DictionaryWord?,
+      savedWord: identical(savedWord, _sentinel)
+          ? this.savedWord
+          : savedWord as DictionaryWord?,
       isValidating: isValidating ?? this.isValidating,
       isChecking: isChecking ?? this.isChecking,
       isExplaining: isExplaining ?? this.isExplaining,
-      errorMessage:
-          identical(errorMessage, _sentinel) ? this.errorMessage : errorMessage as String?,
+      errorMessage: identical(errorMessage, _sentinel)
+          ? this.errorMessage
+          : errorMessage as String?,
     );
   }
 }
 
-class VocabularyCheckController extends AutoDisposeNotifier<VocabularyCheckState> {
+class VocabularyCheckController
+    extends AutoDisposeNotifier<VocabularyCheckState> {
   @override
   VocabularyCheckState build() => const VocabularyCheckState();
 
@@ -76,10 +82,7 @@ class VocabularyCheckController extends AutoDisposeNotifier<VocabularyCheckState
   }
 
   void updateVietnameseMeaning(String value) {
-    state = state.copyWith(
-      vietnameseMeaning: value,
-      errorMessage: null,
-    );
+    state = state.copyWith(vietnameseMeaning: value, errorMessage: null);
   }
 
   Future<void> validateWord() async {
@@ -89,10 +92,16 @@ class VocabularyCheckController extends AutoDisposeNotifier<VocabularyCheckState
       return;
     }
 
-    state = state.copyWith(isValidating: true, errorMessage: null, validation: null, result: null);
+    state = state.copyWith(
+      isValidating: true,
+      errorMessage: null,
+      validation: null,
+      result: null,
+    );
     try {
-      final validation =
-          await ref.read(vocabularyCheckServiceProvider).validateEnglishWord(word);
+      final validation = await ref
+          .read(vocabularyCheckServiceProvider)
+          .validateEnglishWord(word);
       state = state.copyWith(isValidating: false, validation: validation);
     } catch (error) {
       state = state.copyWith(
@@ -106,16 +115,17 @@ class VocabularyCheckController extends AutoDisposeNotifier<VocabularyCheckState
     final word = state.englishWord.trim();
     final meaning = state.vietnameseMeaning.trim();
     if (word.isEmpty || meaning.isEmpty) {
-      state = state.copyWith(errorMessage: 'Enter both the English word and your meaning.');
+      state = state.copyWith(
+        errorMessage: 'Enter both the English word and your meaning.',
+      );
       return;
     }
 
     state = state.copyWith(isChecking: true, errorMessage: null);
     try {
-      final result = await ref.read(vocabularyCheckServiceProvider).checkMeaning(
-            englishWord: word,
-            vietnameseMeaning: meaning,
-          );
+      final result = await ref
+          .read(vocabularyCheckServiceProvider)
+          .checkMeaning(englishWord: word, vietnameseMeaning: meaning);
       state = state.copyWith(isChecking: false, result: result);
     } catch (error) {
       state = state.copyWith(isChecking: false, errorMessage: error.toString());
@@ -125,16 +135,23 @@ class VocabularyCheckController extends AutoDisposeNotifier<VocabularyCheckState
   Future<void> explainWord() async {
     final word = state.englishWord.trim();
     if (word.isEmpty) {
-      state = state.copyWith(errorMessage: 'Enter a word before asking AI for details.');
+      state = state.copyWith(
+        errorMessage: 'Enter a word before asking AI for details.',
+      );
       return;
     }
 
     state = state.copyWith(isExplaining: true, errorMessage: null);
     try {
-      final explanation = await ref.read(vocabularyCheckServiceProvider).explainWord(word);
+      final explanation = await ref
+          .read(vocabularyCheckServiceProvider)
+          .explainWord(word);
       state = state.copyWith(isExplaining: false, explanation: explanation);
     } catch (error) {
-      state = state.copyWith(isExplaining: false, errorMessage: error.toString());
+      state = state.copyWith(
+        isExplaining: false,
+        errorMessage: error.toString(),
+      );
     }
   }
 
@@ -144,8 +161,9 @@ class VocabularyCheckController extends AutoDisposeNotifier<VocabularyCheckState
       return;
     }
 
-    final saved =
-        await ref.read(dictionaryApiProvider).addWord(explanation.toDictionaryWord().toAddPayload());
+    final saved = await ref
+        .read(dictionaryApiProvider)
+        .addWord(explanation.toDictionaryWord().toAddPayload());
     state = state.copyWith(savedWord: saved);
   }
 
@@ -155,8 +173,9 @@ class VocabularyCheckController extends AutoDisposeNotifier<VocabularyCheckState
 }
 
 final vocabularyCheckControllerProvider =
-    AutoDisposeNotifierProvider<VocabularyCheckController, VocabularyCheckState>(
-  VocabularyCheckController.new,
-);
+    AutoDisposeNotifierProvider<
+      VocabularyCheckController,
+      VocabularyCheckState
+    >(VocabularyCheckController.new);
 
 const _sentinel = Object();

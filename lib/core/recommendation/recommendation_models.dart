@@ -1,10 +1,7 @@
 import '../network/json_helpers.dart';
 
 class RecommendationExplanation {
-  const RecommendationExplanation({
-    this.message,
-    this.reasonCode,
-  });
+  const RecommendationExplanation({this.message, this.reasonCode});
 
   final String? message;
   final String? reasonCode;
@@ -92,15 +89,16 @@ class RecommendationFeed {
     final rawItems = json['items'];
     return RecommendationFeed(
       generatedAt:
-          DateTime.tryParse(json['generatedAt']?.toString() ?? '') ?? DateTime.now(),
+          DateTime.tryParse(json['generatedAt']?.toString() ?? '') ??
+          DateTime.now(),
       primary: json['primary'] is Map
           ? RecommendationCardModel.fromJson(jsonMap(json['primary']))
           : null,
       items: rawItems is List
           ? rawItems
-              .whereType<Object?>()
-              .map((item) => RecommendationCardModel.fromJson(jsonMap(item)))
-              .toList(growable: false)
+                .whereType<Object?>()
+                .map((item) => RecommendationCardModel.fromJson(jsonMap(item)))
+                .toList(growable: false)
           : const <RecommendationCardModel>[],
     );
   }

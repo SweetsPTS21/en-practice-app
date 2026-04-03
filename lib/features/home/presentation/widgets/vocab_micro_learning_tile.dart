@@ -38,13 +38,18 @@ class VocabMicroLearningTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Vocab micro-learning',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: tokens.primary,
-                              fontWeight: FontWeight.w700,
-                            )),
+                    Text(
+                      'Vocab micro-learning',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: tokens.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(item.title, style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      item.title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ],
                 ),
               ),
@@ -53,9 +58,9 @@ class VocabMicroLearningTile extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             item.description,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
           ),
           if (item.words.isNotEmpty) ...[
             const SizedBox(height: 12),

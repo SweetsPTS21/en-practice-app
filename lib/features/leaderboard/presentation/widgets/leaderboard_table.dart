@@ -18,7 +18,9 @@ class LeaderboardTable extends StatelessWidget {
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
       return const AppCard(
-        child: Text('No leaderboard entries yet. Keep practicing to populate the board.'),
+        child: Text(
+          'No leaderboard entries yet. Keep practicing to populate the board.',
+        ),
       );
     }
 
@@ -58,13 +60,15 @@ class LeaderboardTable extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(entry.displayName, style: Theme.of(context).textTheme.titleMedium),
+                          Text(
+                            entry.displayName,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             '${entry.xp} XP · ${entry.currentStreak} day streak',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: tokens.text.secondary,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: tokens.text.secondary),
                           ),
                         ],
                       ),
@@ -83,9 +87,7 @@ class LeaderboardTable extends StatelessWidget {
 }
 
 class _ChangeBadge extends StatelessWidget {
-  const _ChangeBadge({
-    required this.entry,
-  });
+  const _ChangeBadge({required this.entry});
 
   final LeaderboardEntry entry;
 
@@ -95,14 +97,16 @@ class _ChangeBadge extends StatelessWidget {
     final color = entry.isRising
         ? tokens.success
         : entry.isFalling
-            ? tokens.danger
-            : tokens.text.secondary;
+        ? tokens.danger
+        : tokens.text.secondary;
     final icon = entry.isRising
         ? Icons.north_rounded
         : entry.isFalling
-            ? Icons.south_rounded
-            : Icons.remove_rounded;
-    final label = entry.rankChange == 0 ? '0' : entry.rankChange.abs().toString();
+        ? Icons.south_rounded
+        : Icons.remove_rounded;
+    final label = entry.rankChange == 0
+        ? '0'
+        : entry.rankChange.abs().toString();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -115,7 +119,12 @@ class _ChangeBadge extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: color),
           const SizedBox(width: 4),
-          Text(label, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: color)),
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(color: color),
+          ),
         ],
       ),
     );

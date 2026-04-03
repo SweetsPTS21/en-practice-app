@@ -41,9 +41,11 @@ class WeeklyChallenge {
       rewardXp: _readInt(json['rewardXp']) ?? 0,
       completed: json['completed'] == true,
       weekStart:
-          DateTime.tryParse(json['weekStart']?.toString() ?? '') ?? DateTime.now(),
+          DateTime.tryParse(json['weekStart']?.toString() ?? '') ??
+          DateTime.now(),
       weekEnd:
-          DateTime.tryParse(json['weekEnd']?.toString() ?? '') ?? DateTime.now(),
+          DateTime.tryParse(json['weekEnd']?.toString() ?? '') ??
+          DateTime.now(),
     );
   }
 }

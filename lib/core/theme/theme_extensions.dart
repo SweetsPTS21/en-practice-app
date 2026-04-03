@@ -5,10 +5,7 @@ import 'theme_tokens.dart';
 
 @immutable
 class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
-  const AppThemeExtension({
-    required this.tokens,
-    required this.pagePalettes,
-  });
+  const AppThemeExtension({required this.tokens, required this.pagePalettes});
 
   final AppThemeTokens tokens;
   final Map<AppPagePaletteKey, AppPagePalette> pagePalettes;
@@ -35,7 +32,8 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
 }
 
 extension AppThemeContextX on BuildContext {
-  AppThemeTokens get tokens => Theme.of(this).extension<AppThemeExtension>()!.tokens;
+  AppThemeTokens get tokens =>
+      Theme.of(this).extension<AppThemeExtension>()!.tokens;
 
   AppPagePalette pagePalette(AppPagePaletteKey key) {
     return Theme.of(this).extension<AppThemeExtension>()!.pagePalettes[key]!;

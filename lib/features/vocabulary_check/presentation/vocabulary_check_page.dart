@@ -18,7 +18,8 @@ class VocabularyCheckPage extends ConsumerWidget {
 
     return AppPageScaffold(
       title: 'Vocabulary check',
-      subtitle: 'Validate a word, check your meaning and save the result back to your dictionary.',
+      subtitle:
+          'Validate a word, check your meaning and save the result back to your dictionary.',
       paletteKey: AppPagePaletteKey.vocabularyCheck,
       children: [
         AppCard(
@@ -27,7 +28,8 @@ class VocabularyCheckPage extends ConsumerWidget {
             children: [
               const AppSectionHeader(
                 title: 'Step 1',
-                subtitle: 'Make sure the English word is valid before checking meaning.',
+                subtitle:
+                    'Make sure the English word is valid before checking meaning.',
               ),
               const SizedBox(height: 16),
               TextField(
@@ -60,7 +62,8 @@ class VocabularyCheckPage extends ConsumerWidget {
             children: [
               const AppSectionHeader(
                 title: 'Step 2',
-                subtitle: 'Write your Vietnamese meaning and compare it with the result.',
+                subtitle:
+                    'Write your Vietnamese meaning and compare it with the result.',
               ),
               const SizedBox(height: 16),
               TextField(
@@ -85,7 +88,9 @@ class VocabularyCheckPage extends ConsumerWidget {
                 ),
                 if (state.result!.alternatives.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text('Alternatives: ${state.result!.alternatives.join(', ')}'),
+                  Text(
+                    'Alternatives: ${state.result!.alternatives.join(', ')}',
+                  ),
                 ],
               ],
             ],
@@ -97,16 +102,21 @@ class VocabularyCheckPage extends ConsumerWidget {
             children: [
               const AppSectionHeader(
                 title: 'Step 3',
-                subtitle: 'Ask for an explanation only when you need a clearer definition or example.',
+                subtitle:
+                    'Ask for an explanation only when you need a clearer definition or example.',
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: AppButton(
-                      label: state.isExplaining ? 'Loading AI...' : 'Ask AI for explanation',
+                      label: state.isExplaining
+                          ? 'Loading AI...'
+                          : 'Ask AI for explanation',
                       icon: Icons.smart_toy_outlined,
-                      onPressed: state.isExplaining ? null : controller.explainWord,
+                      onPressed: state.isExplaining
+                          ? null
+                          : controller.explainWord,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -129,13 +139,19 @@ class VocabularyCheckPage extends ConsumerWidget {
                 Text(state.explanation!.meaning),
                 if (state.explanation!.examples.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  ...state.explanation!.examples.map((example) => Text('• $example')),
+                  ...state.explanation!.examples.map(
+                    (example) => Text('• $example'),
+                  ),
                 ],
                 const SizedBox(height: 12),
                 AppButton(
-                  label: state.savedWord == null ? 'Save to dictionary' : 'Saved',
+                  label: state.savedWord == null
+                      ? 'Save to dictionary'
+                      : 'Saved',
                   icon: Icons.bookmark_add_outlined,
-                  onPressed: state.savedWord == null ? controller.saveExplainedWord : null,
+                  onPressed: state.savedWord == null
+                      ? controller.saveExplainedWord
+                      : null,
                 ),
               ],
             ],

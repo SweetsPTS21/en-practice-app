@@ -33,19 +33,16 @@ class AppSectionHeader extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 subtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: tokens.text.secondary,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
               ),
             ],
           ),
         ),
         if (actionLabel != null) ...[
           const SizedBox(width: 12),
-          TextButton(
-            onPressed: onAction,
-            child: Text(actionLabel!),
-          ),
+          TextButton(onPressed: onAction, child: Text(actionLabel!)),
         ],
       ],
     );
@@ -87,14 +84,11 @@ class AppEmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
           ),
-          if (action != null) ...[
-            const SizedBox(height: 16),
-            action!,
-          ],
+          if (action != null) ...[const SizedBox(height: 16), action!],
         ],
       ),
     );
@@ -102,11 +96,7 @@ class AppEmptyState extends StatelessWidget {
 }
 
 class AppLoadingCard extends StatelessWidget {
-  const AppLoadingCard({
-    super.key,
-    this.height = 160,
-    this.message,
-  });
+  const AppLoadingCard({super.key, this.height = 160, this.message});
 
   final double height;
   final String? message;

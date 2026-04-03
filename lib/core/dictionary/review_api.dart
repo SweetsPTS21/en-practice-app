@@ -16,10 +16,7 @@ class ReviewApi {
     try {
       final response = await _client.get<Object?>(
         '/records/review-words',
-        queryParameters: {
-          'filter': filter.name,
-          'limit': limit,
-        },
+        queryParameters: {'filter': filter.name, 'limit': limit},
       );
       final data = response.data;
       if (data is! List) {
@@ -43,7 +40,9 @@ class ReviewApi {
     }
   }
 
-  Future<ReviewSessionSummary> submitReviewSession(ReviewSessionPayload payload) async {
+  Future<ReviewSessionSummary> submitReviewSession(
+    ReviewSessionPayload payload,
+  ) async {
     try {
       final response = await _client.post<Object?>(
         '/reviews',

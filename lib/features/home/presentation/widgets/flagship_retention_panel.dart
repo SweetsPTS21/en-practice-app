@@ -29,13 +29,16 @@ class FlagshipRetentionPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Flagship retention', style: Theme.of(context).textTheme.titleLarge),
+        Text(
+          'Flagship retention',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
         const SizedBox(height: 8),
         Text(
           'Daily speaking, vocab micro-learning and weekly challenge stay on one shared loop.',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: context.tokens.text.secondary,
-              ),
+            color: context.tokens.text.secondary,
+          ),
         ),
         const SizedBox(height: 16),
         if (flagship.dailySpeakingPrompt != null) ...[

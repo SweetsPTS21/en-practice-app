@@ -12,13 +12,7 @@ enum VocabularyTestSource {
   final String label;
 }
 
-enum VocabularyTestStatus {
-  ready,
-  failed,
-  inProgress,
-  completed,
-  unknown,
-}
+enum VocabularyTestStatus { ready, failed, inProgress, completed, unknown }
 
 class VocabularyTestQuestion {
   const VocabularyTestQuestion({
@@ -123,9 +117,9 @@ class VocabularyTestDetail {
       createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? ''),
       questions: questions is List
           ? questions
-              .whereType<Object?>()
-              .map((item) => VocabularyTestQuestion.fromJson(jsonMap(item)))
-              .toList(growable: false)
+                .whereType<Object?>()
+                .map((item) => VocabularyTestQuestion.fromJson(jsonMap(item)))
+                .toList(growable: false)
           : const <VocabularyTestQuestion>[],
     );
   }
@@ -233,7 +227,8 @@ class VocabularyTestAttemptResult {
   final DateTime? completedAt;
   final VocabularyTestDetail? testDetail;
 
-  bool get isCompleted => status == VocabularyTestStatus.completed || results.isNotEmpty;
+  bool get isCompleted =>
+      status == VocabularyTestStatus.completed || results.isNotEmpty;
 
   factory VocabularyTestAttemptResult.fromJson(Map<String, dynamic> json) {
     final results = json['results'];
@@ -241,16 +236,20 @@ class VocabularyTestAttemptResult {
       attemptId: json['attemptId']?.toString() ?? '',
       testId: json['testId']?.toString() ?? '',
       testTitle:
-          json['testTitle']?.toString() ?? json['title']?.toString() ?? 'Vocabulary test',
+          json['testTitle']?.toString() ??
+          json['title']?.toString() ??
+          'Vocabulary test',
       totalQuestions: _asInt(json['totalQuestions'] ?? json['questionCount']),
       correctCount: _asInt(json['correctCount']),
       accuracyPercent: _asDouble(json['accuracyPercent']),
       status: _statusFromString(json['status']?.toString()),
       results: results is List
           ? results
-              .whereType<Object?>()
-              .map((item) => VocabularyTestAnswerResult.fromJson(jsonMap(item)))
-              .toList(growable: false)
+                .whereType<Object?>()
+                .map(
+                  (item) => VocabularyTestAnswerResult.fromJson(jsonMap(item)),
+                )
+                .toList(growable: false)
           : const <VocabularyTestAnswerResult>[],
       timeSpentSeconds: _asNullableInt(json['timeSpentSeconds']),
       startedAt: DateTime.tryParse(json['startedAt']?.toString() ?? ''),
@@ -312,10 +311,10 @@ class VocabularyTestGeneratePayload {
   final String sourceSurface;
 
   Map<String, dynamic> toJson() => {
-        'questionCount': questionCount,
-        'sources': sources.map((item) => item.apiValue).toList(growable: false),
-        'sourceSurface': sourceSurface,
-      };
+    'questionCount': questionCount,
+    'sources': sources.map((item) => item.apiValue).toList(growable: false),
+    'sourceSurface': sourceSurface,
+  };
 }
 
 class VocabularyTestSubmitAnswer {
@@ -328,9 +327,9 @@ class VocabularyTestSubmitAnswer {
   final int selectedOptionIndex;
 
   Map<String, dynamic> toJson() => {
-        'questionId': questionId,
-        'selectedOptionIndex': selectedOptionIndex,
-      };
+    'questionId': questionId,
+    'selectedOptionIndex': selectedOptionIndex,
+  };
 }
 
 class VocabularyTestSubmitPayload {
@@ -343,9 +342,9 @@ class VocabularyTestSubmitPayload {
   final List<VocabularyTestSubmitAnswer> answers;
 
   Map<String, dynamic> toJson() => {
-        'timeSpentSeconds': timeSpentSeconds,
-        'answers': answers.map((item) => item.toJson()).toList(growable: false),
-      };
+    'timeSpentSeconds': timeSpentSeconds,
+    'answers': answers.map((item) => item.toJson()).toList(growable: false),
+  };
 }
 
 VocabularyTestStatus _statusFromString(String? value) {

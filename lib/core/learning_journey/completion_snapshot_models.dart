@@ -151,12 +151,15 @@ class CompletionSnapshot {
       module: json['module']?.toString() ?? 'UNKNOWN',
       referenceType: json['referenceType']?.toString() ?? 'UNKNOWN',
       referenceId: json['referenceId']?.toString() ?? '',
-      completionTitle: json['completionTitle']?.toString() ?? 'Session complete',
+      completionTitle:
+          json['completionTitle']?.toString() ?? 'Session complete',
       primaryScoreLabel: json['primaryScoreLabel']?.toString(),
       primaryScore: _readDouble(json['primaryScore']),
       primaryScoreDisplay: json['primaryScoreDisplay']?.toString(),
       xpEarned: _readInt(json['xpEarned']),
-      streakKept: json['streakKept'] is bool ? json['streakKept'] as bool : null,
+      streakKept: json['streakKept'] is bool
+          ? json['streakKept'] as bool
+          : null,
       todayGoalProgress: json['todayGoalProgress'] is Map
           ? TodayGoalProgress.fromJson(
               (json['todayGoalProgress'] as Map<Object?, Object?>).map(
@@ -169,10 +172,7 @@ class CompletionSnapshot {
         CompletionScoreSummary.fromJson,
       ),
       deltas: readList(json['deltas'], CompletionDelta.fromJson),
-      improvements: readList(
-        json['improvements'],
-        ImprovementItem.fromJson,
-      ),
+      improvements: readList(json['improvements'], ImprovementItem.fromJson),
       nextAction: json['nextAction'] is Map
           ? ResultNextAction.fromJson(
               (json['nextAction'] as Map<Object?, Object?>).map(

@@ -11,7 +11,8 @@ class ForegroundPushBanner extends ConsumerStatefulWidget {
   const ForegroundPushBanner({super.key});
 
   @override
-  ConsumerState<ForegroundPushBanner> createState() => _ForegroundPushBannerState();
+  ConsumerState<ForegroundPushBanner> createState() =>
+      _ForegroundPushBannerState();
 }
 
 class _ForegroundPushBannerState extends ConsumerState<ForegroundPushBanner> {
@@ -34,7 +35,8 @@ class _ForegroundPushBannerState extends ConsumerState<ForegroundPushBanner> {
     _dismissTimer?.cancel();
     _dismissTimer = Timer(
       const Duration(seconds: 6),
-      () => ref.read(pushLifecycleControllerProvider).dismissForegroundMessage(),
+      () =>
+          ref.read(pushLifecycleControllerProvider).dismissForegroundMessage(),
     );
 
     final tokens = context.tokens;
@@ -47,13 +49,19 @@ class _ForegroundPushBannerState extends ConsumerState<ForegroundPushBanner> {
         child: InkWell(
           borderRadius: BorderRadius.circular(tokens.radius.hero),
           onTap: () async {
-            final outcome = await ref.read(pushLifecycleControllerProvider).openForegroundMessage();
+            final outcome = await ref
+                .read(pushLifecycleControllerProvider)
+                .openForegroundMessage();
             if (!context.mounted || outcome == null) {
               return;
             }
             if (outcome.target.kind.name == 'external') {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('External push routes are not enabled on mobile yet.')),
+                const SnackBar(
+                  content: Text(
+                    'External push routes are not enabled on mobile yet.',
+                  ),
+                ),
               );
               return;
             }
@@ -89,23 +97,27 @@ class _ForegroundPushBannerState extends ConsumerState<ForegroundPushBanner> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(message.title, style: Theme.of(context).textTheme.titleMedium),
+                      Text(
+                        message.title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       if ((message.body ?? '').isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
                           message.body!,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: tokens.text.secondary,
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: tokens.text.secondary),
                         ),
                       ],
                     ],
                   ),
                 ),
                 IconButton(
-                  onPressed: () => ref.read(pushLifecycleControllerProvider).dismissForegroundMessage(),
+                  onPressed: () => ref
+                      .read(pushLifecycleControllerProvider)
+                      .dismissForegroundMessage(),
                   icon: const Icon(Icons.close_rounded),
                 ),
               ],

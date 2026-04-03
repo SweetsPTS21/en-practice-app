@@ -46,8 +46,10 @@ List<Achievement> sortAchievements(Iterable<Achievement> items) {
       }
     }
 
-    final leftLabel = (left.title.isNotEmpty ? left.title : left.code).toLowerCase();
-    final rightLabel = (right.title.isNotEmpty ? right.title : right.code).toLowerCase();
+    final leftLabel = (left.title.isNotEmpty ? left.title : left.code)
+        .toLowerCase();
+    final rightLabel = (right.title.isNotEmpty ? right.title : right.code)
+        .toLowerCase();
     return leftLabel.compareTo(rightLabel);
   });
   return sorted;

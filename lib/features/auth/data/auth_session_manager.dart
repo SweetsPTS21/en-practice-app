@@ -13,8 +13,8 @@ class AuthSessionManager {
   AuthSessionManager({
     required AuthSessionStorage storage,
     required Dio refreshClient,
-  })  : _storage = storage,
-        _refreshClient = refreshClient;
+  }) : _storage = storage,
+       _refreshClient = refreshClient;
 
   final AuthSessionStorage _storage;
   final Dio _refreshClient;
@@ -109,7 +109,10 @@ class AuthSessionManager {
     final currentSession = await restoreSession();
     if (currentSession == null ||
         !currentSession.hasRefreshToken ||
-        isTokenExpired(currentSession.refreshTokenExpiresAt, skew: Duration.zero)) {
+        isTokenExpired(
+          currentSession.refreshTokenExpiresAt,
+          skew: Duration.zero,
+        )) {
       throw const ApiError(
         message: 'Your session has expired. Please sign in again.',
         status: 401,
@@ -118,24 +121,22 @@ class AuthSessionManager {
 
     final response = await _refreshClient.post<Object?>(
       '/auth/refresh',
-      data: {
-        'refreshToken': currentSession.refreshToken,
-      },
+      data: {'refreshToken': currentSession.refreshToken},
       options: Options(
-        extra: const {
-          'skipAuthRefresh': true,
-          'skipAuthorization': true,
-        },
+        extra: const {'skipAuthRefresh': true, 'skipAuthorization': true},
       ),
     );
 
     final data = jsonMap(response.data);
     final refreshedSession = AuthSession(
       accessToken: data['accessToken']?.toString(),
-      refreshToken: data['refreshToken']?.toString() ?? currentSession.refreshToken,
+      refreshToken:
+          data['refreshToken']?.toString() ?? currentSession.refreshToken,
       accessTokenExpiresAt:
-          data['accessTokenExpiresAt']?.toString() ?? currentSession.accessTokenExpiresAt,
-      refreshTokenExpiresAt: data['refreshTokenExpiresAt']?.toString() ??
+          data['accessTokenExpiresAt']?.toString() ??
+          currentSession.accessTokenExpiresAt,
+      refreshTokenExpiresAt:
+          data['refreshTokenExpiresAt']?.toString() ??
           currentSession.refreshTokenExpiresAt,
     );
 

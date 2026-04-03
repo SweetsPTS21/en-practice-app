@@ -39,7 +39,11 @@ class VocabularyTestAttemptState {
 }
 
 class VocabularyTestAttemptController
-    extends AutoDisposeFamilyNotifier<VocabularyTestAttemptState, StartVocabularyTestResponse> {
+    extends
+        AutoDisposeFamilyNotifier<
+          VocabularyTestAttemptState,
+          StartVocabularyTestResponse
+        > {
   @override
   VocabularyTestAttemptState build(StartVocabularyTestResponse arg) {
     return VocabularyTestAttemptState(
@@ -51,7 +55,8 @@ class VocabularyTestAttemptController
   }
 
   void selectAnswer(String questionId, int optionIndex) {
-    final answers = Map<String, int>.from(state.answers)..[questionId] = optionIndex;
+    final answers = Map<String, int>.from(state.answers)
+      ..[questionId] = optionIndex;
     state = state.copyWith(answers: answers);
   }
 
@@ -59,7 +64,9 @@ class VocabularyTestAttemptController
     state = state.copyWith(isSubmitting: true);
     try {
       final duration = DateTime.now().difference(state.startedAt).inSeconds;
-      final result = await ref.read(vocabularyTestApiProvider).submitAttempt(
+      final result = await ref
+          .read(vocabularyTestApiProvider)
+          .submitAttempt(
             state.attemptId,
             VocabularyTestSubmitPayload(
               timeSpentSeconds: duration,
@@ -82,7 +89,9 @@ class VocabularyTestAttemptController
   }
 }
 
-final vocabularyTestAttemptControllerProvider = AutoDisposeNotifierProviderFamily<
-    VocabularyTestAttemptController, VocabularyTestAttemptState, StartVocabularyTestResponse>(
-  VocabularyTestAttemptController.new,
-);
+final vocabularyTestAttemptControllerProvider =
+    AutoDisposeNotifierProviderFamily<
+      VocabularyTestAttemptController,
+      VocabularyTestAttemptState,
+      StartVocabularyTestResponse
+    >(VocabularyTestAttemptController.new);

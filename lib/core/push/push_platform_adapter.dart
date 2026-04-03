@@ -2,12 +2,7 @@ import 'dart:async';
 
 import 'push_message_models.dart';
 
-enum PushPermissionStatus {
-  unknown,
-  granted,
-  denied,
-  unsupported,
-}
+enum PushPermissionStatus { unknown, granted, denied, unsupported }
 
 abstract class PushPlatformAdapter {
   const PushPlatformAdapter();
@@ -46,10 +41,12 @@ class NoopPushPlatformAdapter extends PushPlatformAdapter {
   }
 
   @override
-  Stream<PushMessage> get onForegroundMessage => const Stream<PushMessage>.empty();
+  Stream<PushMessage> get onForegroundMessage =>
+      const Stream<PushMessage>.empty();
 
   @override
-  Stream<PushMessage> get onMessageOpenedApp => const Stream<PushMessage>.empty();
+  Stream<PushMessage> get onMessageOpenedApp =>
+      const Stream<PushMessage>.empty();
 
   @override
   Stream<String> get onTokenRefresh => const Stream<String>.empty();

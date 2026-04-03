@@ -1,8 +1,4 @@
-enum ResultActionIntent {
-  nextStep,
-  review,
-  reviewAgain,
-}
+enum ResultActionIntent { nextStep, review, reviewAgain }
 
 class ResultNextAction {
   const ResultNextAction({

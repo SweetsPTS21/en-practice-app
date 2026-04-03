@@ -5,9 +5,7 @@ import '../../../core/notifications/notification_preferences_models.dart';
 import '../../../core/notifications/notification_providers.dart';
 
 class NotificationSettingsController extends ChangeNotifier {
-  NotificationSettingsController({
-    required this.ref,
-  }) {
+  NotificationSettingsController({required this.ref}) {
     load();
   }
 
@@ -39,7 +37,9 @@ class NotificationSettingsController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      preferences = await ref.read(notificationApiProvider).updatePreferences(next);
+      preferences = await ref
+          .read(notificationApiProvider)
+          .updatePreferences(next);
     } catch (error) {
       errorMessage = error.toString();
     } finally {
@@ -51,5 +51,5 @@ class NotificationSettingsController extends ChangeNotifier {
 
 final notificationSettingsControllerProvider =
     ChangeNotifierProvider.autoDispose<NotificationSettingsController>((ref) {
-  return NotificationSettingsController(ref: ref);
-});
+      return NotificationSettingsController(ref: ref);
+    });

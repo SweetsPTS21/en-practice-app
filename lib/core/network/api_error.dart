@@ -1,11 +1,7 @@
 import 'package:dio/dio.dart';
 
 class ApiError implements Exception {
-  const ApiError({
-    required this.message,
-    required this.status,
-    this.data,
-  });
+  const ApiError({required this.message, required this.status, this.data});
 
   final String message;
   final int status;
@@ -18,7 +14,8 @@ class ApiError implements Exception {
 
     final response = error.response;
     if (response == null) {
-      final timedOut = error.type == DioExceptionType.connectionTimeout ||
+      final timedOut =
+          error.type == DioExceptionType.connectionTimeout ||
           error.type == DioExceptionType.receiveTimeout ||
           error.type == DioExceptionType.sendTimeout;
 
@@ -39,7 +36,8 @@ class ApiError implements Exception {
 
     if (status == 401) {
       return ApiError(
-        message: bodyMessage ?? 'Your session has expired. Please sign in again.',
+        message:
+            bodyMessage ?? 'Your session has expired. Please sign in again.',
         status: 401,
         data: data,
       );
@@ -47,7 +45,9 @@ class ApiError implements Exception {
 
     if (status == 403) {
       return ApiError(
-        message: bodyMessage ?? 'You do not have permission to access this resource.',
+        message:
+            bodyMessage ??
+            'You do not have permission to access this resource.',
         status: 403,
         data: data,
       );
@@ -63,7 +63,9 @@ class ApiError implements Exception {
 
     if (status >= 500) {
       return ApiError(
-        message: bodyMessage ?? 'The server is having trouble right now. Please try again later.',
+        message:
+            bodyMessage ??
+            'The server is having trouble right now. Please try again later.',
         status: status,
         data: data,
       );

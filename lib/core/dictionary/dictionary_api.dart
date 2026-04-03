@@ -42,7 +42,10 @@ class DictionaryApi {
 
   Future<DictionaryWord> addWord(Map<String, dynamic> payload) async {
     try {
-      final response = await _client.post<Object?>('/dictionary', data: payload);
+      final response = await _client.post<Object?>(
+        '/dictionary',
+        data: payload,
+      );
       return DictionaryWord.fromJson(jsonMap(response.data));
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);

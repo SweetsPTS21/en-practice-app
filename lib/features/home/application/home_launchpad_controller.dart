@@ -43,7 +43,8 @@ class HomeLaunchpadController extends AsyncNotifier<HomeLaunchpadState> {
       continueLearning: results[0] as dynamic,
       reminderBanner: results[1] as dynamic,
       dailyPlan: results[2] as dynamic,
-      quickPractice: (results[3] as List?)?.whereType<dynamic>().toList().cast() ??
+      quickPractice:
+          (results[3] as List?)?.whereType<dynamic>().toList().cast() ??
           const [],
       progressSnapshot: results[4] as dynamic,
       flagshipRetention: results[5] as dynamic,

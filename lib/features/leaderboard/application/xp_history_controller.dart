@@ -33,7 +33,8 @@ class XpHistoryScreenState {
   }
 }
 
-class XpHistoryController extends AutoDisposeAsyncNotifier<XpHistoryScreenState> {
+class XpHistoryController
+    extends AutoDisposeAsyncNotifier<XpHistoryScreenState> {
   @override
   Future<XpHistoryScreenState> build() async {
     final api = ref.watch(leaderboardApiProvider);
@@ -58,10 +59,9 @@ class XpHistoryController extends AutoDisposeAsyncNotifier<XpHistoryScreenState>
     state = AsyncData(current.copyWith(isLoadingMore: true));
     try {
       final nextPage = current.page + 1;
-      final nextResponse = await ref.read(leaderboardApiProvider).getXpHistory(
-            page: nextPage,
-            size: current.pageSize,
-          );
+      final nextResponse = await ref
+          .read(leaderboardApiProvider)
+          .getXpHistory(page: nextPage, size: current.pageSize);
       state = AsyncData(
         current.copyWith(
           page: nextPage,
@@ -77,5 +77,5 @@ class XpHistoryController extends AutoDisposeAsyncNotifier<XpHistoryScreenState>
 
 final xpHistoryControllerProvider =
     AutoDisposeAsyncNotifierProvider<XpHistoryController, XpHistoryScreenState>(
-  XpHistoryController.new,
-);
+      XpHistoryController.new,
+    );

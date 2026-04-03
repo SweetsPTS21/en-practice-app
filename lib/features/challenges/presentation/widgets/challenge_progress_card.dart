@@ -32,7 +32,10 @@ class ChallengeProgressCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: challenge.completed
                       ? Colors.green.withValues(alpha: 0.12)
@@ -48,14 +51,18 @@ class ChallengeProgressCard extends StatelessWidget {
           const SizedBox(height: 16),
           LinearProgressIndicator(value: challenge.progressPercent),
           const SizedBox(height: 8),
-          Text('${challenge.currentValue}/${challenge.targetValue} · +${challenge.rewardXp} XP'),
+          Text(
+            '${challenge.currentValue}/${challenge.targetValue} · +${challenge.rewardXp} XP',
+          ),
           if ((nextStep ?? '').isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(nextStep!),
           ],
           const SizedBox(height: 16),
           AppButton(
-            label: challenge.completed ? 'See weekly report' : 'Use weekly report',
+            label: challenge.completed
+                ? 'See weekly report'
+                : 'Use weekly report',
             icon: Icons.calendar_month_rounded,
             onPressed: onOpenReport,
           ),

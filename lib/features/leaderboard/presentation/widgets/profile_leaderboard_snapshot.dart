@@ -19,16 +19,16 @@ class ProfileLeaderboardSnapshot extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Competitive snapshot', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Competitive snapshot',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 8),
             Text(
               'Profile keeps your rank and podium context visible without leaving the page.',
             ),
             const SizedBox(height: 16),
-            MyRankCard(
-              rank: data.myRank,
-              title: 'Your standing',
-            ),
+            MyRankCard(rank: data.myRank, title: 'Your standing'),
             const SizedBox(height: 12),
             Wrap(
               spacing: 10,
@@ -36,7 +36,9 @@ class ProfileLeaderboardSnapshot extends ConsumerWidget {
               children: data.topThree
                   .map(
                     (entry) => Chip(
-                      label: Text('#${entry.rank} ${entry.displayName} · ${entry.xp} XP'),
+                      label: Text(
+                        '#${entry.rank} ${entry.displayName} · ${entry.xp} XP',
+                      ),
                     ),
                   )
                   .toList(growable: false),

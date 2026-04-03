@@ -22,10 +22,7 @@ final rawApiClientProvider = Provider<Dio>((ref) {
 final authSessionManagerProvider = Provider<AuthSessionManager>((ref) {
   final storage = ref.watch(authSessionStorageProvider);
   final refreshClient = ref.watch(rawApiClientProvider);
-  return AuthSessionManager(
-    storage: storage,
-    refreshClient: refreshClient,
-  );
+  return AuthSessionManager(storage: storage, refreshClient: refreshClient);
 });
 
 final apiClientProvider = Provider<Dio>((ref) {

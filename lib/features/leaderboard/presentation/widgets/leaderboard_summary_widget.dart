@@ -22,12 +22,14 @@ class LeaderboardSummaryWidget extends ConsumerWidget {
           TopThreePodium(
             entries: data.topThree,
             title: 'Leaderboard snapshot',
-            subtitle: 'See who is leading the current ${data.period.label.toLowerCase()} race.',
+            subtitle:
+                'See who is leading the current ${data.period.label.toLowerCase()} race.',
           ),
           const SizedBox(height: 12),
           MyRankCard(
             rank: data.myRank,
-            subtitle: 'Competition context on Home should stay lightweight and actionable.',
+            subtitle:
+                'Competition context on Home should stay lightweight and actionable.',
           ),
           const SizedBox(height: 12),
           AppCard(
@@ -37,8 +39,8 @@ class LeaderboardSummaryWidget extends ConsumerWidget {
                 Text(
                   'Open the full leaderboard to compare rank movement and see the entire table.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: context.tokens.text.secondary,
-                      ),
+                    color: context.tokens.text.secondary,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(

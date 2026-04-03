@@ -57,9 +57,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message)));
     }
   }
 
@@ -120,20 +120,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 gradient: LinearGradient(
                                   colors: [
                                     context
-                                        .pagePalette(AppPagePaletteKey.dashboard)
+                                        .pagePalette(
+                                          AppPagePaletteKey.dashboard,
+                                        )
                                         .heroTop,
                                     context
-                                        .pagePalette(AppPagePaletteKey.dashboard)
+                                        .pagePalette(
+                                          AppPagePaletteKey.dashboard,
+                                        )
                                         .heroBottom,
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
-                                borderRadius: BorderRadius.circular(tokens.radius.xl),
+                                borderRadius: BorderRadius.circular(
+                                  tokens.radius.xl,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: context
-                                        .pagePalette(AppPagePaletteKey.dashboard)
+                                        .pagePalette(
+                                          AppPagePaletteKey.dashboard,
+                                        )
                                         .accent
                                         .withValues(alpha: 0.24),
                                     blurRadius: tokens.motion.blurStrong,
@@ -203,7 +211,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   controller: _displayNameController,
                                   textInputAction: TextInputAction.next,
                                   decoration: InputDecoration(
-                                    hintText: context.tr('auth.form.displayNameHint'),
+                                    hintText: context.tr(
+                                      'auth.form.displayNameHint',
+                                    ),
                                   ),
                                   validator: (value) {
                                     if (!_registerMode) {
@@ -235,10 +245,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 ),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return context.tr('auth.validation.emailRequired');
+                                    return context.tr(
+                                      'auth.validation.emailRequired',
+                                    );
                                   }
                                   if (!value.contains('@')) {
-                                    return context.tr('auth.validation.emailInvalid');
+                                    return context.tr(
+                                      'auth.validation.emailInvalid',
+                                    );
                                   }
                                   return null;
                                 },
@@ -255,7 +269,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     : TextInputAction.done,
                                 autofillHints: const [AutofillHints.password],
                                 decoration: InputDecoration(
-                                  hintText: context.tr('auth.form.passwordHint'),
+                                  hintText: context.tr(
+                                    'auth.form.passwordHint',
+                                  ),
                                 ),
                                 onFieldSubmitted: (_) {
                                   if (!_registerMode) {
@@ -264,10 +280,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 },
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return context.tr('auth.validation.passwordRequired');
+                                    return context.tr(
+                                      'auth.validation.passwordRequired',
+                                    );
                                   }
                                   if (value.length < 8) {
-                                    return context.tr('auth.validation.passwordMin');
+                                    return context.tr(
+                                      'auth.validation.passwordMin',
+                                    );
                                   }
                                   return null;
                                 },
@@ -281,7 +301,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   controller: _confirmPasswordController,
                                   obscureText: true,
                                   textInputAction: TextInputAction.done,
-                                  autofillHints: const [AutofillHints.newPassword],
+                                  autofillHints: const [
+                                    AutofillHints.newPassword,
+                                  ],
                                   decoration: InputDecoration(
                                     hintText: context.tr(
                                       'auth.form.confirmPasswordHint',
@@ -308,23 +330,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               ),
                             ],
                             const SizedBox(height: 20),
-                            if (auth.errorMessage != null && auth.errorMessage!.isNotEmpty)
+                            if (auth.errorMessage != null &&
+                                auth.errorMessage!.isNotEmpty)
                               Container(
                                 width: double.infinity,
                                 margin: const EdgeInsets.only(bottom: 16),
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
                                   color: tokens.danger.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(tokens.radius.lg),
+                                  borderRadius: BorderRadius.circular(
+                                    tokens.radius.lg,
+                                  ),
                                   border: Border.all(
-                                    color: tokens.danger.withValues(alpha: 0.18),
+                                    color: tokens.danger.withValues(
+                                      alpha: 0.18,
+                                    ),
                                   ),
                                 ),
                                 child: Text(
                                   auth.errorMessage!,
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: tokens.danger,
-                                      ),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(color: tokens.danger),
                                 ),
                               ),
                             SizedBox(
@@ -332,7 +358,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               child: FilledButton(
                                 onPressed: auth.isSubmitting ? null : _submit,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
                                   child: auth.isSubmitting
                                       ? SizedBox(
                                           width: 20,
@@ -368,10 +396,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 }
 
 class _ModeToggle extends StatelessWidget {
-  const _ModeToggle({
-    required this.registerMode,
-    required this.onChanged,
-  });
+  const _ModeToggle({required this.registerMode, required this.onChanged});
 
   final bool registerMode;
   final ValueChanged<bool>? onChanged;
@@ -442,8 +467,8 @@ class _ModeToggleButton extends StatelessWidget {
               child: Text(
                 label,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: active ? tokens.text.inverse : tokens.text.secondary,
-                    ),
+                  color: active ? tokens.text.inverse : tokens.text.secondary,
+                ),
               ),
             ),
           ),
@@ -454,10 +479,7 @@ class _ModeToggleButton extends StatelessWidget {
 }
 
 class _LabeledField extends StatelessWidget {
-  const _LabeledField({
-    required this.label,
-    required this.child,
-  });
+  const _LabeledField({required this.label, required this.child});
 
   final String label;
   final Widget child;
@@ -467,10 +489,7 @@ class _LabeledField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelLarge,
-        ),
+        Text(label, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
         child,
       ],

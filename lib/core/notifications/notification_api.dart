@@ -42,7 +42,9 @@ class NotificationApi {
 
   Future<int> getUnreadCount() async {
     try {
-      final response = await _client.get<Object?>('/notifications/unread-count');
+      final response = await _client.get<Object?>(
+        '/notifications/unread-count',
+      );
       final data = jsonMap(response.data);
       return switch (data['count']) {
         int value => value,

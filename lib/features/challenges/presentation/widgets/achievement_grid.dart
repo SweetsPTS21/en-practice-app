@@ -4,10 +4,7 @@ import '../../../../core/retention/achievement_models.dart';
 import 'achievement_card.dart';
 
 class AchievementGrid extends StatelessWidget {
-  const AchievementGrid({
-    super.key,
-    required this.achievements,
-  });
+  const AchievementGrid({super.key, required this.achievements});
 
   final List<Achievement> achievements;
 

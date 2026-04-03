@@ -38,13 +38,18 @@ class DailySpeakingPromptTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Daily speaking prompt',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: tokens.warning,
-                              fontWeight: FontWeight.w700,
-                            )),
+                    Text(
+                      'Daily speaking prompt',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: tokens.warning,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(prompt.topic, style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      prompt.topic,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ],
                 ),
               ),
@@ -53,9 +58,9 @@ class DailySpeakingPromptTile extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             prompt.prompt,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
           ),
           const SizedBox(height: 12),
           Wrap(
@@ -70,7 +75,9 @@ class DailySpeakingPromptTile extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           AppButton(
-            label: prompt.resumeState == 'RESUME' ? 'Resume speaking' : 'Start speaking',
+            label: prompt.resumeState == 'RESUME'
+                ? 'Resume speaking'
+                : 'Start speaking',
             icon: Icons.play_arrow_rounded,
             onPressed: onPressed,
           ),

@@ -38,24 +38,21 @@ class NotificationSettingsCard extends ConsumerWidget {
         children: [
           const AppSectionHeader(
             title: 'Notification settings',
-            subtitle: 'Choose which updates you want to receive, then review device permission below.',
+            subtitle:
+                'Choose which updates you want to receive, then review device permission below.',
           ),
           const SizedBox(height: 16),
           _ToggleTile(
             label: 'Push notifications',
             value: preferences.allowPush,
-            onChanged: (value) => _save(
-              ref,
-              preferences.copyWith(allowPush: value),
-            ),
+            onChanged: (value) =>
+                _save(ref, preferences.copyWith(allowPush: value)),
           ),
           _ToggleTile(
             label: 'Email updates',
             value: preferences.allowEmail,
-            onChanged: (value) => _save(
-              ref,
-              preferences.copyWith(allowEmail: value),
-            ),
+            onChanged: (value) =>
+                _save(ref, preferences.copyWith(allowEmail: value)),
           ),
           _ToggleTile(
             label: 'Vocabulary reminders',
@@ -68,31 +65,32 @@ class NotificationSettingsCard extends ConsumerWidget {
           _ToggleTile(
             label: 'Grading results',
             value: preferences.allowGradingResult,
-            onChanged: (value) => _save(
-              ref,
-              preferences.copyWith(allowGradingResult: value),
-            ),
+            onChanged: (value) =>
+                _save(ref, preferences.copyWith(allowGradingResult: value)),
           ),
           _ToggleTile(
             label: 'Admin broadcast',
             value: preferences.allowAdminBroadcast,
-            onChanged: (value) => _save(
-              ref,
-              preferences.copyWith(allowAdminBroadcast: value),
-            ),
+            onChanged: (value) =>
+                _save(ref, preferences.copyWith(allowAdminBroadcast: value)),
           ),
           const SizedBox(height: 16),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+              color: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Device push permission', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'Device push permission',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 6),
                 Text(pushLifecycle.permissionSnapshot?.label ?? 'Checking...'),
                 const SizedBox(height: 12),
@@ -114,10 +112,7 @@ class NotificationSettingsCard extends ConsumerWidget {
     );
   }
 
-  void _save(
-    WidgetRef ref,
-    NotificationPreferences next,
-  ) {
+  void _save(WidgetRef ref, NotificationPreferences next) {
     ref.read(notificationSettingsControllerProvider).update(next);
   }
 }
@@ -140,10 +135,7 @@ class _ToggleTile extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text(label)),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-          ),
+          Switch(value: value, onChanged: onChanged),
         ],
       ),
     );

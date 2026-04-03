@@ -13,7 +13,9 @@ class FlagshipRetention {
   final WeeklyChallenge? weeklyChallenge;
 
   bool get hasAnyBlock =>
-      dailySpeakingPrompt != null || vocabMicroLearning != null || weeklyChallenge != null;
+      dailySpeakingPrompt != null ||
+      vocabMicroLearning != null ||
+      weeklyChallenge != null;
 
   factory FlagshipRetention.fromJson(Map<String, dynamic> json) {
     return FlagshipRetention(
@@ -94,16 +96,17 @@ class VocabMicroLearning {
     return VocabMicroLearning(
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
-      actionUrl: json['actionUrl']?.toString() ?? '/dictionary/review?mode=micro',
+      actionUrl:
+          json['actionUrl']?.toString() ?? '/dictionary/review?mode=micro',
       reason: json['reason']?.toString() ?? 'VOCAB_MICRO_SESSION',
       estimatedMinutes: _readInt(json['estimatedMinutes']),
       targetWordCount: _readInt(json['targetWordCount']),
       dueWordCount: _readInt(json['dueWordCount']),
       words: rawWords is List
           ? rawWords
-              .whereType<Object?>()
-              .map((item) => VocabMicroLearningWord.fromJson(jsonMap(item)))
-              .toList(growable: false)
+                .whereType<Object?>()
+                .map((item) => VocabMicroLearningWord.fromJson(jsonMap(item)))
+                .toList(growable: false)
           : const <VocabMicroLearningWord>[],
     );
   }

@@ -32,7 +32,8 @@ class DictionaryScreenState {
   }
 }
 
-class DictionaryController extends AutoDisposeAsyncNotifier<DictionaryScreenState> {
+class DictionaryController
+    extends AutoDisposeAsyncNotifier<DictionaryScreenState> {
   static const _defaultQuery = DictionaryQueryParams();
 
   @override
@@ -52,10 +53,7 @@ class DictionaryController extends AutoDisposeAsyncNotifier<DictionaryScreenStat
     state = await AsyncValue.guard(() => _load(nextQuery));
   }
 
-  Future<void> updateFilter({
-    String? wordType,
-    bool? isFavorite,
-  }) async {
+  Future<void> updateFilter({String? wordType, bool? isFavorite}) async {
     final nextQuery = state.requireValue.query.copyWith(
       page: 0,
       wordType: wordType,
@@ -92,7 +90,9 @@ class DictionaryController extends AutoDisposeAsyncNotifier<DictionaryScreenStat
   }
 
   Future<DictionaryWord> addWord(DictionaryWord draft) async {
-    final word = await ref.read(dictionaryApiProvider).addWord(draft.toAddPayload());
+    final word = await ref
+        .read(dictionaryApiProvider)
+        .addWord(draft.toAddPayload());
     state = await AsyncValue.guard(() => _load(state.requireValue.query));
     return word;
   }
@@ -101,20 +101,17 @@ class DictionaryController extends AutoDisposeAsyncNotifier<DictionaryScreenStat
     final api = ref.read(dictionaryApiProvider);
     final stats = await api.getStats();
     final page = await api.searchWords(query);
-    return DictionaryScreenState(
-      query: query,
-      stats: stats,
-      page: page,
-    );
+    return DictionaryScreenState(query: query, stats: stats, page: page);
   }
 }
 
 final dictionaryControllerProvider =
-    AutoDisposeAsyncNotifierProvider<DictionaryController, DictionaryScreenState>(
-  DictionaryController.new,
-);
+    AutoDisposeAsyncNotifierProvider<
+      DictionaryController,
+      DictionaryScreenState
+    >(DictionaryController.new);
 
-final dictionaryWordDetailProvider =
-    FutureProvider.autoDispose.family<DictionaryWord, String>((ref, wordId) async {
-  return ref.watch(dictionaryApiProvider).getWordById(wordId);
-});
+final dictionaryWordDetailProvider = FutureProvider.autoDispose
+    .family<DictionaryWord, String>((ref, wordId) async {
+      return ref.watch(dictionaryApiProvider).getWordById(wordId);
+    });

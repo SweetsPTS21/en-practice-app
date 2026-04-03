@@ -29,17 +29,22 @@ class PushMessage {
         ? rawMetadata.map((key, value) => MapEntry(key.toString(), value))
         : const <String, dynamic>{};
     return PushMessage(
-      id: json['notificationId']?.toString() ??
+      id:
+          json['notificationId']?.toString() ??
           json['id']?.toString() ??
           json['messageId']?.toString() ??
           '',
       type: json['type']?.toString() ?? 'GENERAL',
       title: json['title']?.toString() ?? 'Notification',
       body: json['body']?.toString(),
-      actionUrl: json['actionUrl']?.toString() ?? metadata['actionUrl']?.toString(),
+      actionUrl:
+          json['actionUrl']?.toString() ?? metadata['actionUrl']?.toString(),
       referenceType:
-          json['referenceType']?.toString() ?? metadata['referenceType']?.toString(),
-      referenceId: json['referenceId']?.toString() ?? metadata['referenceId']?.toString(),
+          json['referenceType']?.toString() ??
+          metadata['referenceType']?.toString(),
+      referenceId:
+          json['referenceId']?.toString() ??
+          metadata['referenceId']?.toString(),
       metadata: metadata,
     );
   }

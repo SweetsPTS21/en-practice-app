@@ -5,10 +5,7 @@ import '../../../../core/retention/weekly_report_models.dart';
 import '../../../../core/theme/theme_extensions.dart';
 
 class WeeklyReportSummaryCard extends StatelessWidget {
-  const WeeklyReportSummaryCard({
-    super.key,
-    required this.report,
-  });
+  const WeeklyReportSummaryCard({super.key, required this.report});
 
   final WeeklyReport report;
 
@@ -18,16 +15,25 @@ class WeeklyReportSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('This week at a glance', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'This week at a glance',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: _MetricTile(label: 'Study minutes', value: '${report.studyMinutes}'),
+                child: _MetricTile(
+                  label: 'Study minutes',
+                  value: '${report.studyMinutes}',
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _MetricTile(label: 'Vocabulary', value: '${report.vocabularyLearned}'),
+                child: _MetricTile(
+                  label: 'Vocabulary',
+                  value: '${report.vocabularyLearned}',
+                ),
               ),
             ],
           ),
@@ -35,7 +41,10 @@ class WeeklyReportSummaryCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _MetricTile(label: 'Tests', value: '${report.testsCompleted}'),
+                child: _MetricTile(
+                  label: 'Tests',
+                  value: '${report.testsCompleted}',
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -55,10 +64,7 @@ class WeeklyReportSummaryCard extends StatelessWidget {
 }
 
 class _MetricTile extends StatelessWidget {
-  const _MetricTile({
-    required this.label,
-    required this.value,
-  });
+  const _MetricTile({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -78,9 +84,9 @@ class _MetricTile extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
           ),
           const SizedBox(height: 6),
           Text(value, style: Theme.of(context).textTheme.titleMedium),

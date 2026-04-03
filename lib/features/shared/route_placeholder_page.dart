@@ -33,10 +33,7 @@ class RoutePlaceholderPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppSectionHeader(
-                title: 'Coming next',
-                subtitle: subtitle,
-              ),
+              AppSectionHeader(title: 'Coming next', subtitle: subtitle),
               const SizedBox(height: 16),
               const AppEmptyState(
                 icon: Icons.schedule_rounded,
@@ -53,7 +50,8 @@ class RoutePlaceholderPage extends StatelessWidget {
             children: [
               const AppSectionHeader(
                 title: 'What to expect',
-                subtitle: 'The finished page will stay focused on one clear job.',
+                subtitle:
+                    'The finished page will stay focused on one clear job.',
               ),
               const SizedBox(height: 16),
               ...highlights.map(
@@ -64,7 +62,10 @@ class RoutePlaceholderPage extends StatelessWidget {
                     children: [
                       const Padding(
                         padding: EdgeInsets.only(top: 2),
-                        child: Icon(Icons.check_circle_outline_rounded, size: 18),
+                        child: Icon(
+                          Icons.check_circle_outline_rounded,
+                          size: 18,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(child: Text(highlight)),

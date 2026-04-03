@@ -11,7 +11,9 @@ class WeeklyReportApi {
 
   Future<WeeklyReport?> getLatest() async {
     try {
-      final response = await _client.get<Object?>('/user/reports/weekly/latest');
+      final response = await _client.get<Object?>(
+        '/user/reports/weekly/latest',
+      );
       if (response.data == null) {
         return null;
       }

@@ -16,15 +16,8 @@ class AuthApi {
     try {
       final response = await _client.post<Object?>(
         '/auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
-        options: Options(
-          extra: const {
-            'skipAuthRefresh': true,
-          },
-        ),
+        data: {'email': email, 'password': password},
+        options: Options(extra: const {'skipAuthRefresh': true}),
       );
 
       return AuthResult.fromJson(jsonMap(response.data));
@@ -46,11 +39,7 @@ class AuthApi {
           'password': password,
           'displayName': displayName,
         },
-        options: Options(
-          extra: const {
-            'skipAuthRefresh': true,
-          },
-        ),
+        options: Options(extra: const {'skipAuthRefresh': true}),
       );
 
       return AuthResult.fromJson(jsonMap(response.data));
@@ -63,14 +52,8 @@ class AuthApi {
     try {
       await _client.post<Object?>(
         '/auth/logout',
-        data: {
-          'refreshToken': refreshToken,
-        },
-        options: Options(
-          extra: const {
-            'skipAuthRefresh': true,
-          },
-        ),
+        data: {'refreshToken': refreshToken},
+        options: Options(extra: const {'skipAuthRefresh': true}),
       );
     } on DioException catch (_) {
       // Logout is best effort.
@@ -94,11 +77,7 @@ class AuthApi {
     try {
       await _client.post<Object?>(
         '/auth/fcm-token',
-        data: {
-          'fcmToken': fcmToken,
-          'os': os,
-          'browser': browser,
-        },
+        data: {'fcmToken': fcmToken, 'os': os, 'browser': browser},
       );
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);

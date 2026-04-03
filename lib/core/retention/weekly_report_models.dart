@@ -70,9 +70,11 @@ class WeeklyReport {
     return WeeklyReport(
       id: json['id']?.toString() ?? '',
       weekStart:
-          DateTime.tryParse(json['weekStart']?.toString() ?? '') ?? DateTime.now(),
+          DateTime.tryParse(json['weekStart']?.toString() ?? '') ??
+          DateTime.now(),
       weekEnd:
-          DateTime.tryParse(json['weekEnd']?.toString() ?? '') ?? DateTime.now(),
+          DateTime.tryParse(json['weekEnd']?.toString() ?? '') ??
+          DateTime.now(),
       studyMinutes: _readInt(json['studyMinutes']) ?? 0,
       vocabularyLearned: _readInt(json['vocabularyLearned']) ?? 0,
       testsCompleted: _readInt(json['testsCompleted']) ?? 0,

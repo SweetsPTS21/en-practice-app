@@ -13,7 +13,8 @@ class AuthUser {
     return AuthUser(
       id: _readString(json['id']) ?? '',
       email: _readString(json['email']) ?? '',
-      displayName: _readString(json['displayName']) ??
+      displayName:
+          _readString(json['displayName']) ??
           _readString(json['name']) ??
           _readString(json['email']) ??
           'Learner',
@@ -21,16 +22,15 @@ class AuthUser {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'displayName': displayName,
-    };
+    return {'id': id, 'email': email, 'displayName': displayName};
   }
 
   String get initials {
     final parts = displayName.trim().split(RegExp(r'\s+'));
-    final letters = parts.where((part) => part.isNotEmpty).take(2).map((part) => part[0]);
+    final letters = parts
+        .where((part) => part.isNotEmpty)
+        .take(2)
+        .map((part) => part[0]);
     final result = letters.join();
     return result.isEmpty ? 'U' : result.toUpperCase();
   }
@@ -55,10 +55,7 @@ class AuthSession {
 }
 
 class AuthResult {
-  const AuthResult({
-    required this.session,
-    required this.user,
-  });
+  const AuthResult({required this.session, required this.user});
 
   final AuthSession session;
   final AuthUser user;
@@ -72,18 +69,15 @@ class AuthResult {
         refreshTokenExpiresAt: _readString(json['refreshTokenExpiresAt']),
       ),
       user: AuthUser.fromJson(
-        (json['user'] is Map ? json['user'] as Map : <Object?, Object?>{})
-            .map((key, value) => MapEntry(key.toString(), value)),
+        (json['user'] is Map ? json['user'] as Map : <Object?, Object?>{}).map(
+          (key, value) => MapEntry(key.toString(), value),
+        ),
       ),
     );
   }
 }
 
-enum AuthStatus {
-  loading,
-  authenticated,
-  unauthenticated,
-}
+enum AuthStatus { loading, authenticated, unauthenticated }
 
 String? _readString(Object? value) {
   final trimmed = value?.toString().trim();

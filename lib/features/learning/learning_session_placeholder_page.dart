@@ -30,6 +30,7 @@ class LearningSessionPlaceholderPage extends ConsumerStatefulWidget {
   ConsumerState<LearningSessionPlaceholderPage> createState() =>
       _LearningSessionPlaceholderPageState();
 }
+
 class _LearningSessionPlaceholderPageState
     extends ConsumerState<LearningSessionPlaceholderPage> {
   bool _trackedStart = false;
@@ -53,9 +54,9 @@ class _LearningSessionPlaceholderPageState
   @override
   void dispose() {
     if (_trackedStart && !_completed) {
-      ref.read(learningAnalyticsServiceProvider).registerLearningAbandoned(
-            route: widget.route,
-          );
+      ref
+          .read(learningAnalyticsServiceProvider)
+          .registerLearningAbandoned(route: widget.route);
     }
     super.dispose();
   }
@@ -103,13 +104,15 @@ class _LearningSessionPlaceholderPageState
             children: [
               const AppSectionHeader(
                 title: 'Before you start',
-                subtitle: 'Use this screen to confirm the flow, then continue or return without losing context.',
+                subtitle:
+                    'Use this screen to confirm the flow, then continue or return without losing context.',
               ),
               const SizedBox(height: 16),
               AppEmptyState(
                 icon: Icons.play_circle_outline_rounded,
                 title: '${widget.module} session ready',
-                subtitle: 'When you complete this flow, the app will take you to the matching result screen.',
+                subtitle:
+                    'When you complete this flow, the app will take you to the matching result screen.',
               ),
             ],
           ),
@@ -120,10 +123,9 @@ class _LearningSessionPlaceholderPageState
 
   Future<void> _handleCompleteSession() async {
     _completed = true;
-    await ref.read(learningAnalyticsServiceProvider).registerLearningCompletion(
-          route: widget.route,
-          xpEarned: 15,
-        );
+    await ref
+        .read(learningAnalyticsServiceProvider)
+        .registerLearningCompletion(route: widget.route, xpEarned: 15);
 
     if (mounted) {
       context.go(_resultRouteFor(widget.route));
@@ -139,20 +141,23 @@ class _LearningSessionPlaceholderPageState
       return '/ielts/result/${ieltsMatch.group(1)}';
     }
 
-    final writingMatch =
-        RegExp(r'^/writing/task/([^/?#]+)/take$').firstMatch(path);
+    final writingMatch = RegExp(
+      r'^/writing/task/([^/?#]+)/take$',
+    ).firstMatch(path);
     if (writingMatch != null) {
       return '/writing/submission/${writingMatch.group(1)}';
     }
 
-    final speakingMatch =
-        RegExp(r'^/speaking/practice/([^/?#]+)$').firstMatch(path);
+    final speakingMatch = RegExp(
+      r'^/speaking/practice/([^/?#]+)$',
+    ).firstMatch(path);
     if (speakingMatch != null) {
       return '/speaking/result/${speakingMatch.group(1)}';
     }
 
-    final customSpeakingMatch =
-        RegExp(r'^/custom-speaking/conversation/([^/?#]+)$').firstMatch(path);
+    final customSpeakingMatch = RegExp(
+      r'^/custom-speaking/conversation/([^/?#]+)$',
+    ).firstMatch(path);
     if (customSpeakingMatch != null) {
       return '/custom-speaking/result/${customSpeakingMatch.group(1)}';
     }

@@ -11,13 +11,13 @@ class RecommendationApi {
 
   final Dio _client;
 
-  Future<RecommendationCardModel?> getPrimary(RecommendationSurface surface) async {
+  Future<RecommendationCardModel?> getPrimary(
+    RecommendationSurface surface,
+  ) async {
     try {
       final response = await _client.get<Object?>(
         '/user/recommendations/primary',
-        queryParameters: <String, dynamic>{
-          'surface': surface.value,
-        },
+        queryParameters: <String, dynamic>{'surface': surface.value},
       );
 
       if (response.data == null) {
@@ -42,9 +42,7 @@ class RecommendationApi {
     try {
       final response = await _client.get<Object?>(
         '/user/recommendations/feed',
-        queryParameters: <String, dynamic>{
-          'surface': surface.value,
-        },
+        queryParameters: <String, dynamic>{'surface': surface.value},
       );
 
       if (response.data == null) {

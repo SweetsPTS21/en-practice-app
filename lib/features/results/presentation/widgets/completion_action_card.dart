@@ -31,24 +31,28 @@ class CompletionActionCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             action.reason?.replaceAll('_', ' ') ?? action.label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
           ),
           if (action.estimatedMinutes != null) ...[
             const SizedBox(height: 10),
             Text(
               '${action.estimatedMinutes} min',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: tokens.primary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: tokens.primary),
             ),
           ],
           const SizedBox(height: 14),
           AppButton(
             label: action.label,
-            icon: outline ? Icons.open_in_new_rounded : Icons.arrow_forward_rounded,
-            variant: outline ? AppButtonVariant.outline : AppButtonVariant.filled,
+            icon: outline
+                ? Icons.open_in_new_rounded
+                : Icons.arrow_forward_rounded,
+            variant: outline
+                ? AppButtonVariant.outline
+                : AppButtonVariant.filled,
             onPressed: onPressed,
           ),
         ],

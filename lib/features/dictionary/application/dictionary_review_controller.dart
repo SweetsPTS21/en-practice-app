@@ -27,7 +27,9 @@ class DictionaryReviewState {
   final ReviewSessionSummary? session;
 
   ReviewWord? get currentWord =>
-      currentIndex >= 0 && currentIndex < words.length ? words[currentIndex] : null;
+      currentIndex >= 0 && currentIndex < words.length
+      ? words[currentIndex]
+      : null;
 
   int get answeredCount => answers.length;
 
@@ -65,16 +67,15 @@ class DictionaryReviewState {
       currentIndex: currentIndex ?? this.currentIndex,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       isCompleted: isCompleted ?? this.isCompleted,
-      session: identical(session, _sentinel) ? this.session : session as ReviewSessionSummary?,
+      session: identical(session, _sentinel)
+          ? this.session
+          : session as ReviewSessionSummary?,
     );
   }
 }
 
 class DictionaryReviewArgs {
-  const DictionaryReviewArgs({
-    required this.filter,
-    required this.limit,
-  });
+  const DictionaryReviewArgs({required this.filter, required this.limit});
 
   final ReviewFilter filter;
   final int limit;
@@ -94,7 +95,11 @@ class DictionaryReviewArgs {
 }
 
 class DictionaryReviewController
-    extends AutoDisposeFamilyAsyncNotifier<DictionaryReviewState, DictionaryReviewArgs> {
+    extends
+        AutoDisposeFamilyAsyncNotifier<
+          DictionaryReviewState,
+          DictionaryReviewArgs
+        > {
   @override
   Future<DictionaryReviewState> build(DictionaryReviewArgs arg) async {
     final api = ref.watch(reviewApiProvider);
@@ -122,7 +127,8 @@ class DictionaryReviewController
       return current.session;
     }
 
-    final answers = Map<String, bool>.from(current.answers)..[word.word] = isCorrect;
+    final answers = Map<String, bool>.from(current.answers)
+      ..[word.word] = isCorrect;
     final nextIndex = current.currentIndex + 1;
     final isDone = nextIndex >= current.words.length;
     state = AsyncData(
@@ -146,7 +152,9 @@ class DictionaryReviewController
     try {
       final total = current.words.length;
       final correct = current.correctCount;
-      final session = await ref.read(reviewApiProvider).submitReviewSession(
+      final session = await ref
+          .read(reviewApiProvider)
+          .submitReviewSession(
             ReviewSessionPayload(
               filter: current.filter,
               total: total,
@@ -163,7 +171,9 @@ class DictionaryReviewController
                   .toList(growable: false),
             ),
           );
-      state = AsyncData(state.requireValue.copyWith(isSubmitting: false, session: session));
+      state = AsyncData(
+        state.requireValue.copyWith(isSubmitting: false, session: session),
+      );
       return session;
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
@@ -172,9 +182,11 @@ class DictionaryReviewController
   }
 }
 
-final dictionaryReviewControllerProvider = AutoDisposeAsyncNotifierProviderFamily<
-    DictionaryReviewController, DictionaryReviewState, DictionaryReviewArgs>(
-  DictionaryReviewController.new,
-);
+final dictionaryReviewControllerProvider =
+    AutoDisposeAsyncNotifierProviderFamily<
+      DictionaryReviewController,
+      DictionaryReviewState,
+      DictionaryReviewArgs
+    >(DictionaryReviewController.new);
 
 const _sentinel = Object();

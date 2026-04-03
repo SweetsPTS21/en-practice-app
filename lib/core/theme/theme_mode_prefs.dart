@@ -1,13 +1,6 @@
-enum AppThemePreference {
-  light,
-  dark,
-  system,
-}
+enum AppThemePreference { light, dark, system }
 
-enum AppResolvedTheme {
-  light,
-  dark,
-}
+enum AppResolvedTheme { light, dark }
 
 AppThemePreference parseThemePreference(String? value) {
   return AppThemePreference.values.firstWhere(

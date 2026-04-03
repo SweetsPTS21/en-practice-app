@@ -9,8 +9,8 @@ class NotificationRealtimeClient extends ChangeNotifier {
   NotificationRealtimeClient({
     required NotificationApi api,
     required bool isAuthenticated,
-  })  : _api = api,
-        _isAuthenticated = isAuthenticated {
+  }) : _api = api,
+       _isAuthenticated = isAuthenticated {
     if (_isAuthenticated) {
       unawaited(_bootstrap());
     }
@@ -52,7 +52,9 @@ class NotificationRealtimeClient extends ChangeNotifier {
     try {
       final notifications = await _api.getNotifications();
       unreadCount = await _api.getUnreadCount();
-      _latestKnownNotificationId = notifications.isEmpty ? null : notifications.first.id;
+      _latestKnownNotificationId = notifications.isEmpty
+          ? null
+          : notifications.first.id;
     } catch (_) {
       unreadCount = 0;
     } finally {
@@ -70,7 +72,9 @@ class NotificationRealtimeClient extends ChangeNotifier {
     try {
       final notifications = await _api.getNotifications();
       final nextUnreadCount = await _api.getUnreadCount();
-      final latestNotification = notifications.isEmpty ? null : notifications.first;
+      final latestNotification = notifications.isEmpty
+          ? null
+          : notifications.first;
 
       unreadCount = nextUnreadCount;
       if (latestNotification != null &&

@@ -1,9 +1,6 @@
 import 'app_route_contract.dart';
 
-enum LearningActionKind {
-  internal,
-  external,
-}
+enum LearningActionKind { internal, external }
 
 class LearningActionInput {
   const LearningActionInput({
@@ -42,6 +39,7 @@ const _referenceFallbacks = <String, String>{
   'WRITING_TASK': '/writing',
   'SPEAKING_ATTEMPT': '/speaking',
   'SPEAKING_TOPIC': '/speaking',
+  'SPEAKING_CONVERSATION': '/speaking',
   'DAILY_SPEAKING_PROMPT': '/speaking?mode=quick',
   'CUSTOM_SPEAKING_CONVERSATION': '/custom-speaking',
   'IELTS_ATTEMPT': '/ielts',
@@ -58,6 +56,7 @@ const _referenceFallbacks = <String, String>{
 const _moduleFallbacks = <String, String>{
   'WRITING': '/writing',
   'SPEAKING': '/speaking',
+  'CUSTOM_SPEAKING': '/custom-speaking',
   'IELTS': '/ielts',
   'VOCABULARY': '/dictionary',
   'DICTIONARY': '/dictionary',
@@ -78,7 +77,9 @@ LearningActionTarget resolveLearningActionTarget(LearningActionInput input) {
     );
   }
 
-  final detailRoute = _normalizeInternalCandidate(_mapActionUrlToDetailRoute(actionUrl));
+  final detailRoute = _normalizeInternalCandidate(
+    _mapActionUrlToDetailRoute(actionUrl),
+  );
   if (detailRoute != null) {
     return LearningActionTarget(
       kind: LearningActionKind.internal,
@@ -99,7 +100,10 @@ LearningActionTarget resolveLearningActionTarget(LearningActionInput input) {
   }
 
   if (actionUrl != null &&
-      RegExp(r'^/ielts/tests/[^/?#]+/resume', caseSensitive: false).hasMatch(actionUrl) &&
+      RegExp(
+        r'^/ielts/tests/[^/?#]+/resume',
+        caseSensitive: false,
+      ).hasMatch(actionUrl) &&
       input.referenceType == 'IELTS_ATTEMPT' &&
       input.referenceId != null &&
       input.referenceId!.isNotEmpty) {
@@ -173,7 +177,9 @@ String? _mapActionUrlToDetailRoute(String? actionUrl) {
 
   try {
     final uri = Uri.parse(
-      actionUrl.startsWith('http') ? actionUrl : 'https://en-practice.local$actionUrl',
+      actionUrl.startsWith('http')
+          ? actionUrl
+          : 'https://en-practice.local$actionUrl',
     );
     final writingTaskMatch = RegExp(
       r'^/writing/tasks/([^/?#]+)(?:/.*)?$',
@@ -189,6 +195,14 @@ String? _mapActionUrlToDetailRoute(String? actionUrl) {
     ).firstMatch(uri.path);
     if (ieltsTestMatch != null) {
       return '/ielts/test/${ieltsTestMatch.group(1)}${_composeUriSuffix(uri)}';
+    }
+
+    final speakingTopicMatch = RegExp(
+      r'^/speaking/topics/([^/?#]+)(?:/.*)?$',
+      caseSensitive: false,
+    ).firstMatch(uri.path);
+    if (speakingTopicMatch != null) {
+      return '/speaking/practice/${speakingTopicMatch.group(1)}${_composeUriSuffix(uri)}';
     }
   } catch (_) {
     return null;

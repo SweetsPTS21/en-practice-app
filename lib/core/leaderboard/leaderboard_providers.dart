@@ -9,7 +9,9 @@ final leaderboardApiProvider = Provider<LeaderboardApi>((ref) {
   return LeaderboardApi(client);
 });
 
-final leaderboardSummaryProvider = FutureProvider<LeaderboardSummaryResponse>((ref) async {
+final leaderboardSummaryProvider = FutureProvider<LeaderboardSummaryResponse>((
+  ref,
+) async {
   final api = ref.watch(leaderboardApiProvider);
   return api.getSummary();
 });

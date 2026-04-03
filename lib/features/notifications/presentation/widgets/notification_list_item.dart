@@ -32,10 +32,14 @@ class NotificationListItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: item.isRead ? tokens.background.panelStrong : tokens.background.elevated,
+            color: item.isRead
+                ? tokens.background.panelStrong
+                : tokens.background.elevated,
             borderRadius: BorderRadius.circular(tokens.radius.xl),
             border: Border.all(
-              color: item.isRead ? tokens.border.subtle : priorityColor.withValues(alpha: 0.28),
+              color: item.isRead
+                  ? tokens.border.subtle
+                  : priorityColor.withValues(alpha: 0.28),
             ),
           ),
           child: Row(
@@ -49,7 +53,9 @@ class NotificationListItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(tokens.radius.lg),
                 ),
                 child: Icon(
-                  item.isRead ? Icons.mark_email_read_rounded : Icons.mark_email_unread_rounded,
+                  item.isRead
+                      ? Icons.mark_email_read_rounded
+                      : Icons.mark_email_unread_rounded,
                   color: priorityColor,
                 ),
               ),
@@ -58,14 +64,17 @@ class NotificationListItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.title, style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      item.title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     if ((item.body ?? '').isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         item.body ?? '',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: tokens.text.secondary,
-                            ),
+                          color: tokens.text.secondary,
+                        ),
                       ),
                     ],
                     const SizedBox(height: 8),
@@ -75,7 +84,9 @@ class NotificationListItem extends StatelessWidget {
                       children: [
                         _Chip(label: item.priority),
                         if ((item.reason ?? '').isNotEmpty)
-                          _Chip(label: (item.reason ?? '').replaceAll('_', ' ')),
+                          _Chip(
+                            label: (item.reason ?? '').replaceAll('_', ' '),
+                          ),
                         if (item.estimatedMinutes != null)
                           _Chip(label: '${item.estimatedMinutes} min'),
                       ],
@@ -86,7 +97,10 @@ class NotificationListItem extends StatelessWidget {
               IconButton(
                 tooltip: 'Delete',
                 onPressed: onDelete,
-                icon: Icon(Icons.delete_outline_rounded, color: tokens.text.secondary),
+                icon: Icon(
+                  Icons.delete_outline_rounded,
+                  color: tokens.text.secondary,
+                ),
               ),
             ],
           ),
@@ -97,9 +111,7 @@ class NotificationListItem extends StatelessWidget {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({
-    required this.label,
-  });
+  const _Chip({required this.label});
 
   final String label;
 
@@ -112,10 +124,7 @@ class _Chip extends StatelessWidget {
         color: tokens.background.panel,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelMedium,
-      ),
+      child: Text(label, style: Theme.of(context).textTheme.labelMedium),
     );
   }
 }

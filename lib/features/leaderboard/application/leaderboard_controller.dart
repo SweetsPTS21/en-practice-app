@@ -30,17 +30,15 @@ class LeaderboardScreenState {
   }
 }
 
-class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardScreenState> {
+class LeaderboardController
+    extends AutoDisposeAsyncNotifier<LeaderboardScreenState> {
   static const _defaultQuery = LeaderboardQueryParams();
 
   @override
   Future<LeaderboardScreenState> build() async {
     final api = ref.watch(leaderboardApiProvider);
     final response = await api.getLeaderboard(_defaultQuery);
-    return LeaderboardScreenState(
-      query: _defaultQuery,
-      response: response,
-    );
+    return LeaderboardScreenState(query: _defaultQuery, response: response);
   }
 
   Future<void> refresh() async {
@@ -49,22 +47,12 @@ class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardScreenSt
 
   Future<void> updatePeriod(LeaderboardPeriod period) async {
     final current = state.requireValue.query;
-    await _replace(
-      current.copyWith(
-        period: period,
-        page: 0,
-      ),
-    );
+    await _replace(current.copyWith(period: period, page: 0));
   }
 
   Future<void> updateScope(LeaderboardScope scope) async {
     final current = state.requireValue.query;
-    await _replace(
-      current.copyWith(
-        scope: scope,
-        page: 0,
-      ),
-    );
+    await _replace(current.copyWith(scope: scope, page: 0));
   }
 
   Future<void> loadMore() async {
@@ -76,7 +64,9 @@ class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardScreenSt
     state = AsyncData(current.copyWith(isLoadingMore: true));
     try {
       final nextQuery = current.query.copyWith(page: current.query.page + 1);
-      final nextResponse = await ref.read(leaderboardApiProvider).getLeaderboard(nextQuery);
+      final nextResponse = await ref
+          .read(leaderboardApiProvider)
+          .getLeaderboard(nextQuery);
       state = AsyncData(
         current.copyWith(
           query: nextQuery,
@@ -92,16 +82,16 @@ class LeaderboardController extends AutoDisposeAsyncNotifier<LeaderboardScreenSt
   Future<void> _replace(LeaderboardQueryParams nextQuery) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final response = await ref.read(leaderboardApiProvider).getLeaderboard(nextQuery);
-      return LeaderboardScreenState(
-        query: nextQuery,
-        response: response,
-      );
+      final response = await ref
+          .read(leaderboardApiProvider)
+          .getLeaderboard(nextQuery);
+      return LeaderboardScreenState(query: nextQuery, response: response);
     });
   }
 }
 
 final leaderboardControllerProvider =
-    AutoDisposeAsyncNotifierProvider<LeaderboardController, LeaderboardScreenState>(
-  LeaderboardController.new,
-);
+    AutoDisposeAsyncNotifierProvider<
+      LeaderboardController,
+      LeaderboardScreenState
+    >(LeaderboardController.new);

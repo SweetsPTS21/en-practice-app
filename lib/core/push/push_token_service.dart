@@ -9,9 +9,9 @@ class PushTokenService {
     required SharedPreferences preferences,
     required PushPlatformAdapter adapter,
     required PushRegistrationApi registrationApi,
-  })  : _preferences = preferences,
-        _adapter = adapter,
-        _registrationApi = registrationApi;
+  }) : _preferences = preferences,
+       _adapter = adapter,
+       _registrationApi = registrationApi;
 
   final SharedPreferences _preferences;
   final PushPlatformAdapter _adapter;

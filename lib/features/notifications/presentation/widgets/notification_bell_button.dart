@@ -29,24 +29,27 @@ class NotificationBellButton extends ConsumerWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              const Center(
-                child: Icon(Icons.notifications_none_rounded),
-              ),
+              const Center(child: Icon(Icons.notifications_none_rounded)),
               if (realtime.unreadCount > 0)
                 Positioned(
                   top: -2,
                   right: -2,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: tokens.danger,
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      realtime.unreadCount > 99 ? '99+' : '${realtime.unreadCount}',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                          ),
+                      realtime.unreadCount > 99
+                          ? '99+'
+                          : '${realtime.unreadCount}',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelSmall?.copyWith(color: Colors.white),
                     ),
                   ),
                 ),

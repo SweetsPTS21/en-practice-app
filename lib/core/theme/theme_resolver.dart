@@ -23,16 +23,21 @@ AppThemeState resolveAppThemeState({
   final resolvedTheme = switch (effectiveThemePreference) {
     AppThemePreference.light => AppResolvedTheme.light,
     AppThemePreference.dark => AppResolvedTheme.dark,
-    AppThemePreference.system => systemBrightness == Brightness.dark
-        ? AppResolvedTheme.dark
-        : AppResolvedTheme.light,
+    AppThemePreference.system =>
+      systemBrightness == Brightness.dark
+          ? AppResolvedTheme.dark
+          : AppResolvedTheme.light,
   };
   final isDark = resolvedTheme == AppResolvedTheme.dark;
   final surfaces =
-      appThemeBackgroundPresets[effectiveThemeBackgroundPreference]!.resolve(isDark);
+      appThemeBackgroundPresets[effectiveThemeBackgroundPreference]!.resolve(
+        isDark,
+      );
 
   var primary = isDark ? const Color(0xFF7AB8FF) : const Color(0xFF2563EB);
-  var primaryStrong = isDark ? const Color(0xFFB9D6FF) : const Color(0xFF1D4ED8);
+  var primaryStrong = isDark
+      ? const Color(0xFFB9D6FF)
+      : const Color(0xFF1D4ED8);
   var secondary = isDark ? const Color(0xFF12263C) : const Color(0xFFDCEAFE);
   var accent = isDark ? const Color(0xFF8B9EFF) : const Color(0xFF4F46E5);
   var borderAccent = accent.withValues(alpha: isDark ? 0.52 : 0.28);
@@ -258,10 +263,7 @@ ThemeData buildThemeData(AppThemeState state) {
       ),
     ),
     extensions: [
-      AppThemeExtension(
-        tokens: tokens,
-        pagePalettes: appPagePalettes,
-      ),
+      AppThemeExtension(tokens: tokens, pagePalettes: appPagePalettes),
     ],
   );
 }

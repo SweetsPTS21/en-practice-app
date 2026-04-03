@@ -11,7 +11,9 @@ class FlagshipRetentionApi {
 
   Future<FlagshipRetention?> getFlagshipRetention() async {
     try {
-      final response = await _client.get<Object?>('/user/dashboard/flagship-retention');
+      final response = await _client.get<Object?>(
+        '/user/dashboard/flagship-retention',
+      );
       if (response.data == null) {
         return null;
       }

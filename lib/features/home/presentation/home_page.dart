@@ -45,7 +45,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (auth.isAuthenticated && launchpad.hasValue && !_trackedHomeOpen) {
       _trackedHomeOpen = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(learningAnalyticsServiceProvider).trackEvent(
+        ref
+            .read(learningAnalyticsServiceProvider)
+            .trackEvent(
               const LearningEventPayload(
                 eventName: LearningEventName.homeOpened,
                 source: 'HOME_V2',
@@ -59,8 +61,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (!_consumedFeedback && launchpad.hasValue) {
       _consumedFeedback = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final feedback =
-            ref.read(learningLaunchStoreProvider).consumeRecentLearningFeedback();
+        final feedback = ref
+            .read(learningLaunchStoreProvider)
+            .consumeRecentLearningFeedback();
         if (!mounted || feedback == null) {
           return;
         }
@@ -68,38 +71,47 @@ class _HomePageState extends ConsumerState<HomePage> {
         final message = feedback.xpEarned != null
             ? '${context.tr('home.feedback.completed')} ${feedback.taskTitle ?? context.tr('home.feedback.defaultTask')} · +${feedback.xpEarned} XP'
             : '${context.tr('home.feedback.completed')} ${feedback.taskTitle ?? context.tr('home.feedback.defaultTask')}';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       });
     }
 
     return switch (launchpad) {
       AsyncData<HomeLaunchpadState>(:final value) => RefreshIndicator(
-          onRefresh: () =>
-              ref.read(homeLaunchpadControllerProvider.notifier).refreshLaunchpad(),
-          child: _HomeContent(
-            state: value,
-            onContinueLearning: () => _handleContinueLearning(value.continueLearning),
-            onReminderBanner: value.reminderBanner == null
-                ? null
-                : () => _handleReminderBanner(value.reminderBanner!),
-            onOpenDailyPlan: () => _openDailyPlanSheet(value.dailyPlan),
-            onDailyTask: _handleDailyTask,
-            onQuickPractice: _handleQuickPractice,
-            onOpenSpeakingPrompt: value.flagshipRetention?.dailySpeakingPrompt == null
-                ? null
-                : () => _handleDailySpeakingPrompt(value.flagshipRetention!.dailySpeakingPrompt!),
-            onOpenVocabMicroLearning: value.flagshipRetention?.vocabMicroLearning == null
-                ? null
-                : () => _handleVocabMicroLearning(value.flagshipRetention!.vocabMicroLearning!),
-            onOpenChallenge: () => context.go('/challenges'),
-          ),
+        onRefresh: () => ref
+            .read(homeLaunchpadControllerProvider.notifier)
+            .refreshLaunchpad(),
+        child: _HomeContent(
+          state: value,
+          onContinueLearning: () =>
+              _handleContinueLearning(value.continueLearning),
+          onReminderBanner: value.reminderBanner == null
+              ? null
+              : () => _handleReminderBanner(value.reminderBanner!),
+          onOpenDailyPlan: () => _openDailyPlanSheet(value.dailyPlan),
+          onDailyTask: _handleDailyTask,
+          onQuickPractice: _handleQuickPractice,
+          onOpenSpeakingPrompt:
+              value.flagshipRetention?.dailySpeakingPrompt == null
+              ? null
+              : () => _handleDailySpeakingPrompt(
+                  value.flagshipRetention!.dailySpeakingPrompt!,
+                ),
+          onOpenVocabMicroLearning:
+              value.flagshipRetention?.vocabMicroLearning == null
+              ? null
+              : () => _handleVocabMicroLearning(
+                  value.flagshipRetention!.vocabMicroLearning!,
+                ),
+          onOpenChallenge: () => context.go('/challenges'),
         ),
+      ),
       AsyncError() => _HomeErrorState(
-          onRetry: () =>
-              ref.read(homeLaunchpadControllerProvider.notifier).refreshLaunchpad(),
-        ),
+        onRetry: () => ref
+            .read(homeLaunchpadControllerProvider.notifier)
+            .refreshLaunchpad(),
+      ),
       _ => const _HomeLoadingState(),
     };
   }
@@ -129,7 +141,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
     );
 
-    await ref.read(learningAnalyticsServiceProvider).trackEvent(
+    await ref
+        .read(learningAnalyticsServiceProvider)
+        .trackEvent(
           LearningEventPayload(
             eventName: LearningEventName.continueLearningClicked,
             source: 'HOME_CONTINUE_CARD',
@@ -147,7 +161,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         );
 
     if (effectiveItem.reason == 'UNFINISHED_ATTEMPT') {
-      await ref.read(learningAnalyticsServiceProvider).trackEvent(
+      await ref
+          .read(learningAnalyticsServiceProvider)
+          .trackEvent(
             LearningEventPayload(
               eventName: LearningEventName.resumeStarted,
               source: 'HOME_CONTINUE_CARD',
@@ -155,9 +171,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               route: target.href,
               referenceType: effectiveItem.referenceType,
               referenceId: effectiveItem.referenceId,
-              metadata: {
-                'reason': effectiveItem.reason,
-              },
+              metadata: {'reason': effectiveItem.reason},
             ),
           );
     }
@@ -191,7 +205,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
     );
 
-    await ref.read(learningAnalyticsServiceProvider).trackEvent(
+    await ref
+        .read(learningAnalyticsServiceProvider)
+        .trackEvent(
           LearningEventPayload(
             eventName: LearningEventName.dailyTaskClicked,
             source: 'HOME_DAILY_PLAN',
@@ -258,7 +274,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _handleReminderBanner(ReminderBanner banner) async {
-    final outcome = await ref.read(learningJourneyActionServiceProvider).prepareAction(
+    final outcome = await ref
+        .read(learningJourneyActionServiceProvider)
+        .prepareAction(
           JourneyActionRequest(
             source: 'HOME_REMINDER_BANNER',
             analyticsEvents: const [LearningEventName.reminderBannerClicked],
@@ -280,7 +298,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     if (outcome.target.kind == LearningActionKind.external) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr('home.common.externalRouteUnsupported'))),
+        SnackBar(
+          content: Text(context.tr('home.common.externalRouteUnsupported')),
+        ),
       );
       return;
     }
@@ -357,14 +377,18 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (target.kind == LearningActionKind.external) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.tr('home.common.externalRouteUnsupported'))),
+          SnackBar(
+            content: Text(context.tr('home.common.externalRouteUnsupported')),
+          ),
         );
       }
       return;
     }
 
     if (target.isLearningSession) {
-      await ref.read(learningLaunchStoreProvider).rememberLearningLaunch(contextData);
+      await ref
+          .read(learningLaunchStoreProvider)
+          .rememberLearningLaunch(contextData);
     }
 
     if (mounted) {
@@ -433,13 +457,15 @@ class _HomeContent extends ConsumerWidget {
     final completedTaskIds = plan == null
         ? const <String>{}
         : ref
-            .watch(learningLaunchStoreProvider)
-            .getCompletedDailyTaskIds(date: plan.date)
-            .toSet();
+              .watch(learningLaunchStoreProvider)
+              .getCompletedDailyTaskIds(date: plan.date)
+              .toSet();
     final pushEntry = ref.watch(pushEntryControllerProvider);
 
     return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
@@ -463,9 +489,7 @@ class _HomeContent extends ConsumerWidget {
         ),
         const SliverPadding(
           padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
-          sliver: SliverToBoxAdapter(
-            child: LeaderboardSummaryWidget(),
-          ),
+          sliver: SliverToBoxAdapter(child: LeaderboardSummaryWidget()),
         ),
         if (state.flagshipRetention?.hasAnyBlock == true)
           SliverPadding(
@@ -489,14 +513,19 @@ class _HomeContent extends ConsumerWidget {
               ),
             ),
           ),
-        if (pushEntry.shouldShowHomePrompt(weeklyXp: state.progressSnapshot?.weeklyXp ?? 0))
+        if (pushEntry.shouldShowHomePrompt(
+          weeklyXp: state.progressSnapshot?.weeklyXp ?? 0,
+        ))
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
             sliver: SliverToBoxAdapter(
               child: _PushPermissionPromptCard(
-                statusLabel: pushEntry.permissionSnapshot?.label ?? 'Not requested yet',
+                statusLabel:
+                    pushEntry.permissionSnapshot?.label ?? 'Not requested yet',
                 onEnable: () => PushPermissionSheet.show(context),
-                onDismiss: () => ref.read(pushLifecycleControllerProvider).dismissContextualPrompt(),
+                onDismiss: () => ref
+                    .read(pushLifecycleControllerProvider)
+                    .dismissContextualPrompt(),
               ),
             ),
           ),
@@ -532,10 +561,7 @@ class _HomeContent extends ConsumerWidget {
 }
 
 class _ContinueLearningCard extends StatelessWidget {
-  const _ContinueLearningCard({
-    required this.item,
-    required this.onPressed,
-  });
+  const _ContinueLearningCard({required this.item, required this.onPressed});
 
   final ContinueLearningItem? item;
   final VoidCallback onPressed;
@@ -544,9 +570,11 @@ class _ContinueLearningCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.pagePalette(AppPagePaletteKey.dashboard);
     final tokens = context.tokens;
-    final title = item?.title ?? context.tr('home.continueLearning.fallbackTitle');
+    final title =
+        item?.title ?? context.tr('home.continueLearning.fallbackTitle');
     final description =
-        item?.description ?? context.tr('home.continueLearning.fallbackDescription');
+        item?.description ??
+        context.tr('home.continueLearning.fallbackDescription');
 
     return Container(
       padding: EdgeInsets.all(tokens.density.panelPadding),
@@ -576,20 +604,24 @@ class _ContinueLearningCard extends StatelessWidget {
             ),
             child: Text(
               context.tr('home.continueLearning.eyebrow'),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white),
+              style: Theme.of(
+                context,
+              ).textTheme.labelMedium?.copyWith(color: Colors.white),
             ),
           ),
           const SizedBox(height: 16),
           Text(
             title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(color: Colors.white),
           ),
           const SizedBox(height: 10),
           Text(
             description,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.88),
-                ),
+              color: Colors.white.withValues(alpha: 0.88),
+            ),
           ),
           const SizedBox(height: 16),
           Wrap(
@@ -598,7 +630,8 @@ class _ContinueLearningCard extends StatelessWidget {
             children: [
               _HeroMetaChip(
                 icon: Icons.schedule_rounded,
-                label: '${item?.estimatedMinutes ?? 5} ${context.tr('home.common.minutes')}',
+                label:
+                    '${item?.estimatedMinutes ?? 5} ${context.tr('home.common.minutes')}',
               ),
               _HeroMetaChip(
                 icon: Icons.flag_rounded,
@@ -621,10 +654,7 @@ class _ContinueLearningCard extends StatelessWidget {
 }
 
 class _HeroMetaChip extends StatelessWidget {
-  const _HeroMetaChip({
-    required this.icon,
-    required this.label,
-  });
+  const _HeroMetaChip({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -644,7 +674,9 @@ class _HeroMetaChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white),
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(color: Colors.white),
           ),
         ],
       ),
@@ -668,7 +700,9 @@ class _DailyPlanPreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    final items = plan?.items.take(3).toList(growable: false) ?? const <DailyLearningPlanItem>[];
+    final items =
+        plan?.items.take(3).toList(growable: false) ??
+        const <DailyLearningPlanItem>[];
 
     return AppCard(
       child: Column(
@@ -677,7 +711,9 @@ class _DailyPlanPreviewCard extends StatelessWidget {
           _SectionHeader(
             title: context.tr('home.dailyPlan.title'),
             subtitle: context.tr('home.dailyPlan.subtitle'),
-            actionLabel: items.isEmpty ? null : context.tr('home.dailyPlan.viewAll'),
+            actionLabel: items.isEmpty
+                ? null
+                : context.tr('home.dailyPlan.viewAll'),
             onAction: items.isEmpty ? null : onOpenAll,
           ),
           const SizedBox(height: 16),
@@ -722,7 +758,9 @@ class _DailyTaskRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isCompleted ? tokens.background.panelStrong : tokens.background.elevated,
+        color: isCompleted
+            ? tokens.background.panelStrong
+            : tokens.background.elevated,
         borderRadius: BorderRadius.circular(tokens.radius.xl),
         border: Border.all(color: tokens.border.subtle),
       ),
@@ -747,21 +785,28 @@ class _DailyTaskRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.title, style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  item.title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 4),
                 Text(
                   item.description,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: tokens.text.secondary,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 12),
           AppButton(
-            label: isCompleted ? context.tr('home.dailyPlan.completed') : item.ctaLabel,
-            variant: isCompleted ? AppButtonVariant.outline : AppButtonVariant.filled,
+            label: isCompleted
+                ? context.tr('home.dailyPlan.completed')
+                : item.ctaLabel,
+            variant: isCompleted
+                ? AppButtonVariant.outline
+                : AppButtonVariant.filled,
             onPressed: isCompleted ? null : onPressed,
           ),
         ],
@@ -771,10 +816,7 @@ class _DailyTaskRow extends StatelessWidget {
 }
 
 class _QuickPracticeCard extends StatelessWidget {
-  const _QuickPracticeCard({
-    required this.items,
-    required this.onPressed,
-  });
+  const _QuickPracticeCard({required this.items, required this.onPressed});
 
   final List<QuickPracticeItem> items;
   final ValueChanged<QuickPracticeItem> onPressed;
@@ -813,10 +855,7 @@ class _QuickPracticeCard extends StatelessWidget {
 }
 
 class _QuickPracticeRow extends StatelessWidget {
-  const _QuickPracticeRow({
-    required this.item,
-    required this.onPressed,
-  });
+  const _QuickPracticeRow({required this.item, required this.onPressed});
 
   final QuickPracticeItem item;
   final VoidCallback onPressed;
@@ -853,13 +892,16 @@ class _QuickPracticeRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.title, style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      item.title,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       item.description,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: tokens.text.secondary,
-                          ),
+                        color: tokens.text.secondary,
+                      ),
                     ),
                   ],
                 ),
@@ -872,9 +914,9 @@ class _QuickPracticeRow extends StatelessWidget {
                     item.estimatedMinutes == null
                         ? context.tr('home.quickPractice.startNow')
                         : '${item.estimatedMinutes} ${context.tr('home.common.minutes')}',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: tokens.primary,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(color: tokens.primary),
                   ),
                   const SizedBox(height: 6),
                   Icon(Icons.arrow_forward_rounded, color: tokens.primary),
@@ -907,13 +949,16 @@ class _PushPermissionPromptCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Stay in the loop', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'Stay in the loop',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           Text(
             'Ask for push permission after the learner already has momentum. This prompt is gated by actual weekly XP, not by first app launch.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
           ),
           const SizedBox(height: 14),
           Container(
@@ -953,9 +998,7 @@ class _PushPermissionPromptCard extends StatelessWidget {
 }
 
 class _ProgressSnapshotCard extends StatelessWidget {
-  const _ProgressSnapshotCard({
-    required this.snapshot,
-  });
+  const _ProgressSnapshotCard({required this.snapshot});
 
   final ProgressSnapshot? snapshot;
 
@@ -1011,9 +1054,9 @@ class _ProgressSnapshotCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             '$progress% ${context.tr('home.progress.progressLabel')}',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(color: tokens.text.secondary),
           ),
           if ((snapshot?.latestImprovementText ?? '').isNotEmpty) ...[
             const SizedBox(height: 14),
@@ -1035,10 +1078,7 @@ class _ProgressSnapshotCard extends StatelessWidget {
 }
 
 class _MetricTile extends StatelessWidget {
-  const _MetricTile({
-    required this.label,
-    required this.value,
-  });
+  const _MetricTile({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -1059,9 +1099,9 @@ class _MetricTile extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
           ),
           const SizedBox(height: 6),
           Text(value, style: Theme.of(context).textTheme.titleMedium),
@@ -1099,14 +1139,15 @@ class _SectionHeader extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 subtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: tokens.text.secondary,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
               ),
             ],
           ),
         ),
-        if (actionLabel != null) TextButton(onPressed: onAction, child: Text(actionLabel!)),
+        if (actionLabel != null)
+          TextButton(onPressed: onAction, child: Text(actionLabel!)),
       ],
     );
   }
@@ -1144,9 +1185,9 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
           ),
         ],
       ),
@@ -1160,7 +1201,9 @@ class _HomeLoadingState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
       children: const [
         _LoadingBlock(height: 240),
@@ -1176,9 +1219,7 @@ class _HomeLoadingState extends StatelessWidget {
 }
 
 class _HomeErrorState extends StatelessWidget {
-  const _HomeErrorState({
-    required this.onRetry,
-  });
+  const _HomeErrorState({required this.onRetry});
 
   final Future<void> Function() onRetry;
 
@@ -1191,7 +1232,11 @@ class _HomeErrorState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.cloud_off_rounded, size: 40, color: context.tokens.warning),
+              Icon(
+                Icons.cloud_off_rounded,
+                size: 40,
+                color: context.tokens.warning,
+              ),
               const SizedBox(height: 12),
               Text(
                 context.tr('home.common.errorTitle'),
@@ -1217,9 +1262,7 @@ class _HomeErrorState extends StatelessWidget {
 }
 
 class _LoadingBlock extends StatelessWidget {
-  const _LoadingBlock({
-    required this.height,
-  });
+  const _LoadingBlock({required this.height});
 
   final double height;
 
@@ -1235,4 +1278,3 @@ class _LoadingBlock extends StatelessWidget {
     );
   }
 }
-

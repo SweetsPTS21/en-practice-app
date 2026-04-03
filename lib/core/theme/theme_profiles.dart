@@ -25,10 +25,7 @@ AppThemeProfilePreference parseThemeProfilePreference(String? value) {
 
 @immutable
 class AppThemeProfileBehavior {
-  const AppThemeProfileBehavior({
-    this.lockMode,
-    this.lockBackground,
-  });
+  const AppThemeProfileBehavior({this.lockMode, this.lockBackground});
 
   final AppThemePreference? lockMode;
   final AppThemeBackgroundPreference? lockBackground;
@@ -280,9 +277,7 @@ const appThemeProfiles = <AppThemeProfilePreference, AppThemeProfileDefinition>{
       compactGap: 8,
       regularGap: 14,
     ),
-    palette: AppThemePaletteOverride(
-      accent: Color(0xFF2563EB),
-    ),
+    palette: AppThemePaletteOverride(accent: Color(0xFF2563EB)),
   ),
   AppThemeProfilePreference.signal: AppThemeProfileDefinition(
     radius: AppRadiusTokens(

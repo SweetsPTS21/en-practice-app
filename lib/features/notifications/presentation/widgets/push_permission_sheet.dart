@@ -20,7 +20,8 @@ class PushPermissionSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(pushLifecycleControllerProvider);
-    final status = controller.permissionSnapshot?.status ?? PushPermissionStatus.unknown;
+    final status =
+        controller.permissionSnapshot?.status ?? PushPermissionStatus.unknown;
     final theme = Theme.of(context).textTheme;
 
     return SafeArea(
@@ -67,7 +68,9 @@ class PushPermissionSheet extends ConsumerWidget {
               children: [
                 Expanded(
                   child: AppButton(
-                    label: status == PushPermissionStatus.granted ? 'Close' : 'Not now',
+                    label: status == PushPermissionStatus.granted
+                        ? 'Close'
+                        : 'Not now',
                     variant: AppButtonVariant.outline,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -75,18 +78,26 @@ class PushPermissionSheet extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppButton(
-                    label: status == PushPermissionStatus.granted ? 'Sync token' : 'Enable push',
+                    label: status == PushPermissionStatus.granted
+                        ? 'Sync token'
+                        : 'Enable push',
                     icon: status == PushPermissionStatus.granted
                         ? Icons.sync_rounded
                         : Icons.notifications_active_rounded,
-                    onPressed: controller.isRequestingPermission || controller.isSyncingToken
+                    onPressed:
+                        controller.isRequestingPermission ||
+                            controller.isSyncingToken
                         ? null
                         : () async {
                             if (status == PushPermissionStatus.granted) {
-                              await ref.read(pushLifecycleControllerProvider).syncToken(force: true);
+                              await ref
+                                  .read(pushLifecycleControllerProvider)
+                                  .syncToken(force: true);
                               return;
                             }
-                            await ref.read(pushLifecycleControllerProvider).requestPermission();
+                            await ref
+                                .read(pushLifecycleControllerProvider)
+                                .requestPermission();
                           },
                   ),
                 ),
@@ -100,10 +111,7 @@ class PushPermissionSheet extends ConsumerWidget {
 }
 
 class _StatusRow extends StatelessWidget {
-  const _StatusRow({
-    required this.label,
-    required this.value,
-  });
+  const _StatusRow({required this.label, required this.value});
 
   final String label;
   final String value;

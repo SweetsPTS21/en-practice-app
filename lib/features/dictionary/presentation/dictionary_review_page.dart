@@ -33,7 +33,8 @@ class DictionaryReviewPage extends ConsumerWidget {
 
     return AppPageScaffold(
       title: 'Dictionary review',
-      subtitle: 'Grade each due word quickly, then bridge into the shared result journey.',
+      subtitle:
+          'Grade each due word quickly, then bridge into the shared result journey.',
       paletteKey: AppPagePaletteKey.dictionary,
       children: [
         ...state.when(
@@ -73,9 +74,14 @@ class DictionaryReviewPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Review completed', style: Theme.of(context).textTheme.headlineSmall),
+                      Text(
+                        'Review completed',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
                       const SizedBox(height: 8),
-                      Text('${value.correctCount} / ${value.words.length} correct'),
+                      Text(
+                        '${value.correctCount} / ${value.words.length} correct',
+                      ),
                       const SizedBox(height: 16),
                       AppButton(
                         label: 'Open result',
@@ -86,10 +92,14 @@ class DictionaryReviewPage extends ConsumerWidget {
                               .registerLearningCompletion(
                                 route: route,
                                 xpEarned: value.correctCount * 2,
-                                metadata: {'completedWordCount': value.words.length},
+                                metadata: {
+                                  'completedWordCount': value.words.length,
+                                },
                               );
                           if (context.mounted) {
-                            context.go('/dictionary/review/result/${value.session!.sessionId}');
+                            context.go(
+                              '/dictionary/review/result/${value.session!.sessionId}',
+                            );
                           }
                         },
                       ),
@@ -117,7 +127,10 @@ class DictionaryReviewPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(word!.word, style: Theme.of(context).textTheme.headlineSmall),
+                    Text(
+                      word!.word,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
                     const SizedBox(height: 8),
                     Text(word.meaning),
                     if (word.alternatives.isNotEmpty) ...[
@@ -183,7 +196,11 @@ class DictionaryReviewPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _answer(BuildContext context, WidgetRef ref, bool isCorrect) async {
+  Future<void> _answer(
+    BuildContext context,
+    WidgetRef ref,
+    bool isCorrect,
+  ) async {
     final summary = await ref
         .read(
           dictionaryReviewControllerProvider(
@@ -195,6 +212,8 @@ class DictionaryReviewPage extends ConsumerWidget {
       return;
     }
 
-    await ref.read(learningAnalyticsServiceProvider).registerLearningStartIfNeeded(route);
+    await ref
+        .read(learningAnalyticsServiceProvider)
+        .registerLearningStartIfNeeded(route);
   }
 }

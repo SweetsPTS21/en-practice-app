@@ -10,7 +10,9 @@ class VocabularyTestApi {
 
   final Dio _client;
 
-  Future<VocabularyTestDetail> generate(VocabularyTestGeneratePayload payload) async {
+  Future<VocabularyTestDetail> generate(
+    VocabularyTestGeneratePayload payload,
+  ) async {
     try {
       final response = await _client.post<Object?>(
         '/vocabulary-tests/generate',
@@ -49,7 +51,9 @@ class VocabularyTestApi {
 
   Future<StartVocabularyTestResponse> startTest(String id) async {
     try {
-      final response = await _client.post<Object?>('/vocabulary-tests/$id/start');
+      final response = await _client.post<Object?>(
+        '/vocabulary-tests/$id/start',
+      );
       return StartVocabularyTestResponse.fromJson(jsonMap(response.data));
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);
@@ -85,7 +89,9 @@ class VocabularyTestApi {
       }
       return data
           .whereType<Object?>()
-          .map((item) => VocabularyTestAttemptHistoryItem.fromJson(jsonMap(item)))
+          .map(
+            (item) => VocabularyTestAttemptHistoryItem.fromJson(jsonMap(item)),
+          )
           .toList(growable: false);
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);
@@ -94,8 +100,9 @@ class VocabularyTestApi {
 
   Future<VocabularyTestAttemptResult> getAttemptDetail(String attemptId) async {
     try {
-      final response =
-          await _client.get<Object?>('/vocabulary-tests/attempts/$attemptId');
+      final response = await _client.get<Object?>(
+        '/vocabulary-tests/attempts/$attemptId',
+      );
       return VocabularyTestAttemptResult.fromJson(jsonMap(response.data));
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);

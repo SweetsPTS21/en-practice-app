@@ -38,10 +38,12 @@ const supportedAppRoutePatterns = <String>[
   '/speaking/practice/:id',
   '/speaking/result/:id',
   '/speaking/history',
+  '/speaking/conversation/history',
   '/speaking/conversation/:topicId',
   '/speaking/conversation/result/:id',
   '/custom-speaking',
   '/custom-speaking/conversation/:id',
+  '/custom-speaking/history',
   '/custom-speaking/result/:id',
   '/weekly-report',
   '/challenges',
@@ -59,6 +61,7 @@ const learningSessionRoutePatterns = <String>[
   '/ielts/take/:attemptId',
   '/writing/task/:taskId/take',
   '/speaking/practice/:id',
+  '/speaking/conversation/:topicId',
   '/custom-speaking/conversation/:id',
 ];
 
@@ -67,29 +70,40 @@ const reviewRoutePatterns = <String>[
   '/ielts/result/:attemptId',
   '/writing/submission/:submissionId',
   '/speaking/result/:id',
+  '/speaking/conversation/result/:id',
   '/custom-speaking/result/:id',
 ];
 
 final _routeAliases = <MapEntry<RegExp, String>>[
   MapEntry(RegExp(r'^/dashboard(?=/|$)', caseSensitive: false), '/home'),
   MapEntry(RegExp(r'^/vocabulary$', caseSensitive: false), '/vocabulary-tests'),
-  MapEntry(RegExp(r'^/history(?=/|$)', caseSensitive: false), '/vocabulary-tests/history'),
-  MapEntry(RegExp(r'^/review(?=/|$)', caseSensitive: false), '/dictionary/review'),
+  MapEntry(
+    RegExp(r'^/history(?=/|$)', caseSensitive: false),
+    '/vocabulary-tests/history',
+  ),
+  MapEntry(
+    RegExp(r'^/review(?=/|$)', caseSensitive: false),
+    '/dictionary/review',
+  ),
   MapEntry(
     RegExp(r'^/writing/submissions/([^/?#]+)', caseSensitive: false),
-    '/writing/submission/\$1',
+    r'/writing/submission/$1',
+  ),
+  MapEntry(
+    RegExp(r'^/writing/tasks/([^/?#]+)$', caseSensitive: false),
+    r'/writing/task/$1',
   ),
   MapEntry(
     RegExp(r'^/ielts/attempts/([^/?#]+)', caseSensitive: false),
-    '/ielts/result/\$1',
+    r'/ielts/result/$1',
   ),
   MapEntry(
     RegExp(r'^/speaking/attempts/([^/?#]+)', caseSensitive: false),
-    '/speaking/result/\$1',
+    r'/speaking/result/$1',
   ),
   MapEntry(
     RegExp(r'^/ielts/tests/([^/?#]+)/resume', caseSensitive: false),
-    '/ielts/test/\$1',
+    r'/ielts/test/$1',
   ),
   MapEntry(
     RegExp(r'^/practice/reading/matching-headings', caseSensitive: false),
@@ -101,16 +115,25 @@ final _routeAliases = <MapEntry<RegExp, String>>[
   ),
   MapEntry(
     RegExp(r'^/custom-speaking-conversations/([^/?#]+)', caseSensitive: false),
-    '/custom-speaking/result/\$1',
+    r'/custom-speaking/result/$1',
+  ),
+  MapEntry(
+    RegExp(r'^/speaking/conversations/([^/?#]+)', caseSensitive: false),
+    r'/speaking/conversation/result/$1',
+  ),
+  MapEntry(
+    RegExp(r'^/speaking/custom/([^/?#]+)', caseSensitive: false),
+    r'/custom-speaking/conversation/$1',
+  ),
+  MapEntry(
+    RegExp(r'^/speaking/custom(?=/|$)', caseSensitive: false),
+    '/custom-speaking',
   ),
   MapEntry(
     RegExp(r'^/reports/weekly/latest(?=/|$)', caseSensitive: false),
     '/weekly-report',
   ),
-  MapEntry(
-    RegExp(r'^/xp/history(?=/|$)', caseSensitive: false),
-    '/xp-history',
-  ),
+  MapEntry(RegExp(r'^/xp/history(?=/|$)', caseSensitive: false), '/xp-history'),
 ];
 
 AppResolvedRoute? normalizeInternalRoute(String? route) {
@@ -136,7 +159,10 @@ AppResolvedRoute? normalizeInternalRoute(String? route) {
 
   var normalizedPathname = uri.path.isEmpty ? '/' : uri.path;
   for (final alias in _routeAliases) {
-    normalizedPathname = normalizedPathname.replaceFirst(alias.key, alias.value);
+    normalizedPathname = normalizedPathname.replaceFirstMapped(
+      alias.key,
+      (match) => _expandRouteAlias(alias.value, match),
+    );
   }
 
   final questionIndex = normalizedPathname.indexOf('?');
@@ -200,6 +226,14 @@ bool routesMatch(String? routeA, String? routeB) {
 
   return normalizedA.pathname == normalizedB.pathname ||
       normalizedB.pathname.startsWith('${normalizedA.pathname}/');
+}
+
+String _expandRouteAlias(String template, Match match) {
+  var result = template;
+  for (var index = 1; index <= match.groupCount; index += 1) {
+    result = result.replaceAll('\$$index', match.group(index) ?? '');
+  }
+  return result;
 }
 
 bool matchRoutePattern(String path, String pattern) {

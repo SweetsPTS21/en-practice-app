@@ -137,9 +137,9 @@ class LeaderboardPageInfo<T> {
       totalPages: _readInt(json['totalPages']) ?? 0,
       items: rawItems is List
           ? rawItems
-              .whereType<Object?>()
-              .map((item) => itemBuilder(jsonMap(item)))
-              .toList(growable: false)
+                .whereType<Object?>()
+                .map((item) => itemBuilder(jsonMap(item)))
+                .toList(growable: false)
           : <T>[],
     );
   }
@@ -160,12 +160,14 @@ class LeaderboardSummaryResponse {
     final rawTopThree = json['topThree'];
     return LeaderboardSummaryResponse(
       period: LeaderboardPeriod.fromValue(json['period']?.toString()),
-      myRank: json['myRank'] is Map ? MyRankSummary.fromJson(jsonMap(json['myRank'])) : null,
+      myRank: json['myRank'] is Map
+          ? MyRankSummary.fromJson(jsonMap(json['myRank']))
+          : null,
       topThree: rawTopThree is List
           ? rawTopThree
-              .whereType<Object?>()
-              .map((item) => LeaderboardEntry.fromJson(jsonMap(item)))
-              .toList(growable: false)
+                .whereType<Object?>()
+                .map((item) => LeaderboardEntry.fromJson(jsonMap(item)))
+                .toList(growable: false)
           : const <LeaderboardEntry>[],
     );
   }
@@ -187,19 +189,13 @@ class LeaderboardResponse {
   LeaderboardResponse append(LeaderboardResponse next) {
     return LeaderboardResponse(
       myRank: next.myRank ?? myRank,
-      topUsers: <LeaderboardEntry>[
-        ...topUsers,
-        ...next.topUsers,
-      ],
+      topUsers: <LeaderboardEntry>[...topUsers, ...next.topUsers],
       page: LeaderboardPageInfo<LeaderboardEntry>(
         page: next.page.page,
         size: next.page.size,
         totalElements: next.page.totalElements,
         totalPages: next.page.totalPages,
-        items: <LeaderboardEntry>[
-          ...page.items,
-          ...next.page.items,
-        ],
+        items: <LeaderboardEntry>[...page.items, ...next.page.items],
       ),
     );
   }
@@ -220,13 +216,15 @@ class LeaderboardResponse {
     final rawTopUsers = json['topUsers'];
     final topUsers = rawTopUsers is List
         ? rawTopUsers
-            .whereType<Object?>()
-            .map((item) => LeaderboardEntry.fromJson(jsonMap(item)))
-            .toList(growable: false)
+              .whereType<Object?>()
+              .map((item) => LeaderboardEntry.fromJson(jsonMap(item)))
+              .toList(growable: false)
         : parsedPage.items;
 
     return LeaderboardResponse(
-      myRank: json['myRank'] is Map ? MyRankSummary.fromJson(jsonMap(json['myRank'])) : null,
+      myRank: json['myRank'] is Map
+          ? MyRankSummary.fromJson(jsonMap(json['myRank']))
+          : null,
       topUsers: topUsers,
       page: LeaderboardPageInfo<LeaderboardEntry>(
         page: parsedPage.page,

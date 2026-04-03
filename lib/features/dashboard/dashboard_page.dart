@@ -39,9 +39,9 @@ class DashboardPage extends ConsumerWidget {
         ),
         child: Text(
           context.tr('dashboard.hero.badge'),
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Colors.white,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge?.copyWith(color: Colors.white),
         ),
       ),
       children: [
@@ -82,7 +82,9 @@ class DashboardPage extends ConsumerWidget {
                   _MetricCard(
                     label: context.tr('dashboard.metrics.mockReadiness'),
                     value: '84%',
-                    caption: context.tr('dashboard.metrics.mockReadinessCaption'),
+                    caption: context.tr(
+                      'dashboard.metrics.mockReadinessCaption',
+                    ),
                     color: const Color(0xFF8B5CF6),
                     icon: Icons.analytics_rounded,
                   ),
@@ -113,7 +115,9 @@ class DashboardPage extends ConsumerWidget {
                   .where((destination) => destination.route != '/')
                   .map(
                     (destination) => Padding(
-                      padding: EdgeInsets.only(bottom: tokens.density.compactGap),
+                      padding: EdgeInsets.only(
+                        bottom: tokens.density.compactGap,
+                      ),
                       child: _DestinationCard(destination: destination),
                     ),
                   ),
@@ -179,11 +183,17 @@ class DashboardPage extends ConsumerWidget {
               ),
               _SummaryRow(
                 label: context.tr('dashboard.summary.effectiveMode'),
-                value: _themeModeLabel(context, themeState.effectiveThemePreference),
+                value: _themeModeLabel(
+                  context,
+                  themeState.effectiveThemePreference,
+                ),
               ),
               _SummaryRow(
                 label: context.tr('dashboard.summary.profile'),
-                value: _profileLabel(context, themeState.themeProfilePreference),
+                value: _profileLabel(
+                  context,
+                  themeState.themeProfilePreference,
+                ),
               ),
               _SummaryRow(
                 label: context.tr('dashboard.summary.background'),
@@ -267,20 +277,11 @@ class _MetricCard extends StatelessWidget {
             child: Icon(icon, color: color, size: 18),
           ),
           const Spacer(),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
+          Text(value, style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text(label, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 2),
-          Text(
-            caption,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(caption, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );
@@ -288,9 +289,7 @@ class _MetricCard extends StatelessWidget {
 }
 
 class _DestinationCard extends StatelessWidget {
-  const _DestinationCard({
-    required this.destination,
-  });
+  const _DestinationCard({required this.destination});
 
   final AppDestination destination;
 
@@ -327,10 +326,7 @@ class _DestinationCard extends StatelessWidget {
                   color: palette.accent.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(tokens.radius.lg),
                 ),
-                child: Icon(
-                  destination.icon,
-                  color: palette.accent,
-                ),
+                child: Icon(destination.icon, color: palette.accent),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -343,16 +339,15 @@ class _DestinationCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      context.tr('dashboard.moduleCards${_routeSuffix(destination.route)}'),
+                      context.tr(
+                        'dashboard.moduleCards${_routeSuffix(destination.route)}',
+                      ),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_rounded,
-                color: palette.accent,
-              ),
+              Icon(Icons.arrow_forward_rounded, color: palette.accent),
             ],
           ),
         ),
@@ -399,10 +394,7 @@ class _FocusStrip extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
@@ -420,10 +412,7 @@ class _FocusStrip extends StatelessWidget {
 }
 
 class _SummaryRow extends StatelessWidget {
-  const _SummaryRow({
-    required this.label,
-    required this.value,
-  });
+  const _SummaryRow({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -466,7 +455,10 @@ String _themeModeLabel(BuildContext context, AppThemePreference value) {
   return context.tr('app.theme.modes.${value.name}');
 }
 
-String _backgroundLabel(BuildContext context, AppThemeBackgroundPreference value) {
+String _backgroundLabel(
+  BuildContext context,
+  AppThemeBackgroundPreference value,
+) {
   return context.tr('app.theme.backgrounds.${value.name}');
 }
 
@@ -474,7 +466,10 @@ String _profileLabel(BuildContext context, AppThemeProfilePreference value) {
   return context.tr('app.theme.profiles.${value.name}');
 }
 
-String _solidPrimaryLabel(BuildContext context, AppThemeSolidPrimaryPreference value) {
+String _solidPrimaryLabel(
+  BuildContext context,
+  AppThemeSolidPrimaryPreference value,
+) {
   return context.tr('app.theme.solidPrimary.${value.name}');
 }
 

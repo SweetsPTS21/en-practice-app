@@ -32,10 +32,7 @@ class NotificationItem {
   String? get triggerType => metadata?['triggerType']?.toString();
   int? get estimatedMinutes => _readInt(metadata?['estimatedMinutes']);
 
-  NotificationItem copyWith({
-    bool? isRead,
-    DateTime? readAt,
-  }) {
+  NotificationItem copyWith({bool? isRead, DateTime? readAt}) {
     return NotificationItem(
       id: id,
       type: type,
@@ -68,7 +65,8 @@ class NotificationItem {
               (key, value) => MapEntry(key.toString(), value),
             )
           : null,
-      createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
           DateTime.now(),
       readAt: DateTime.tryParse(json['readAt']?.toString() ?? ''),
     );

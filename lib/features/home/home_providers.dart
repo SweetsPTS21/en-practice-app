@@ -17,12 +17,14 @@ final dashboardApiProvider = Provider<DashboardApi>((ref) {
   return DashboardApi(client);
 });
 
-final homeLaunchpadRepositoryProvider = Provider<HomeLaunchpadRepository>((ref) {
+final homeLaunchpadRepositoryProvider = Provider<HomeLaunchpadRepository>((
+  ref,
+) {
   final api = ref.watch(dashboardApiProvider);
   return HomeLaunchpadRepository(api);
 });
 
 final homeLaunchpadControllerProvider =
     AsyncNotifierProvider<HomeLaunchpadController, HomeLaunchpadState>(
-  HomeLaunchpadController.new,
-);
+      HomeLaunchpadController.new,
+    );

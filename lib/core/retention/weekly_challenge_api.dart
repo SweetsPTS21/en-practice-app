@@ -11,7 +11,9 @@ class WeeklyChallengeApi {
 
   Future<WeeklyChallenge?> getCurrentWeekly() async {
     try {
-      final response = await _client.get<Object?>('/user/challenges/weekly/current');
+      final response = await _client.get<Object?>(
+        '/user/challenges/weekly/current',
+      );
       if (response.data == null) {
         return null;
       }

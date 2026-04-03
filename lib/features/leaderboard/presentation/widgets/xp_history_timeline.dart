@@ -5,10 +5,7 @@ import '../../../../core/leaderboard/xp_history_models.dart';
 import '../../../../core/theme/theme_extensions.dart';
 
 class XpHistoryTimeline extends StatelessWidget {
-  const XpHistoryTimeline({
-    super.key,
-    required this.entries,
-  });
+  const XpHistoryTimeline({super.key, required this.entries});
 
   final List<XpHistoryEntry> entries;
 
@@ -38,20 +35,25 @@ class XpHistoryTimeline extends StatelessWidget {
                         color: tokens.secondary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(tokens.radius.lg),
                       ),
-                      child: Icon(Icons.auto_awesome_rounded, color: tokens.secondary),
+                      child: Icon(
+                        Icons.auto_awesome_rounded,
+                        color: tokens.secondary,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(entry.description, style: Theme.of(context).textTheme.titleMedium),
+                          Text(
+                            entry.description,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             '${entry.source} · ${_formatDate(entry.earnedAt)}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: tokens.text.secondary,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: tokens.text.secondary),
                           ),
                         ],
                       ),
@@ -59,9 +61,9 @@ class XpHistoryTimeline extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       '+${entry.xp}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: tokens.success,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleMedium?.copyWith(color: tokens.success),
                     ),
                   ],
                 ),

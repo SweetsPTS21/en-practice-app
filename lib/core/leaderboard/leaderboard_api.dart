@@ -20,7 +20,9 @@ class LeaderboardApi {
     }
   }
 
-  Future<LeaderboardResponse> getLeaderboard(LeaderboardQueryParams query) async {
+  Future<LeaderboardResponse> getLeaderboard(
+    LeaderboardQueryParams query,
+  ) async {
     try {
       final response = await _client.get<Object?>(
         '/leaderboard',
@@ -32,17 +34,11 @@ class LeaderboardApi {
     }
   }
 
-  Future<XpHistoryResponse> getXpHistory({
-    int page = 0,
-    int size = 20,
-  }) async {
+  Future<XpHistoryResponse> getXpHistory({int page = 0, int size = 20}) async {
     try {
       final response = await _client.get<Object?>(
         '/xp/history',
-        queryParameters: {
-          'page': page,
-          'size': size,
-        },
+        queryParameters: {'page': page, 'size': size},
       );
       return XpHistoryResponse.fromJson(jsonMap(response.data));
     } on DioException catch (error) {

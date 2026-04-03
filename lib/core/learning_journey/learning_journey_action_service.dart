@@ -50,8 +50,8 @@ class LearningJourneyActionService {
   LearningJourneyActionService({
     required LearningAnalyticsService analyticsService,
     required LearningLaunchStore launchStore,
-  })  : _analyticsService = analyticsService,
-        _launchStore = launchStore;
+  }) : _analyticsService = analyticsService,
+       _launchStore = launchStore;
 
   final LearningAnalyticsService _analyticsService;
   final LearningLaunchStore _launchStore;
@@ -113,10 +113,7 @@ class LearningJourneyActionService {
       );
     }
 
-    return JourneyActionOutcome(
-      target: target,
-      isReviewRoute: reviewRoute,
-    );
+    return JourneyActionOutcome(target: target, isReviewRoute: reviewRoute);
   }
 
   Future<JourneyActionOutcome> prepareResultAction({

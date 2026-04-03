@@ -27,8 +27,8 @@ class PushPermissionService {
   PushPermissionService({
     required SharedPreferences preferences,
     required PushPlatformAdapter adapter,
-  })  : _preferences = preferences,
-        _adapter = adapter;
+  }) : _preferences = preferences,
+       _adapter = adapter;
 
   final SharedPreferences _preferences;
   final PushPlatformAdapter _adapter;
@@ -55,7 +55,10 @@ class PushPermissionService {
   }
 
   Future<void> dismissContextualPrompt() async {
-    await _preferences.setString(_lastDismissedAtKey, DateTime.now().toIso8601String());
+    await _preferences.setString(
+      _lastDismissedAtKey,
+      DateTime.now().toIso8601String(),
+    );
   }
 
   bool shouldShowContextualPrompt(
@@ -73,7 +76,8 @@ class PushPermissionService {
     }
 
     final dismissedAt = snapshot.lastContextualDismissedAt;
-    if (dismissedAt != null && DateTime.now().difference(dismissedAt) < const Duration(days: 3)) {
+    if (dismissedAt != null &&
+        DateTime.now().difference(dismissedAt) < const Duration(days: 3)) {
       return false;
     }
 

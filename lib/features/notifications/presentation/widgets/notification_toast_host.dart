@@ -16,7 +16,8 @@ class NotificationToastHost extends ConsumerStatefulWidget {
   const NotificationToastHost({super.key});
 
   @override
-  ConsumerState<NotificationToastHost> createState() => _NotificationToastHostState();
+  ConsumerState<NotificationToastHost> createState() =>
+      _NotificationToastHostState();
 }
 
 class _NotificationToastHostState extends ConsumerState<NotificationToastHost> {
@@ -40,7 +41,9 @@ class _NotificationToastHostState extends ConsumerState<NotificationToastHost> {
     _dismissTimer?.cancel();
     _dismissTimer = Timer(
       const Duration(seconds: 6),
-      () => ref.read(notificationRealtimeClientProvider).consumeForegroundNotification(),
+      () => ref
+          .read(notificationRealtimeClientProvider)
+          .consumeForegroundNotification(),
     );
 
     final tokens = context.tokens;
@@ -78,23 +81,28 @@ class _NotificationToastHostState extends ConsumerState<NotificationToastHost> {
                       color: tokens.primary.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(tokens.radius.lg),
                     ),
-                    child: Icon(Icons.notifications_active_rounded, color: tokens.primary),
+                    child: Icon(
+                      Icons.notifications_active_rounded,
+                      color: tokens.primary,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(item.title, style: Theme.of(context).textTheme.titleMedium),
+                        Text(
+                          item.title,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                         if ((item.body ?? '').isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(
                             item.body ?? '',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: tokens.text.secondary,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: tokens.text.secondary),
                           ),
                         ],
                       ],
@@ -119,7 +127,9 @@ class _NotificationToastHostState extends ConsumerState<NotificationToastHost> {
     BuildContext context,
     NotificationItem item,
   ) async {
-    ref.read(notificationRealtimeClientProvider).consumeForegroundNotification();
+    ref
+        .read(notificationRealtimeClientProvider)
+        .consumeForegroundNotification();
 
     if (!item.isRead) {
       try {
@@ -131,7 +141,9 @@ class _NotificationToastHostState extends ConsumerState<NotificationToastHost> {
 
     await ref.read(notificationRealtimeClientProvider).syncUnreadCount();
 
-    final outcome = await ref.read(learningJourneyActionServiceProvider).prepareAction(
+    final outcome = await ref
+        .read(learningJourneyActionServiceProvider)
+        .prepareAction(
           JourneyActionRequest(
             source: 'NOTIFICATION_TOAST',
             analyticsEvents: const [
@@ -159,7 +171,11 @@ class _NotificationToastHostState extends ConsumerState<NotificationToastHost> {
 
     if (outcome.target.kind == LearningActionKind.external) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('External notification routes are not enabled on mobile yet.')),
+        const SnackBar(
+          content: Text(
+            'External notification routes are not enabled on mobile yet.',
+          ),
+        ),
       );
       return;
     }

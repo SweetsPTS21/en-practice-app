@@ -26,18 +26,18 @@ class RecommendationSurfaceSlot extends ConsumerWidget {
 
     return switch (recommendation) {
       AsyncData(:final value) when value != null => RecommendationCard(
-          recommendation: value,
-          surface: surface,
-          source: source,
-          hero: hero,
-          showFeedbackActions: showFeedbackActions,
-        ),
+        recommendation: value,
+        surface: surface,
+        source: source,
+        hero: hero,
+        showFeedbackActions: showFeedbackActions,
+      ),
       AsyncLoading() => const AppCard(
-          child: SizedBox(
-            height: 180,
-            child: Center(child: CircularProgressIndicator()),
-          ),
+        child: SizedBox(
+          height: 180,
+          child: Center(child: CircularProgressIndicator()),
         ),
+      ),
       _ => const SizedBox.shrink(),
     };
   }

@@ -14,11 +14,7 @@ import '../../theme/page_palettes.dart';
 import '../../theme/theme_extensions.dart';
 
 class AppShell extends ConsumerStatefulWidget {
-  const AppShell({
-    super.key,
-    required this.location,
-    required this.child,
-  });
+  const AppShell({super.key, required this.location, required this.child});
 
   final String location;
   final Widget child;
@@ -66,7 +62,8 @@ class _AppShellState extends ConsumerState<AppShell> {
         return false;
       }
 
-      if ((_scrollAccumulator > 0 && delta < 0) || (_scrollAccumulator < 0 && delta > 0)) {
+      if ((_scrollAccumulator > 0 && delta < 0) ||
+          (_scrollAccumulator < 0 && delta > 0)) {
         _scrollAccumulator = 0;
       }
 
@@ -77,7 +74,8 @@ class _AppShellState extends ConsumerState<AppShell> {
         setState(() {
           _isHeaderVisible = false;
         });
-      } else if (!_isHeaderVisible && _scrollAccumulator <= -_showHeaderThreshold) {
+      } else if (!_isHeaderVisible &&
+          _scrollAccumulator <= -_showHeaderThreshold) {
         _scrollAccumulator = 0;
         setState(() {
           _isHeaderVisible = true;
@@ -85,7 +83,8 @@ class _AppShellState extends ConsumerState<AppShell> {
       }
     }
 
-    if (notification is ScrollEndNotification || notification is UserScrollNotification) {
+    if (notification is ScrollEndNotification ||
+        notification is UserScrollNotification) {
       if (notification is UserScrollNotification &&
           notification.direction != ScrollDirection.idle) {
         return false;
@@ -130,7 +129,9 @@ class _AppShellState extends ConsumerState<AppShell> {
                       child: Align(
                         heightFactor: _isHeaderVisible ? 1 : 0,
                         child: AnimatedSlide(
-                          offset: _isHeaderVisible ? Offset.zero : const Offset(0, -0.18),
+                          offset: _isHeaderVisible
+                              ? Offset.zero
+                              : const Offset(0, -0.18),
                           duration: tokens.motion.normal,
                           curve: Curves.easeOutCubic,
                           child: Padding(
@@ -139,7 +140,9 @@ class _AppShellState extends ConsumerState<AppShell> {
                               user: auth.user,
                               onLogout: auth.isSubmitting
                                   ? null
-                                  : () => ref.read(authControllerProvider).logout(),
+                                  : () => ref
+                                        .read(authControllerProvider)
+                                        .logout(),
                             ),
                           ),
                         ),
@@ -153,13 +156,18 @@ class _AppShellState extends ConsumerState<AppShell> {
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
                         final destination = appPrimaryDestinations[index];
-                        final selected = destination.route == currentDestination.route;
-                        final palette = context.pagePalette(destination.paletteKey);
+                        final selected =
+                            destination.route == currentDestination.route;
+                        final palette = context.pagePalette(
+                          destination.paletteKey,
+                        );
 
                         return Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(tokens.radius.hero),
+                            borderRadius: BorderRadius.circular(
+                              tokens.radius.hero,
+                            ),
                             onTap: () => context.go(destination.route),
                             child: AnimatedContainer(
                               duration: tokens.motion.normal,
@@ -172,7 +180,9 @@ class _AppShellState extends ConsumerState<AppShell> {
                                 color: selected
                                     ? palette.accent.withValues(alpha: 0.16)
                                     : tokens.background.mobileDrawer,
-                                borderRadius: BorderRadius.circular(tokens.radius.hero),
+                                borderRadius: BorderRadius.circular(
+                                  tokens.radius.hero,
+                                ),
                                 border: Border.all(
                                   color: selected
                                       ? palette.accent.withValues(alpha: 0.42)
@@ -185,12 +195,17 @@ class _AppShellState extends ConsumerState<AppShell> {
                                   Icon(
                                     destination.icon,
                                     size: 18,
-                                    color: selected ? palette.accent : tokens.text.secondary,
+                                    color: selected
+                                        ? palette.accent
+                                        : tokens.text.secondary,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     context.tr(destination.labelKey),
-                                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.copyWith(
                                           color: selected
                                               ? tokens.text.primary
                                               : tokens.text.secondary,
@@ -202,7 +217,8 @@ class _AppShellState extends ConsumerState<AppShell> {
                           ),
                         );
                       },
-                      separatorBuilder: (context, index) => const SizedBox(width: 10),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 10),
                       itemCount: appPrimaryDestinations.length,
                     ),
                   ),
@@ -226,10 +242,7 @@ class _AppShellState extends ConsumerState<AppShell> {
 }
 
 class _ShellHeader extends StatelessWidget {
-  const _ShellHeader({
-    required this.user,
-    required this.onLogout,
-  });
+  const _ShellHeader({required this.user, required this.onLogout});
 
   final AuthUser? user;
   final VoidCallback? onLogout;
@@ -254,14 +267,9 @@ class _ShellHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Expanded(
-            child: _HeaderBrand(),
-          ),
+          const Expanded(child: _HeaderBrand()),
           const SizedBox(width: 12),
-          _HeaderActionCluster(
-            user: user,
-            onLogout: onLogout,
-          ),
+          _HeaderActionCluster(user: user, onLogout: onLogout),
         ],
       ),
     );
@@ -309,18 +317,10 @@ class _HeaderBrand extends StatelessWidget {
   }
 }
 
-enum _HeaderMenuAction {
-  profile,
-  theme,
-  settings,
-  logout,
-}
+enum _HeaderMenuAction { profile, theme, settings, logout }
 
 class _HeaderActionCluster extends StatelessWidget {
-  const _HeaderActionCluster({
-    required this.user,
-    required this.onLogout,
-  });
+  const _HeaderActionCluster({required this.user, required this.onLogout});
 
   final AuthUser? user;
   final VoidCallback? onLogout;
@@ -346,10 +346,7 @@ class _HeaderActionCluster extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 2),
             color: tokens.border.subtle,
           ),
-          _AvatarMenu(
-            user: user,
-            onLogout: onLogout,
-          ),
+          _AvatarMenu(user: user, onLogout: onLogout),
         ],
       ),
     );
@@ -375,24 +372,27 @@ class _HeaderNotificationBellButton extends ConsumerWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              const Center(
-                child: Icon(Icons.notifications_none_rounded),
-              ),
+              const Center(child: Icon(Icons.notifications_none_rounded)),
               if (realtime.unreadCount > 0)
                 Positioned(
                   top: -2,
                   right: -2,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: tokens.danger,
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      realtime.unreadCount > 99 ? '99+' : '${realtime.unreadCount}',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                          ),
+                      realtime.unreadCount > 99
+                          ? '99+'
+                          : '${realtime.unreadCount}',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelSmall?.copyWith(color: Colors.white),
                     ),
                   ),
                 ),
@@ -405,10 +405,7 @@ class _HeaderNotificationBellButton extends ConsumerWidget {
 }
 
 class _AvatarMenu extends StatelessWidget {
-  const _AvatarMenu({
-    required this.user,
-    required this.onLogout,
-  });
+  const _AvatarMenu({required this.user, required this.onLogout});
 
   final AuthUser? user;
   final VoidCallback? onLogout;
@@ -542,10 +539,7 @@ class _MenuHeader extends StatelessWidget {
           radius: 20,
           backgroundColor: palette.accent.withValues(alpha: 0.14),
           foregroundColor: palette.accent,
-          child: Text(
-            initials,
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
+          child: Text(initials, style: Theme.of(context).textTheme.labelLarge),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -556,9 +550,9 @@ class _MenuHeader extends StatelessWidget {
                 displayName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: tokens.text.primary,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: tokens.text.primary),
               ),
               if (email.isNotEmpty) ...[
                 const SizedBox(height: 2),
@@ -566,9 +560,9 @@ class _MenuHeader extends StatelessWidget {
                   email,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: tokens.text.secondary,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
                 ),
               ],
             ],
@@ -602,11 +596,7 @@ class _MenuOption extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 2),
-          child: Icon(
-            icon,
-            size: 18,
-            color: color,
-          ),
+          child: Icon(icon, size: 18, color: color),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -615,9 +605,9 @@ class _MenuOption extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: color,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: color),
               ),
               if ((subtitle ?? '').isNotEmpty)
                 Padding(
@@ -625,8 +615,10 @@ class _MenuOption extends StatelessWidget {
                   child: Text(
                     subtitle!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: destructive ? color.withValues(alpha: 0.8) : tokens.text.secondary,
-                        ),
+                      color: destructive
+                          ? color.withValues(alpha: 0.8)
+                          : tokens.text.secondary,
+                    ),
                   ),
                 ),
             ],

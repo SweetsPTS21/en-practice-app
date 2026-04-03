@@ -39,8 +39,13 @@ class DictionaryWord {
     return DictionaryWord(
       id: json['id']?.toString() ?? json['wordId']?.toString() ?? '',
       word: json['word']?.toString() ?? json['englishWord']?.toString() ?? '',
-      meaning: json['meaning']?.toString() ?? json['correctMeaning']?.toString() ?? '',
-      wordType: (json['wordType'] ?? json['type'] ?? '').toString().toUpperCase(),
+      meaning:
+          json['meaning']?.toString() ??
+          json['correctMeaning']?.toString() ??
+          '',
+      wordType: (json['wordType'] ?? json['type'] ?? '')
+          .toString()
+          .toUpperCase(),
       ipa: json['ipa']?.toString() ?? json['phonetic']?.toString() ?? '',
       examples: _stringList(json['examples']),
       isFavorite: json['isFavorite'] == true,
@@ -61,7 +66,8 @@ class DictionaryWord {
       if (wordType.isNotEmpty) 'wordType': wordType,
       'meaning': meaning,
       if (examples.isNotEmpty) 'examples': examples,
-      if (sourceType != null && sourceType!.isNotEmpty) 'sourceType': sourceType,
+      if (sourceType != null && sourceType!.isNotEmpty)
+        'sourceType': sourceType,
     };
   }
 }
@@ -85,9 +91,9 @@ class DictionaryWordPage {
     final rawContent = json['content'];
     final content = rawContent is List
         ? rawContent
-            .whereType<Object?>()
-            .map((item) => DictionaryWord.fromJson(jsonMap(item)))
-            .toList(growable: false)
+              .whereType<Object?>()
+              .map((item) => DictionaryWord.fromJson(jsonMap(item)))
+              .toList(growable: false)
         : const <DictionaryWord>[];
     final totalElements = _asInt(json['totalElements']);
     final size = _asInt(json['size'], fallback: content.length);

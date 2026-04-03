@@ -16,9 +16,9 @@ class RecommendationFeedbackController {
     required RecommendationApi api,
     required LearningAnalyticsService analyticsService,
     required LearningLaunchStore launchStore,
-  })  : _api = api,
-        _analyticsService = analyticsService,
-        _launchStore = launchStore;
+  }) : _api = api,
+       _analyticsService = analyticsService,
+       _launchStore = launchStore;
 
   final RecommendationApi _api;
   final LearningAnalyticsService _analyticsService;
@@ -47,10 +47,7 @@ class RecommendationFeedbackController {
         action: RecommendationFeedbackAction.click,
         sourceSurface: surface,
         route: currentRoute,
-        metadata: {
-          'component': source.toLowerCase(),
-          'position': position,
-        },
+        metadata: {'component': source.toLowerCase(), 'position': position},
       ),
     );
 
@@ -61,7 +58,8 @@ class RecommendationFeedbackController {
         module: recommendation.type,
         route: target.href,
         referenceType: recommendation.referenceType ?? recommendation.type,
-        referenceId: recommendation.referenceId ?? recommendation.recommendationKey,
+        referenceId:
+            recommendation.referenceId ?? recommendation.recommendationKey,
         metadata: {
           'sourceSurface': surface.value,
           'sourceRecommendationKey': recommendation.recommendationKey,
@@ -78,7 +76,8 @@ class RecommendationFeedbackController {
           module: recommendation.type,
           route: target.href,
           referenceType: recommendation.referenceType ?? recommendation.type,
-          referenceId: recommendation.referenceId ?? recommendation.recommendationKey,
+          referenceId:
+              recommendation.referenceId ?? recommendation.recommendationKey,
           taskTitle: recommendation.title,
           reason: recommendation.explanation?.reasonCode ?? recommendation.type,
           estimatedMinutes: recommendation.estimatedMinutes,
@@ -112,10 +111,7 @@ class RecommendationFeedbackController {
         action: RecommendationFeedbackAction.dismiss,
         sourceSurface: surface,
         route: currentRoute,
-        metadata: {
-          'component': source.toLowerCase(),
-          'position': position,
-        },
+        metadata: {'component': source.toLowerCase(), 'position': position},
       ),
     );
   }
@@ -145,13 +141,14 @@ class RecommendationFeedbackController {
   }
 }
 
-final recommendationFeedbackControllerProvider = Provider<RecommendationFeedbackController>((ref) {
-  final api = ref.watch(recommendationApiProvider);
-  final analyticsService = ref.watch(learningAnalyticsServiceProvider);
-  final launchStore = ref.watch(learningLaunchStoreProvider);
-  return RecommendationFeedbackController(
-    api: api,
-    analyticsService: analyticsService,
-    launchStore: launchStore,
-  );
-});
+final recommendationFeedbackControllerProvider =
+    Provider<RecommendationFeedbackController>((ref) {
+      final api = ref.watch(recommendationApiProvider);
+      final analyticsService = ref.watch(learningAnalyticsServiceProvider);
+      final launchStore = ref.watch(learningLaunchStoreProvider);
+      return RecommendationFeedbackController(
+        api: api,
+        analyticsService: analyticsService,
+        launchStore: launchStore,
+      );
+    });

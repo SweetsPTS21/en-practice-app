@@ -44,13 +44,18 @@ class VocabularyTestAttemptPage extends ConsumerWidget {
       );
     }
 
-    final state = ref.watch(vocabularyTestAttemptControllerProvider(startResponse!));
-    final controller = ref.read(vocabularyTestAttemptControllerProvider(startResponse!).notifier);
+    final state = ref.watch(
+      vocabularyTestAttemptControllerProvider(startResponse!),
+    );
+    final controller = ref.read(
+      vocabularyTestAttemptControllerProvider(startResponse!).notifier,
+    );
     final result = state.result;
     if (result != null) {
       return AppPageScaffold(
         title: 'Vocabulary test result',
-        subtitle: 'Accuracy is the primary metric, with question-by-question review below.',
+        subtitle:
+            'Accuracy is the primary metric, with question-by-question review below.',
         paletteKey: AppPagePaletteKey.vocabularyTest,
         children: _buildResultCards(context, result),
       );
@@ -58,11 +63,14 @@ class VocabularyTestAttemptPage extends ConsumerWidget {
 
     return AppPageScaffold(
       title: startResponse!.testDetail.title,
-      subtitle: 'Answer each generated question, then submit the attempt for scoring.',
+      subtitle:
+          'Answer each generated question, then submit the attempt for scoring.',
       paletteKey: AppPagePaletteKey.vocabularyTest,
       children: [
         AppCard(
-          child: Text('${state.answeredCount} / ${state.detail.questions.length} answered'),
+          child: Text(
+            '${state.answeredCount} / ${state.detail.questions.length} answered',
+          ),
         ),
         ...state.detail.questions.map(
           (question) => AppCard(
@@ -103,14 +111,20 @@ class VocabularyTestAttemptPage extends ConsumerWidget {
     );
   }
 
-  List<Widget> _buildResultCards(BuildContext context, VocabularyTestAttemptResult result) {
+  List<Widget> _buildResultCards(
+    BuildContext context,
+    VocabularyTestAttemptResult result,
+  ) {
     return [
       AppCard(
         strong: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${result.accuracyPercent.round()}%', style: Theme.of(context).textTheme.displaySmall),
+            Text(
+              '${result.accuracyPercent.round()}%',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
             const SizedBox(height: 8),
             Text('${result.correctCount} / ${result.totalQuestions} correct'),
           ],

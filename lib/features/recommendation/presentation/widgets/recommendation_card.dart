@@ -74,10 +74,10 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
                     Text(
                       _typeLabel(recommendation.type),
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: accent,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.8,
-                          ),
+                        color: accent,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -124,9 +124,9 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
             const SizedBox(height: 12),
             Text(
               recommendation.description,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: tokens.text.secondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
             ),
           ],
           if ((recommendation.explanation?.message ?? '').isNotEmpty) ...[
@@ -141,9 +141,9 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
               ),
               child: Text(
                 recommendation.explanation!.message!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: tokens.text.secondary,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
               ),
             ),
           ],
@@ -192,7 +192,9 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
 
     try {
       final currentRoute = GoRouterState.of(context).uri.toString();
-      final target = await ref.read(recommendationFeedbackControllerProvider).click(
+      final target = await ref
+          .read(recommendationFeedbackControllerProvider)
+          .click(
             recommendation: widget.recommendation,
             surface: widget.surface,
             source: widget.source,
@@ -206,7 +208,11 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
 
       if (target.kind == LearningActionKind.external) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('External recommendation routes are not enabled on mobile.')),
+          const SnackBar(
+            content: Text(
+              'External recommendation routes are not enabled on mobile.',
+            ),
+          ),
         );
         return;
       }
@@ -217,9 +223,9 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.toString())));
     } finally {
       if (mounted) {
         setState(() {
@@ -235,7 +241,9 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
     });
 
     try {
-      await ref.read(recommendationFeedbackControllerProvider).dismiss(
+      await ref
+          .read(recommendationFeedbackControllerProvider)
+          .dismiss(
             recommendation: widget.recommendation,
             surface: widget.surface,
             currentRoute: GoRouterState.of(context).uri.toString(),
@@ -254,9 +262,9 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.toString())));
     } finally {
       if (mounted) {
         setState(() {
@@ -278,7 +286,9 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
     };
 
     try {
-      await ref.read(recommendationFeedbackControllerProvider).snooze(
+      await ref
+          .read(recommendationFeedbackControllerProvider)
+          .snooze(
             recommendation: widget.recommendation,
             surface: widget.surface,
             currentRoute: GoRouterState.of(context).uri.toString(),
@@ -298,9 +308,9 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.toString())));
     } finally {
       if (mounted) {
         setState(() {
@@ -311,16 +321,10 @@ class _RecommendationCardState extends ConsumerState<RecommendationCard> {
   }
 }
 
-enum _SnoozePreset {
-  oneHour,
-  tomorrow,
-}
+enum _SnoozePreset { oneHour, tomorrow }
 
 class _MetaChip extends StatelessWidget {
-  const _MetaChip({
-    required this.icon,
-    required this.label,
-  });
+  const _MetaChip({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -342,9 +346,9 @@ class _MetaChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(color: tokens.text.secondary),
           ),
         ],
       ),

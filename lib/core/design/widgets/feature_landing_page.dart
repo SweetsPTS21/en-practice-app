@@ -40,11 +40,7 @@ class FeatureLandingPage extends StatelessWidget {
           color: Colors.white.withValues(alpha: 0.16),
           borderRadius: BorderRadius.circular(tokens.radius.lg),
         ),
-        child: Icon(
-          icon,
-          color: Colors.white,
-          size: 22,
-        ),
+        child: Icon(icon, color: Colors.white, size: 22),
       ),
       children: [
         AppCard(
@@ -85,7 +81,8 @@ class FeatureLandingPage extends StatelessWidget {
             children: [
               const AppSectionHeader(
                 title: 'How to use it',
-                subtitle: 'Start with one clear task, then come back here for the next step.',
+                subtitle:
+                    'Start with one clear task, then come back here for the next step.',
               ),
               const SizedBox(height: 16),
               const AppEmptyState(
@@ -103,7 +100,8 @@ class FeatureLandingPage extends StatelessWidget {
             children: [
               const AppSectionHeader(
                 title: 'Next actions',
-                subtitle: 'Keep the main choices simple and easy to return from.',
+                subtitle:
+                    'Keep the main choices simple and easy to return from.',
               ),
               SizedBox(height: tokens.density.regularGap),
               Wrap(

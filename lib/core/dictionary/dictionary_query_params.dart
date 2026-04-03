@@ -24,8 +24,12 @@ class DictionaryQueryParams {
       page: page ?? this.page,
       size: size ?? this.size,
       keyword: keyword ?? this.keyword,
-      wordType: identical(wordType, _sentinel) ? this.wordType : wordType as String?,
-      isFavorite: identical(isFavorite, _sentinel) ? this.isFavorite : isFavorite as bool?,
+      wordType: identical(wordType, _sentinel)
+          ? this.wordType
+          : wordType as String?,
+      isFavorite: identical(isFavorite, _sentinel)
+          ? this.isFavorite
+          : isFavorite as bool?,
     );
   }
 

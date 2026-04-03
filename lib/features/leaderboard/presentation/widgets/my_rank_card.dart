@@ -30,9 +30,9 @@ class MyRankCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               subtitle!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: tokens.text.secondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
             ),
           ],
           const SizedBox(height: 16),
@@ -44,7 +44,8 @@ class MyRankCard extends StatelessWidget {
           else ...[
             LayoutBuilder(
               builder: (context, constraints) {
-                final availableWidth = constraints.hasBoundedWidth &&
+                final availableWidth =
+                    constraints.hasBoundedWidth &&
                         constraints.maxWidth.isFinite &&
                         constraints.maxWidth > 0
                     ? constraints.maxWidth
@@ -67,10 +68,7 @@ class MyRankCard extends StatelessWidget {
                     ),
                     SizedBox(
                       width: itemWidth,
-                      child: _MetricBlock(
-                        label: 'XP',
-                        value: '${rank!.xp}',
-                      ),
+                      child: _MetricBlock(label: 'XP', value: '${rank!.xp}'),
                     ),
                     SizedBox(
                       width: itemWidth,
@@ -97,13 +95,13 @@ class MyRankCard extends StatelessWidget {
                     rank!.isRising
                         ? Icons.trending_up_rounded
                         : rank!.isFalling
-                            ? Icons.trending_down_rounded
-                            : Icons.remove_rounded,
+                        ? Icons.trending_down_rounded
+                        : Icons.remove_rounded,
                     color: rank!.isRising
                         ? tokens.success
                         : rank!.isFalling
-                            ? tokens.danger
-                            : tokens.text.secondary,
+                        ? tokens.danger
+                        : tokens.text.secondary,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -125,10 +123,7 @@ class MyRankCard extends StatelessWidget {
 }
 
 class _MetricBlock extends StatelessWidget {
-  const _MetricBlock({
-    required this.label,
-    required this.value,
-  });
+  const _MetricBlock({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -150,9 +145,9 @@ class _MetricBlock extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
           ),
           const SizedBox(height: 6),
           Text(value, style: Theme.of(context).textTheme.titleMedium),

@@ -47,7 +47,9 @@ class SettingsPage extends ConsumerWidget {
                     .map(
                       (value) => ButtonSegment(
                         value: value,
-                        label: Text(context.tr('app.theme.modes.${value.name}')),
+                        label: Text(
+                          context.tr('app.theme.modes.${value.name}'),
+                        ),
                       ),
                     )
                     .toList(),
@@ -61,7 +63,8 @@ class SettingsPage extends ConsumerWidget {
                 label: context.tr('common.profile'),
                 value: themeState.themeProfilePreference,
                 items: AppThemeProfilePreference.values,
-                itemLabel: (value) => context.tr('app.theme.profiles.${value.name}'),
+                itemLabel: (value) =>
+                    context.tr('app.theme.profiles.${value.name}'),
                 onChanged: (value) {
                   if (value != null) {
                     themeController.setThemeProfilePreference(value);
@@ -73,7 +76,8 @@ class SettingsPage extends ConsumerWidget {
                 label: context.tr('common.background'),
                 value: themeState.themeBackgroundPreference,
                 items: AppThemeBackgroundPreference.values,
-                itemLabel: (value) => context.tr('app.theme.backgrounds.${value.name}'),
+                itemLabel: (value) =>
+                    context.tr('app.theme.backgrounds.${value.name}'),
                 onChanged: themeState.themeBackgroundLocked
                     ? null
                     : (value) {
@@ -118,7 +122,9 @@ class SettingsPage extends ConsumerWidget {
                     .map(
                       (value) => ButtonSegment(
                         value: value,
-                        label: Text(context.tr('app.language.${value.languageCode}')),
+                        label: Text(
+                          context.tr('app.language.${value.languageCode}'),
+                        ),
                       ),
                     )
                     .toList(),
@@ -181,10 +187,8 @@ class _EnumDropdown<T> extends StatelessWidget {
       initialValue: value,
       items: items
           .map(
-            (item) => DropdownMenuItem<T>(
-              value: item,
-              child: Text(itemLabel(item)),
-            ),
+            (item) =>
+                DropdownMenuItem<T>(value: item, child: Text(itemLabel(item))),
           )
           .toList(),
       onChanged: onChanged,
@@ -194,10 +198,7 @@ class _EnumDropdown<T> extends StatelessWidget {
 }
 
 class _LockChip extends StatelessWidget {
-  const _LockChip({
-    required this.text,
-    required this.active,
-  });
+  const _LockChip({required this.text, required this.active});
 
   final String text;
   final bool active;
@@ -209,7 +210,9 @@ class _LockChip extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: active ? tokens.primary.withValues(alpha: 0.12) : tokens.secondary,
+        color: active
+            ? tokens.primary.withValues(alpha: 0.12)
+            : tokens.secondary,
         borderRadius: BorderRadius.circular(tokens.radius.lg),
         border: Border.all(
           color: active ? tokens.border.accent : tokens.border.subtle,

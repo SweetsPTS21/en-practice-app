@@ -70,8 +70,8 @@ class LearningAnalyticsService {
   LearningAnalyticsService({
     required Dio client,
     required LearningLaunchStore launchStore,
-  })  : _client = client,
-        _launchStore = launchStore;
+  }) : _client = client,
+       _launchStore = launchStore;
 
   final Dio _client;
   final LearningLaunchStore _launchStore;
@@ -87,7 +87,9 @@ class LearningAnalyticsService {
     }
   }
 
-  Future<LearningLaunchContext?> registerLearningStartIfNeeded(String route) async {
+  Future<LearningLaunchContext?> registerLearningStartIfNeeded(
+    String route,
+  ) async {
     final normalizedRoute = normalizeInternalRoute(route)?.href ?? route;
     final launchContext = await _launchStore.consumeLearningStartForRoute(
       normalizedRoute,
@@ -140,9 +142,7 @@ class LearningAnalyticsService {
           route: normalizedRoute,
           referenceType: launchContext.referenceType ?? 'DAILY_SPEAKING_PROMPT',
           referenceId: launchContext.referenceId,
-          metadata: {
-            'resumeState': launchContext.metadata?['resumeState'],
-          },
+          metadata: {'resumeState': launchContext.metadata?['resumeState']},
         ),
       );
     }
@@ -202,7 +202,8 @@ class LearningAnalyticsService {
       ),
     );
 
-    if (effectiveContext.taskId != null && effectiveContext.taskId!.isNotEmpty) {
+    if (effectiveContext.taskId != null &&
+        effectiveContext.taskId!.isNotEmpty) {
       await trackEvent(
         LearningEventPayload(
           eventName: LearningEventName.dailyTaskCompleted,
@@ -232,7 +233,8 @@ class LearningAnalyticsService {
           referenceId: effectiveContext.referenceId,
           metadata: {
             'sourceSurface': effectiveContext.metadata?['sourceSurface'],
-            'sourceRecommendationKey': effectiveContext.metadata?['sourceRecommendationKey'],
+            'sourceRecommendationKey':
+                effectiveContext.metadata?['sourceRecommendationKey'],
             'xpEarned': xpEarned,
             ...?metadata,
           },
@@ -247,11 +249,10 @@ class LearningAnalyticsService {
           source: effectiveContext.source,
           module: 'SPEAKING',
           route: normalizedRoute,
-          referenceType: effectiveContext.referenceType ?? 'DAILY_SPEAKING_PROMPT',
+          referenceType:
+              effectiveContext.referenceType ?? 'DAILY_SPEAKING_PROMPT',
           referenceId: effectiveContext.referenceId,
-          metadata: {
-            'resumeState': effectiveContext.metadata?['resumeState'],
-          },
+          metadata: {'resumeState': effectiveContext.metadata?['resumeState']},
         ),
       );
     }
@@ -263,12 +264,14 @@ class LearningAnalyticsService {
           source: effectiveContext.source,
           module: 'VOCAB',
           route: normalizedRoute,
-          referenceType: effectiveContext.referenceType ?? 'VOCAB_MICRO_SESSION',
+          referenceType:
+              effectiveContext.referenceType ?? 'VOCAB_MICRO_SESSION',
           referenceId: effectiveContext.referenceId,
           metadata: {
             'targetWordCount': effectiveContext.metadata?['targetWordCount'],
             'completedWordCount':
-                metadata?['completedWordCount'] ?? effectiveContext.metadata?['targetWordCount'],
+                metadata?['completedWordCount'] ??
+                effectiveContext.metadata?['targetWordCount'],
           },
         ),
       );
@@ -277,9 +280,7 @@ class LearningAnalyticsService {
     return effectiveContext;
   }
 
-  Future<void> registerLearningAbandoned({
-    required String route,
-  }) async {
+  Future<void> registerLearningAbandoned({required String route}) async {
     final pendingLaunch = _launchStore.getPendingLearningLaunch();
     if (pendingLaunch == null || !pendingLaunch.started) {
       return;

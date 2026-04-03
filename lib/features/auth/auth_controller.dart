@@ -13,9 +13,9 @@ class AuthController extends ChangeNotifier {
     required AuthApi authApi,
     required AuthSessionStorage storage,
     required AuthSessionManager sessionManager,
-  })  : _authApi = authApi,
-        _storage = storage,
-        _sessionManager = sessionManager {
+  }) : _authApi = authApi,
+       _storage = storage,
+       _sessionManager = sessionManager {
     _sessionManager.onSessionInvalidated = _handleSessionInvalidated;
     unawaited(_bootstrap());
   }
@@ -35,21 +35,16 @@ class AuthController extends ChangeNotifier {
 
   String? get errorMessage => _errorMessage;
 
-  bool get isAuthenticated => _status == AuthStatus.authenticated && _user != null;
+  bool get isAuthenticated =>
+      _status == AuthStatus.authenticated && _user != null;
 
   bool get isRestoring => _status == AuthStatus.loading;
 
   bool get isSubmitting => _isSubmitting;
 
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> login({required String email, required String password}) async {
     await _runSubmission(() async {
-      final result = await _authApi.login(
-        email: email,
-        password: password,
-      );
+      final result = await _authApi.login(email: email, password: password);
 
       await _sessionManager.persistSession(result.session);
       await _storage.writeUser(result.user);

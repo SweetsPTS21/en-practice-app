@@ -47,10 +47,7 @@ class ReminderBannerCard extends StatelessWidget {
                   color: accent.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(tokens.radius.lg),
                 ),
-                child: Icon(
-                  _iconForType(banner.type),
-                  color: accent,
-                ),
+                child: Icon(_iconForType(banner.type), color: accent),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -64,9 +61,9 @@ class ReminderBannerCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             banner.description,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: tokens.text.secondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
           ),
           const SizedBox(height: 14),
           Wrap(
@@ -110,17 +107,15 @@ class ReminderBannerCard extends StatelessWidget {
       'STREAK_RISK' => Icons.local_fire_department_rounded,
       'GRADING_RESULT_READY' => Icons.task_alt_rounded,
       'DUE_VOCAB_QUICK_REVIEW' => Icons.refresh_rounded,
-      'REENGAGEMENT_3D' || 'REENGAGEMENT_7D' => Icons.notifications_active_rounded,
+      'REENGAGEMENT_3D' ||
+      'REENGAGEMENT_7D' => Icons.notifications_active_rounded,
       _ => Icons.bolt_rounded,
     };
   }
 }
 
 class _MetaChip extends StatelessWidget {
-  const _MetaChip({
-    required this.icon,
-    required this.label,
-  });
+  const _MetaChip({required this.icon, required this.label});
 
   final IconData icon;
   final String label;

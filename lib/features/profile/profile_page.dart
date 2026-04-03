@@ -21,7 +21,8 @@ class ProfilePage extends ConsumerWidget {
 
     return AppPageScaffold(
       title: 'Profile',
-      subtitle: 'Review your account, track your progress snapshot and pick what to do next.',
+      subtitle:
+          'Review your account, track your progress snapshot and pick what to do next.',
       paletteKey: AppPagePaletteKey.profile,
       children: [
         AppCard(
@@ -31,21 +32,13 @@ class ProfilePage extends ConsumerWidget {
             children: [
               const AppSectionHeader(
                 title: 'Account',
-                subtitle: 'Keep the core account details visible and easy to verify.',
+                subtitle:
+                    'Keep the core account details visible and easy to verify.',
               ),
               SizedBox(height: tokens.density.regularGap),
-              _ProfileRow(
-                label: 'Name',
-                value: user?.displayName ?? '-',
-              ),
-              _ProfileRow(
-                label: 'Email',
-                value: user?.email ?? '-',
-              ),
-              const _ProfileRow(
-                label: 'Status',
-                value: 'Active',
-              ),
+              _ProfileRow(label: 'Name', value: user?.displayName ?? '-'),
+              _ProfileRow(label: 'Email', value: user?.email ?? '-'),
+              const _ProfileRow(label: 'Status', value: 'Active'),
               SizedBox(height: tokens.density.regularGap),
               AppButton(
                 label: 'Log out',
@@ -64,7 +57,8 @@ class ProfilePage extends ConsumerWidget {
             children: [
               const AppSectionHeader(
                 title: 'What stays here',
-                subtitle: 'This page keeps identity, progress visibility and preferences in one place.',
+                subtitle:
+                    'This page keeps identity, progress visibility and preferences in one place.',
               ),
               SizedBox(height: tokens.density.regularGap),
               const _Pill(label: 'Identity'),
@@ -82,10 +76,7 @@ class ProfilePage extends ConsumerWidget {
 }
 
 class _ProfileRow extends StatelessWidget {
-  const _ProfileRow({
-    required this.label,
-    required this.value,
-  });
+  const _ProfileRow({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -114,9 +105,7 @@ class _ProfileRow extends StatelessWidget {
 }
 
 class _Pill extends StatelessWidget {
-  const _Pill({
-    required this.label,
-  });
+  const _Pill({required this.label});
 
   final String label;
 

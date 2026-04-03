@@ -12,10 +12,15 @@ class AppLocalizations {
   final Map<String, dynamic> _translations;
 
   static const delegate = _AppLocalizationsDelegate();
-  static final supportedLocales = AppLocale.values.map((item) => item.locale).toList();
+  static final supportedLocales = AppLocale.values
+      .map((item) => item.locale)
+      .toList();
 
   static AppLocalizations of(BuildContext context) {
-    final localizations = Localizations.of<AppLocalizations>(context, AppLocalizations);
+    final localizations = Localizations.of<AppLocalizations>(
+      context,
+      AppLocalizations,
+    );
     assert(localizations != null, 'AppLocalizations not found in widget tree.');
     return localizations!;
   }
@@ -36,13 +41,15 @@ class AppLocalizations {
   }
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
   bool isSupported(Locale locale) {
-    return AppLocalizations.supportedLocales
-        .any((supported) => supported.languageCode == locale.languageCode);
+    return AppLocalizations.supportedLocales.any(
+      (supported) => supported.languageCode == locale.languageCode,
+    );
   }
 
   @override
@@ -55,7 +62,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool shouldReload(covariant LocalizationsDelegate<AppLocalizations> old) => false;
+  bool shouldReload(covariant LocalizationsDelegate<AppLocalizations> old) =>
+      false;
 }
 
 extension AppLocalizationsContextX on BuildContext {

@@ -24,8 +24,8 @@ class WeeklyReportInsightCard extends StatelessWidget {
           Text(
             (value ?? '').isEmpty ? 'No data yet for this section.' : value!,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: context.tokens.text.secondary,
-                ),
+              color: context.tokens.text.secondary,
+            ),
           ),
         ],
       ),

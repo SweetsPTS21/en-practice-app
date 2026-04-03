@@ -11,10 +11,10 @@ final notificationApiProvider = Provider<NotificationApi>((ref) {
 
 final notificationRealtimeClientProvider =
     ChangeNotifierProvider<NotificationRealtimeClient>((ref) {
-  final api = ref.watch(notificationApiProvider);
-  final auth = ref.watch(authControllerProvider);
-  return NotificationRealtimeClient(
-    api: api,
-    isAuthenticated: auth.isAuthenticated,
-  );
-});
+      final api = ref.watch(notificationApiProvider);
+      final auth = ref.watch(authControllerProvider);
+      return NotificationRealtimeClient(
+        api: api,
+        isAuthenticated: auth.isAuthenticated,
+      );
+    });

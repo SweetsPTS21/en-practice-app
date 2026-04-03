@@ -10,7 +10,8 @@ Map<String, dynamic> buildRecommendationLaunchMetadata(
 
   final metadata = <String, dynamic>{};
 
-  if (normalizedType.contains('SPEAK') && normalizedRoute.startsWith('/speaking')) {
+  if (normalizedType.contains('SPEAK') &&
+      normalizedRoute.startsWith('/speaking')) {
     metadata['specialEvent'] = 'SPEAKING_PROMPT';
     metadata['resumeState'] = recommendation.metadata['resumeState'];
   }
@@ -19,7 +20,8 @@ Map<String, dynamic> buildRecommendationLaunchMetadata(
       normalizedRoute.startsWith('/dictionary/review')) {
     metadata['specialEvent'] = 'VOCAB_MICRO_SESSION';
     metadata['targetWordCount'] =
-        recommendation.metadata['targetWordCount'] ?? recommendation.metadata['dueWordCount'];
+        recommendation.metadata['targetWordCount'] ??
+        recommendation.metadata['dueWordCount'];
   }
 
   return metadata;

@@ -24,7 +24,8 @@ class DailyPlanSheet extends StatelessWidget {
     final completedCount = plan.items
         .where((item) => completedTaskIds.contains(item.id))
         .length;
-    final goalMinutes = plan.goalMinutes ??
+    final goalMinutes =
+        plan.goalMinutes ??
         plan.items.fold<int>(
           0,
           (sum, item) => sum + (item.estimatedMinutes ?? 0),
@@ -60,14 +61,17 @@ class DailyPlanSheet extends StatelessWidget {
                       Text(
                         context.tr('home.dailyPlan.sheetSubtitle'),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: tokens.text.secondary,
-                            ),
+                          color: tokens.text.secondary,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: tokens.background.panelStrong,
                     borderRadius: BorderRadius.circular(tokens.radius.lg),
@@ -83,8 +87,8 @@ class DailyPlanSheet extends StatelessWidget {
                       Text(
                         '$goalMinutes ${context.tr('home.common.minutes')}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: tokens.text.secondary,
-                            ),
+                          color: tokens.text.secondary,
+                        ),
                       ),
                     ],
                   ),
@@ -96,7 +100,8 @@ class DailyPlanSheet extends StatelessWidget {
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: plan.items.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final item = plan.items[index];
                   final isCompleted = completedTaskIds.contains(item.id);
@@ -113,13 +118,17 @@ class DailyPlanSheet extends StatelessWidget {
                             color: isCompleted
                                 ? tokens.success.withValues(alpha: 0.14)
                                 : tokens.primary.withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(tokens.radius.lg),
+                            borderRadius: BorderRadius.circular(
+                              tokens.radius.lg,
+                            ),
                           ),
                           child: Icon(
                             isCompleted
                                 ? Icons.check_circle_rounded
                                 : Icons.play_arrow_rounded,
-                            color: isCompleted ? tokens.success : tokens.primary,
+                            color: isCompleted
+                                ? tokens.success
+                                : tokens.primary,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -134,9 +143,8 @@ class DailyPlanSheet extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 item.description,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: tokens.text.secondary,
-                                    ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: tokens.text.secondary),
                               ),
                               const SizedBox(height: 10),
                               Wrap(
@@ -169,7 +177,9 @@ class DailyPlanSheet extends StatelessWidget {
                           variant: isCompleted
                               ? AppButtonVariant.outline
                               : AppButtonVariant.filled,
-                          onPressed: isCompleted ? null : () => onTaskPressed(item),
+                          onPressed: isCompleted
+                              ? null
+                              : () => onTaskPressed(item),
                         ),
                       ],
                     ),
@@ -185,10 +195,7 @@ class DailyPlanSheet extends StatelessWidget {
 }
 
 class _InfoChip extends StatelessWidget {
-  const _InfoChip({
-    required this.label,
-    required this.color,
-  });
+  const _InfoChip({required this.label, required this.color});
 
   final String label;
   final Color color;

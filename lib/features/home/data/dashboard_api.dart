@@ -12,7 +12,9 @@ class DashboardApi {
 
   Future<ContinueLearningItem> getContinueLearning() async {
     try {
-      final response = await _client.get<Object?>('/user/dashboard/continue-learning');
+      final response = await _client.get<Object?>(
+        '/user/dashboard/continue-learning',
+      );
       return ContinueLearningItem.fromJson(jsonMap(response.data));
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);
@@ -21,7 +23,9 @@ class DashboardApi {
 
   Future<DailyLearningPlan> getDailyLearningPlan() async {
     try {
-      final response = await _client.get<Object?>('/user/dashboard/daily-learning-plan');
+      final response = await _client.get<Object?>(
+        '/user/dashboard/daily-learning-plan',
+      );
       return DailyLearningPlan.fromJson(jsonMap(response.data));
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);
@@ -30,7 +34,9 @@ class DashboardApi {
 
   Future<List<QuickPracticeItem>> getQuickPractice() async {
     try {
-      final response = await _client.get<Object?>('/user/dashboard/quick-practice');
+      final response = await _client.get<Object?>(
+        '/user/dashboard/quick-practice',
+      );
       final data = jsonMap(response.data);
       final items = data['items'];
       if (items is! List) {
@@ -48,7 +54,9 @@ class DashboardApi {
 
   Future<ProgressSnapshot> getProgressSnapshot() async {
     try {
-      final response = await _client.get<Object?>('/user/dashboard/progress-snapshot');
+      final response = await _client.get<Object?>(
+        '/user/dashboard/progress-snapshot',
+      );
       return ProgressSnapshot.fromJson(jsonMap(response.data));
     } on DioException catch (error) {
       throw ApiError.fromDioException(error);
@@ -57,7 +65,9 @@ class DashboardApi {
 
   Future<ReminderBanner?> getReminderBanner() async {
     try {
-      final response = await _client.get<Object?>('/user/dashboard/reminder-banner');
+      final response = await _client.get<Object?>(
+        '/user/dashboard/reminder-banner',
+      );
       if (response.data == null) {
         return null;
       }
@@ -79,7 +89,9 @@ class DashboardApi {
 
   Future<FlagshipRetention?> getFlagshipRetention() async {
     try {
-      final response = await _client.get<Object?>('/user/dashboard/flagship-retention');
+      final response = await _client.get<Object?>(
+        '/user/dashboard/flagship-retention',
+      );
       if (response.data == null) {
         return null;
       }

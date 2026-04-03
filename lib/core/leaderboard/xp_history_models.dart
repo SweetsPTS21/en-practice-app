@@ -22,7 +22,9 @@ class XpHistoryEntry {
       source: json['source']?.toString() ?? 'XP',
       description: json['description']?.toString() ?? '',
       xp: _readInt(json['xp']) ?? 0,
-      earnedAt: DateTime.tryParse(json['earnedAt']?.toString() ?? '') ?? DateTime.now(),
+      earnedAt:
+          DateTime.tryParse(json['earnedAt']?.toString() ?? '') ??
+          DateTime.now(),
     );
   }
 }
@@ -46,19 +48,13 @@ class XpHistoryResponse {
     return XpHistoryResponse(
       totalXP: next.totalXP,
       weeklyXP: next.weeklyXP,
-      history: <XpHistoryEntry>[
-        ...history,
-        ...next.history,
-      ],
+      history: <XpHistoryEntry>[...history, ...next.history],
       page: LeaderboardPageInfo<XpHistoryEntry>(
         page: next.page.page,
         size: next.page.size,
         totalElements: next.page.totalElements,
         totalPages: next.page.totalPages,
-        items: <XpHistoryEntry>[
-          ...page.items,
-          ...next.page.items,
-        ],
+        items: <XpHistoryEntry>[...page.items, ...next.page.items],
       ),
     );
   }
@@ -79,9 +75,9 @@ class XpHistoryResponse {
           );
     final history = rawHistory is List
         ? rawHistory
-            .whereType<Object?>()
-            .map((item) => XpHistoryEntry.fromJson(jsonMap(item)))
-            .toList(growable: false)
+              .whereType<Object?>()
+              .map((item) => XpHistoryEntry.fromJson(jsonMap(item)))
+              .toList(growable: false)
         : parsedPage.items;
     return XpHistoryResponse(
       totalXP: _readInt(json['totalXP']) ?? 0,
