@@ -7,6 +7,7 @@ import '../../theme/theme_extensions.dart';
 import 'app_button.dart';
 import 'app_card.dart';
 import 'app_page_scaffold.dart';
+import 'app_state_widgets.dart';
 
 class FeatureLandingPage extends StatelessWidget {
   const FeatureLandingPage({
@@ -51,9 +52,9 @@ class FeatureLandingPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                context.tr('featureHub.sections.focus'),
-                style: Theme.of(context).textTheme.titleLarge,
+              AppSectionHeader(
+                title: context.tr('featureHub.sections.focus'),
+                subtitle: subtitle,
               ),
               SizedBox(height: tokens.density.regularGap),
               Wrap(
@@ -82,12 +83,17 @@ class FeatureLandingPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                context.tr('featureHub.sections.scope'),
-                style: Theme.of(context).textTheme.titleLarge,
+              const AppSectionHeader(
+                title: 'How to use it',
+                subtitle: 'Start with one clear task, then come back here for the next step.',
               ),
-              const SizedBox(height: 8),
-              Text(context.tr('featureHub.copy.scope')),
+              const SizedBox(height: 16),
+              const AppEmptyState(
+                icon: Icons.rocket_launch_rounded,
+                title: 'Ready in the app shell',
+                subtitle:
+                    'This area follows the same theme, navigation and progress patterns as the rest of the app.',
+              ),
             ],
           ),
         ),
@@ -95,12 +101,10 @@ class FeatureLandingPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                context.tr('featureHub.sections.actions'),
-                style: Theme.of(context).textTheme.titleLarge,
+              const AppSectionHeader(
+                title: 'Next actions',
+                subtitle: 'Keep the main choices simple and easy to return from.',
               ),
-              const SizedBox(height: 8),
-              Text(context.tr('featureHub.copy.actions')),
               SizedBox(height: tokens.density.regularGap),
               Wrap(
                 spacing: 12,

@@ -32,6 +32,13 @@ Output APK:
 
 ```powershell
 flutter pub get
+```
+
+Run virtual device (from Android Studio)
+
+```powershell
+emulator -list-avds
+emulator -avd <avd>
 flutter devices
 flutter run -d emulator-5554
 ```

@@ -7,8 +7,8 @@ import '../../../app/navigation/app_destinations.dart';
 import '../../../features/auth/auth_providers.dart';
 import '../../../features/auth/models/auth_models.dart';
 import '../../../features/notifications/presentation/widgets/foreground_push_banner.dart';
-import '../../../features/notifications/presentation/widgets/notification_bell_button.dart';
 import '../../../features/notifications/presentation/widgets/notification_toast_host.dart';
+import '../../notifications/notification_providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/page_palettes.dart';
 import '../../theme/theme_extensions.dart';
@@ -35,7 +35,7 @@ class _AppShellState extends ConsumerState<AppShell> {
   double _scrollAccumulator = 0;
 
   bool _handleScrollNotification(ScrollNotification notification) {
-    if (notification.metrics.axis != Axis.vertical) {
+    if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) {
       return false;
     }
 
@@ -50,8 +50,19 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
 
     if (notification is ScrollUpdateNotification) {
+      if (notification.metrics.outOfRange) {
+        _scrollAccumulator = 0;
+        return false;
+      }
+
       final delta = notification.scrollDelta ?? 0;
       if (delta == 0) {
+        return false;
+      }
+
+      // Ignore the rebound that happens when the list hits the bottom edge.
+      if (notification.metrics.extentAfter == 0 && delta < 0) {
+        _scrollAccumulator = 0;
         return false;
       }
 
@@ -243,11 +254,11 @@ class _ShellHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const _HeaderBrand(),
-          const Spacer(),
-          const NotificationBellButton(),
-          const SizedBox(width: 10),
-          _AvatarMenu(
+          const Expanded(
+            child: _HeaderBrand(),
+          ),
+          const SizedBox(width: 12),
+          _HeaderActionCluster(
             user: user,
             onLogout: onLogout,
           ),
@@ -266,7 +277,6 @@ class _HeaderBrand extends StatelessWidget {
     final palette = context.pagePalette(AppPagePaletteKey.dashboard);
 
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 40,
@@ -286,11 +296,13 @@ class _HeaderBrand extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Text(
-          context.tr('common.appName'),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.titleMedium,
+        Flexible(
+          child: Text(
+            context.tr('common.appName'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
         ),
       ],
     );
@@ -298,9 +310,98 @@ class _HeaderBrand extends StatelessWidget {
 }
 
 enum _HeaderMenuAction {
+  profile,
   theme,
   settings,
   logout,
+}
+
+class _HeaderActionCluster extends StatelessWidget {
+  const _HeaderActionCluster({
+    required this.user,
+    required this.onLogout,
+  });
+
+  final AuthUser? user;
+  final VoidCallback? onLogout;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: tokens.background.panelStrong,
+        borderRadius: BorderRadius.circular(tokens.radius.hero),
+        border: Border.all(color: tokens.border.subtle),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const _HeaderNotificationBellButton(),
+          Container(
+            width: 1,
+            height: 24,
+            margin: const EdgeInsets.symmetric(horizontal: 2),
+            color: tokens.border.subtle,
+          ),
+          _AvatarMenu(
+            user: user,
+            onLogout: onLogout,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderNotificationBellButton extends ConsumerWidget {
+  const _HeaderNotificationBellButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final realtime = ref.watch(notificationRealtimeClientProvider);
+    final tokens = context.tokens;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.go('/notifications'),
+        borderRadius: BorderRadius.circular(tokens.radius.hero),
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const Center(
+                child: Icon(Icons.notifications_none_rounded),
+              ),
+              if (realtime.unreadCount > 0)
+                Positioned(
+                  top: -2,
+                  right: -2,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: tokens.danger,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      realtime.unreadCount > 99 ? '99+' : '${realtime.unreadCount}',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                          ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _AvatarMenu extends StatelessWidget {
@@ -317,6 +418,10 @@ class _AvatarMenu extends StatelessWidget {
     final tokens = context.tokens;
     final palette = context.pagePalette(AppPagePaletteKey.profile);
     final initials = user?.initials ?? 'U';
+    final displayName = user?.displayName.trim().isNotEmpty == true
+        ? user!.displayName
+        : context.tr('app.nav.profile');
+    final email = user?.email ?? '';
 
     return PopupMenuButton<_HeaderMenuAction>(
       tooltip: context.tr('app.nav.profile'),
@@ -329,6 +434,8 @@ class _AvatarMenu extends StatelessWidget {
       ),
       onSelected: (value) {
         switch (value) {
+          case _HeaderMenuAction.profile:
+            context.go('/profile');
           case _HeaderMenuAction.theme:
             context.go('/preview');
           case _HeaderMenuAction.settings:
@@ -339,10 +446,29 @@ class _AvatarMenu extends StatelessWidget {
       },
       itemBuilder: (context) => [
         PopupMenuItem<_HeaderMenuAction>(
+          enabled: false,
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+          child: _MenuHeader(
+            initials: initials,
+            displayName: displayName,
+            email: email,
+          ),
+        ),
+        const PopupMenuDivider(height: 1),
+        PopupMenuItem<_HeaderMenuAction>(
+          value: _HeaderMenuAction.profile,
+          child: _MenuOption(
+            icon: Icons.account_circle_rounded,
+            label: context.tr('app.nav.profile'),
+            subtitle: 'Account and progress',
+          ),
+        ),
+        PopupMenuItem<_HeaderMenuAction>(
           value: _HeaderMenuAction.theme,
           child: _MenuOption(
             icon: Icons.palette_outlined,
             label: context.tr('common.theme'),
+            subtitle: 'Colors and preview',
           ),
         ),
         PopupMenuItem<_HeaderMenuAction>(
@@ -350,26 +476,70 @@ class _AvatarMenu extends StatelessWidget {
           child: _MenuOption(
             icon: Icons.tune_rounded,
             label: context.tr('app.nav.settings'),
+            subtitle: 'Language and app options',
           ),
         ),
+        const PopupMenuDivider(height: 1),
         PopupMenuItem<_HeaderMenuAction>(
           value: _HeaderMenuAction.logout,
           child: _MenuOption(
             icon: Icons.logout_rounded,
             label: context.tr('common.logout'),
+            subtitle: 'Sign out of this device',
             destructive: true,
           ),
         ),
       ],
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.fromLTRB(8, 4, 6, 4),
         decoration: BoxDecoration(
-          color: tokens.background.panelStrong,
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(tokens.radius.hero),
-          border: Border.all(color: tokens.border.subtle),
         ),
-        child: CircleAvatar(
-          radius: 18,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: palette.accent.withValues(alpha: 0.14),
+              foregroundColor: palette.accent,
+              child: Text(
+                initials,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: tokens.text.secondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MenuHeader extends StatelessWidget {
+  const _MenuHeader({
+    required this.initials,
+    required this.displayName,
+    required this.email,
+  });
+
+  final String initials;
+  final String displayName;
+  final String email;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    final palette = context.pagePalette(AppPagePaletteKey.profile);
+
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 20,
           backgroundColor: palette.accent.withValues(alpha: 0.14),
           foregroundColor: palette.accent,
           child: Text(
@@ -377,7 +547,34 @@ class _AvatarMenu extends StatelessWidget {
             style: Theme.of(context).textTheme.labelLarge,
           ),
         ),
-      ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: tokens.text.primary,
+                    ),
+              ),
+              if (email.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: tokens.text.secondary,
+                      ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -386,11 +583,13 @@ class _MenuOption extends StatelessWidget {
   const _MenuOption({
     required this.icon,
     required this.label,
+    this.subtitle,
     this.destructive = false,
   });
 
   final IconData icon;
   final String label;
+  final String? subtitle;
   final bool destructive;
 
   @override
@@ -399,18 +598,39 @@ class _MenuOption extends StatelessWidget {
     final color = destructive ? tokens.danger : tokens.text.primary;
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: color,
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(
+            icon,
+            size: 18,
+            color: color,
+          ),
         ),
         const SizedBox(width: 10),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: color,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: color,
+                    ),
               ),
+              if ((subtitle ?? '').isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    subtitle!,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: destructive ? color.withValues(alpha: 0.8) : tokens.text.secondary,
+                        ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ],
     );

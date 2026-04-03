@@ -29,7 +29,17 @@ class DictionaryReviewState {
   ReviewWord? get currentWord =>
       currentIndex >= 0 && currentIndex < words.length ? words[currentIndex] : null;
 
-  double get progress => words.isEmpty ? 0 : currentIndex / words.length;
+  int get answeredCount => answers.length;
+
+  double get progress {
+    if (words.isEmpty) {
+      return 0;
+    }
+    if (isCompleted) {
+      return 1;
+    }
+    return answeredCount / words.length;
+  }
 
   int get correctCount => answers.values.where((value) => value).length;
 
@@ -68,6 +78,19 @@ class DictionaryReviewArgs {
 
   final ReviewFilter filter;
   final int limit;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is DictionaryReviewArgs &&
+        other.filter == filter &&
+        other.limit == limit;
+  }
+
+  @override
+  int get hashCode => Object.hash(filter, limit);
 }
 
 class DictionaryReviewController
@@ -105,7 +128,7 @@ class DictionaryReviewController
     state = AsyncData(
       current.copyWith(
         answers: answers,
-        currentIndex: isDone ? current.currentIndex : nextIndex,
+        currentIndex: isDone ? current.words.length : nextIndex,
         isCompleted: isDone,
       ),
     );

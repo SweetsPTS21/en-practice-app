@@ -17,8 +17,10 @@ class XpHistoryPage extends ConsumerWidget {
 
     return AppPageScaffold(
       title: 'XP history',
-      subtitle: 'This screen explains where your rewards came from and keeps the progress loop legible.',
+      subtitle:
+          'This screen explains where your rewards came from and keeps the progress loop legible.',
       paletteKey: AppPagePaletteKey.leaderboard,
+      onRefresh: () => ref.read(xpHistoryControllerProvider.notifier).refresh(),
       children: [
         ...history.when(
           data: (state) => [
@@ -27,11 +29,17 @@ class XpHistoryPage extends ConsumerWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: _StatCard(label: 'Total XP', value: '${state.response.totalXP}'),
+                    child: _StatCard(
+                      label: 'Total XP',
+                      value: '${state.response.totalXP}',
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _StatCard(label: 'Weekly XP', value: '${state.response.weeklyXP}'),
+                    child: _StatCard(
+                      label: 'Weekly XP',
+                      value: '${state.response.weeklyXP}',
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -52,7 +60,9 @@ class XpHistoryPage extends ConsumerWidget {
                     icon: Icons.expand_more_rounded,
                     onPressed: state.isLoadingMore
                         ? null
-                        : () => ref.read(xpHistoryControllerProvider.notifier).loadMore(),
+                        : () => ref
+                              .read(xpHistoryControllerProvider.notifier)
+                              .loadMore(),
                   ),
                 ),
               ),
@@ -75,7 +85,9 @@ class XpHistoryPage extends ConsumerWidget {
                   AppButton(
                     label: 'Retry',
                     icon: Icons.refresh_rounded,
-                    onPressed: () => ref.read(xpHistoryControllerProvider.notifier).refresh(),
+                    onPressed: () => ref
+                        .read(xpHistoryControllerProvider.notifier)
+                        .refresh(),
                   ),
                 ],
               ),
@@ -88,10 +100,7 @@ class XpHistoryPage extends ConsumerWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({
-    required this.label,
-    required this.value,
-  });
+  const _StatCard({required this.label, required this.value});
 
   final String label;
   final String value;

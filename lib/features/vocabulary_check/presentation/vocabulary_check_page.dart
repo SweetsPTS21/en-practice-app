@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
+import '../../../core/design/widgets/app_state_widgets.dart';
 import '../../../core/theme/page_palettes.dart';
 import '../application/vocabulary_check_controller.dart';
 
@@ -17,13 +18,18 @@ class VocabularyCheckPage extends ConsumerWidget {
 
     return AppPageScaffold(
       title: 'Vocabulary check',
-      subtitle: 'Validate a word, test your Vietnamese meaning, then save the AI explanation back into your dictionary.',
+      subtitle: 'Validate a word, check your meaning and save the result back to your dictionary.',
       paletteKey: AppPagePaletteKey.vocabularyCheck,
       children: [
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const AppSectionHeader(
+                title: 'Step 1',
+                subtitle: 'Make sure the English word is valid before checking meaning.',
+              ),
+              const SizedBox(height: 16),
               TextField(
                 decoration: const InputDecoration(
                   labelText: 'English word',
@@ -52,6 +58,11 @@ class VocabularyCheckPage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const AppSectionHeader(
+                title: 'Step 2',
+                subtitle: 'Write your Vietnamese meaning and compare it with the result.',
+              ),
+              const SizedBox(height: 16),
               TextField(
                 decoration: const InputDecoration(
                   labelText: 'Your Vietnamese meaning',
@@ -84,6 +95,11 @@ class VocabularyCheckPage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const AppSectionHeader(
+                title: 'Step 3',
+                subtitle: 'Ask for an explanation only when you need a clearer definition or example.',
+              ),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
@@ -126,8 +142,9 @@ class VocabularyCheckPage extends ConsumerWidget {
           ),
         ),
         if (state.errorMessage != null)
-          AppCard(
-            child: Text(state.errorMessage!),
+          AppErrorCard(
+            title: 'Vocabulary check failed',
+            message: state.errorMessage!,
           ),
       ],
     );

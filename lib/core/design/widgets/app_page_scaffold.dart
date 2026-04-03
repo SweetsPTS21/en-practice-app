@@ -11,6 +11,7 @@ class AppPageScaffold extends StatelessWidget {
     required this.paletteKey,
     required this.children,
     this.trailing,
+    this.onRefresh,
   });
 
   final String title;
@@ -18,20 +19,32 @@ class AppPageScaffold extends StatelessWidget {
   final AppPagePaletteKey paletteKey;
   final List<Widget> children;
   final Widget? trailing;
+  final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final palette = context.pagePalette(paletteKey);
-    return ListView.separated(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-      itemCount: children.length + 1,
-      separatorBuilder: (context, index) => SizedBox(
-        height: index == 0 ? 12 : tokens.density.regularGap,
-      ),
-      itemBuilder: (context, index) {
-        if (index == 0) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final horizontalPadding = width >= 1200
+            ? 32.0
+            : width >= 720
+            ? 24.0
+            : 20.0;
+
+        Widget wrapContent(Widget child) {
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 960),
+              child: child,
+            ),
+          );
+        }
+
+        Widget buildHeroCard() {
           return Container(
             padding: EdgeInsets.all(tokens.density.panelPadding),
             decoration: BoxDecoration(
@@ -49,33 +62,67 @@ class AppPageScaffold extends StatelessWidget {
                 ),
               ],
             ),
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (trailing != null)
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: trailing!,
+                Expanded(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 560),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(color: Colors.white),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          subtitle,
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.88),
+                              ),
+                        ),
+                      ],
+                    ),
                   ),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
-                      ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.88),
-                      ),
-                ),
+                if (trailing != null) ...[const SizedBox(width: 16), trailing!],
               ],
             ),
           );
         }
 
-        return children[index - 1];
+        final listView = ListView.separated(
+          physics: onRefresh == null
+              ? const BouncingScrollPhysics()
+              : const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            20,
+            horizontalPadding,
+            32,
+          ),
+          itemCount: children.length + 1,
+          separatorBuilder: (context, index) =>
+              SizedBox(height: index == 0 ? 12 : tokens.density.regularGap),
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return wrapContent(buildHeroCard());
+            }
+
+            return wrapContent(children[index - 1]);
+          },
+        );
+
+        if (onRefresh == null) {
+          return listView;
+        }
+
+        return RefreshIndicator(onRefresh: onRefresh!, child: listView);
       },
     );
   }

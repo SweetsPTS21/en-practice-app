@@ -13,10 +13,13 @@ class VocabularyTestHistoryPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(vocabularyTestListControllerProvider);
+    final controller = ref.read(vocabularyTestListControllerProvider.notifier);
     return AppPageScaffold(
       title: 'Attempt history',
-      subtitle: 'Review completed vocabulary test attempts from the AI-generated loop.',
+      subtitle:
+          'Review completed vocabulary test attempts from the AI-generated loop.',
       paletteKey: AppPagePaletteKey.vocabularyTest,
+      onRefresh: controller.refresh,
       children: [
         ...state.when(
           data: (value) => [
@@ -36,7 +39,9 @@ class VocabularyTestHistoryPage extends ConsumerWidget {
                           ? '--'
                           : '${attempt.accuracyPercent!.round()}%',
                     ),
-                    onTap: () => context.go('/vocabulary-tests/attempts/${attempt.attemptId}'),
+                    onTap: () => context.go(
+                      '/vocabulary-tests/attempts/${attempt.attemptId}',
+                    ),
                   ),
                 ),
               ),

@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/design/widgets/app_button.dart';
 import '../../core/design/widgets/app_card.dart';
+import '../../core/design/widgets/app_header_icon_action.dart';
 import '../../core/design/widgets/app_page_scaffold.dart';
+import '../../core/design/widgets/app_state_widgets.dart';
 import '../../core/dictionary/dictionary_models.dart';
 import '../../core/theme/page_palettes.dart';
 import 'application/dictionary_controller.dart';
@@ -35,12 +37,13 @@ class _DictionaryPageState extends ConsumerState<DictionaryPage> {
     return AppPageScaffold(
       title: 'Dictionary',
       subtitle:
-          'Search your saved words, jump into due reviews, and open the new vocabulary mastery surfaces.',
+          'Review saved words, clean up your list and jump back into practice.',
       paletteKey: AppPagePaletteKey.dictionary,
-      trailing: AppButton(
-        label: 'Review now',
+      onRefresh: () =>
+          ref.read(dictionaryControllerProvider.notifier).refresh(),
+      trailing: AppHeaderIconAction(
+        tooltip: 'Review now',
         icon: Icons.auto_stories_rounded,
-        variant: AppButtonVariant.tonal,
         onPressed: () => context.go('/dictionary/review'),
       ),
       children: [
@@ -89,14 +92,26 @@ class _DictionaryPageState extends ConsumerState<DictionaryPage> {
                 );
               },
             ),
-            loading: () => const LinearProgressIndicator(),
-            error: (_, _) => const Text('Dictionary stats are unavailable.'),
+            loading: () => const SizedBox(
+              height: 96,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (_, _) => Text(
+              'Your saved totals could not be loaded right now.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const AppSectionHeader(
+                title: 'Find and manage words',
+                subtitle:
+                    'Search quickly, narrow the list, then take the next useful action.',
+              ),
+              const SizedBox(height: 16),
               TextField(
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.search_rounded),
@@ -176,20 +191,16 @@ class _DictionaryPageState extends ConsumerState<DictionaryPage> {
             if (state.page.content.isEmpty) {
               return [
                 AppCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'No saved words match this filter.',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 12),
-                      AppButton(
-                        label: 'Add your first word',
-                        icon: Icons.add_rounded,
-                        onPressed: () => _openAddWordSheet(context),
-                      ),
-                    ],
+                  child: AppEmptyState(
+                    icon: Icons.menu_book_rounded,
+                    title: 'No words found',
+                    subtitle:
+                        'Try a different filter or add a new word to start building your list.',
+                    action: AppButton(
+                      label: 'Add word',
+                      icon: Icons.add_rounded,
+                      onPressed: () => _openAddWordSheet(context),
+                    ),
                   ),
                 ),
               ];
@@ -270,31 +281,14 @@ class _DictionaryPageState extends ConsumerState<DictionaryPage> {
             ];
           },
           loading: () => const [
-            AppCard(
-              child: SizedBox(
-                height: 120,
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            ),
+            AppLoadingCard(height: 120, message: 'Loading your saved words...'),
           ],
-          error: (error, _) => [
-            AppCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Dictionary could not be loaded.'),
-                  const SizedBox(height: 12),
-                  Text(error.toString()),
-                  const SizedBox(height: 12),
-                  AppButton(
-                    label: 'Retry',
-                    icon: Icons.refresh_rounded,
-                    onPressed: () => ref
-                        .read(dictionaryControllerProvider.notifier)
-                        .refresh(),
-                  ),
-                ],
-              ),
+          error: (_, _) => [
+            AppErrorCard(
+              title: 'Dictionary is unavailable',
+              message: 'We could not load your saved words. Please try again.',
+              onRetry: () =>
+                  ref.read(dictionaryControllerProvider.notifier).refresh(),
             ),
           ],
         ),
@@ -309,22 +303,27 @@ class _DictionaryPageState extends ConsumerState<DictionaryPage> {
         ref
             .read(dictionaryControllerProvider.notifier)
             .updateFilter(isFavorite: true);
+        return;
       case 'VERB':
         ref
             .read(dictionaryControllerProvider.notifier)
             .updateFilter(wordType: 'VERB');
+        return;
       case 'NOUN':
         ref
             .read(dictionaryControllerProvider.notifier)
             .updateFilter(wordType: 'NOUN');
+        return;
       case 'ADJ':
         ref
             .read(dictionaryControllerProvider.notifier)
             .updateFilter(wordType: 'ADJ');
+        return;
       default:
         ref
             .read(dictionaryControllerProvider.notifier)
             .updateFilter(wordType: null, isFavorite: null);
+        return;
     }
   }
 

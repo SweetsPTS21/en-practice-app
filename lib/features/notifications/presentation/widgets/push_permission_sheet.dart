@@ -33,7 +33,7 @@ class PushPermissionSheet extends ConsumerWidget {
             Text('Enable push notifications', style: theme.headlineSmall),
             const SizedBox(height: 10),
             Text(
-              'Push should reuse the same learning re-entry spine as the notification center and bring you back into the right task or result screen.',
+              'Enable push so reminders and results can bring you back to the right task.',
               style: theme.bodyMedium,
             ),
             const SizedBox(height: 18),
@@ -49,17 +49,17 @@ class PushPermissionSheet extends ConsumerWidget {
             const SizedBox(height: 18),
             if (status == PushPermissionStatus.unsupported)
               Text(
-                'This build does not include the native Firebase messaging bridge yet, so device-level push cannot be enabled from inside the app.',
+                'Push is not available on this build yet.',
                 style: theme.bodyMedium,
               )
             else if (status == PushPermissionStatus.granted)
               Text(
-                'Push permission is enabled. The app will sync the token whenever the native bridge provides one.',
+                'Push permission is enabled. We will keep your device token up to date.',
                 style: theme.bodyMedium,
               )
             else
               Text(
-                'Ask for permission only after the learner has already invested in the product. This sheet is the contextual prompt surface for that step.',
+                'Turn on push when you want reminders, grading updates and quick re-entry into lessons.',
                 style: theme.bodyMedium,
               ),
             const SizedBox(height: 18),

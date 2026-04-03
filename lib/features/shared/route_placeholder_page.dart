@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/design/widgets/app_button.dart';
 import '../../core/design/widgets/app_card.dart';
 import '../../core/design/widgets/app_page_scaffold.dart';
+import '../../core/design/widgets/app_state_widgets.dart';
 import '../../core/theme/page_palettes.dart';
 
 class RoutePlaceholderPage extends StatelessWidget {
@@ -30,33 +33,53 @@ class RoutePlaceholderPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text(subtitle),
+              AppSectionHeader(
+                title: 'Coming next',
+                subtitle: subtitle,
+              ),
+              const SizedBox(height: 16),
+              const AppEmptyState(
+                icon: Icons.schedule_rounded,
+                title: 'This area is still being prepared',
+                subtitle:
+                    'You can already reach this route. The detailed workflow will be added soon.',
+              ),
             ],
           ),
         ),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: highlights
-                .map(
-                  (highlight) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(top: 2),
-                          child: Icon(Icons.check_circle_outline_rounded, size: 18),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(highlight)),
-                      ],
-                    ),
+            children: [
+              const AppSectionHeader(
+                title: 'What to expect',
+                subtitle: 'The finished page will stay focused on one clear job.',
+              ),
+              const SizedBox(height: 16),
+              ...highlights.map(
+                (highlight) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 2),
+                        child: Icon(Icons.check_circle_outline_rounded, size: 18),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(highlight)),
+                    ],
                   ),
-                )
-                .toList(growable: false),
+                ),
+              ),
+              const SizedBox(height: 6),
+              AppButton(
+                label: 'Back to home',
+                icon: Icons.home_rounded,
+                variant: AppButtonVariant.outline,
+                onPressed: () => context.go('/home'),
+              ),
+            ],
           ),
         ),
       ],

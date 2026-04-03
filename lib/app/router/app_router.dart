@@ -161,7 +161,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         referenceId: state.pathParameters['sessionId'] ?? '',
                       ),
                       title: 'Dictionary Review Result',
-                      subtitle: 'Shared completion snapshot and next-step routing now land here.',
+                      subtitle: 'Review your latest dictionary session and choose the next step.',
                       paletteKey: AppPagePaletteKey.dictionary,
                     ),
                   ),
@@ -204,11 +204,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'test/:testId',
                 builder: (context, state) => const RoutePlaceholderPage(
                   title: 'IELTS Test Detail',
-                  subtitle: 'Task detail and readiness view will land here.',
+                  subtitle: 'Review the test details before you begin.',
                   paletteKey: AppPagePaletteKey.ielts,
                   highlights: [
-                    'Deep link compatible with web actionUrl.',
-                    'Reserved for test entry and metadata.',
+                    'Overview of the selected test.',
+                    'Entry point before starting the session.',
                   ],
                 ),
               ),
@@ -216,7 +216,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'take/:attemptId',
                 builder: (context, state) => LearningSessionPlaceholderPage(
                   title: 'IELTS Session',
-                  subtitle: 'Resume and launch tracking are wired for this session route.',
+                  subtitle: 'Continue your IELTS practice session.',
                   route: state.uri.toString(),
                   module: 'IELTS',
                   paletteKey: AppPagePaletteKey.ielts,
@@ -230,7 +230,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     referenceId: state.pathParameters['attemptId'] ?? '',
                   ),
                   title: 'IELTS Result',
-                  subtitle: 'Shared completion snapshot, review actions and next-step routing now live here.',
+                  subtitle: 'See your IELTS result and decide what to do next.',
                   paletteKey: AppPagePaletteKey.ielts,
                 ),
               ),
@@ -244,11 +244,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'history',
                 builder: (context, state) => const RoutePlaceholderPage(
                   title: 'Writing History',
-                  subtitle: 'Draft history and submission revisit flow will grow here.',
+                  subtitle: 'Review previous writing drafts and submissions.',
                   paletteKey: AppPagePaletteKey.writing,
                   highlights: [
-                    'Reserved for submission list.',
-                    'Route contract now stable for navigation resolver.',
+                    'List of recent drafts and submissions.',
+                    'Quick access to continue previous work.',
                   ],
                 ),
               ),
@@ -256,11 +256,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'task/:taskId',
                 builder: (context, state) => const RoutePlaceholderPage(
                   title: 'Writing Task',
-                  subtitle: 'Prompt detail and setup surface will live here.',
+                  subtitle: 'Read the prompt and prepare before you start.',
                   paletteKey: AppPagePaletteKey.writing,
                   highlights: [
-                    'Supports direct actionUrl resolution.',
-                    'Ready for task detail and preparation UI.',
+                    'Task instructions and brief details.',
+                    'Preparation step before the writing session.',
                   ],
                 ),
                 routes: [
@@ -268,8 +268,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     path: 'take',
                     builder: (context, state) => LearningSessionPlaceholderPage(
                       title: 'Writing Session',
-                      subtitle:
-                          'Writing task session placeholder with launch analytics wired.',
+                      subtitle: 'Continue your writing task.',
                       route: state.uri.toString(),
                       module: 'WRITING',
                       paletteKey: AppPagePaletteKey.writing,
@@ -285,7 +284,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     referenceId: state.pathParameters['submissionId'] ?? '',
                   ),
                   title: 'Writing Submission',
-                  subtitle: 'Submission review, recap and next actions now share the result journey contract.',
+                  subtitle: 'Review your submission and choose the next step.',
                   paletteKey: AppPagePaletteKey.writing,
                 ),
               ),
@@ -299,7 +298,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'practice/:id',
                 builder: (context, state) => LearningSessionPlaceholderPage(
                   title: 'Speaking Practice',
-                  subtitle: 'Speaking launch flow is ready for session started analytics.',
+                  subtitle: 'Continue your speaking practice.',
                   route: state.uri.toString(),
                   module: 'SPEAKING',
                   paletteKey: AppPagePaletteKey.speaking,
@@ -313,7 +312,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     referenceId: state.pathParameters['id'] ?? '',
                   ),
                   title: 'Speaking Result',
-                  subtitle: 'Result review and retry decisions now run through the shared completion snapshot contract.',
+                  subtitle: 'Review your speaking result and decide what to do next.',
                   paletteKey: AppPagePaletteKey.speaking,
                 ),
               ),
@@ -321,11 +320,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'history',
                 builder: (context, state) => const RoutePlaceholderPage(
                   title: 'Speaking History',
-                  subtitle: 'History of speaking attempts will show in this route.',
+                  subtitle: 'Review your recent speaking attempts.',
                   paletteKey: AppPagePaletteKey.speaking,
                   highlights: [
-                    'Reserved for recent attempts.',
-                    'Navigation contract fixed for future feature work.',
+                    'Recent attempts with quick re-entry.',
+                    'Easy access to past speaking practice.',
                   ],
                 ),
               ),
@@ -333,11 +332,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'conversation/:topicId',
                 builder: (context, state) => const RoutePlaceholderPage(
                   title: 'Speaking Conversation',
-                  subtitle: 'Conversation setup and prompt context will appear here.',
+                  subtitle: 'Set up the conversation before you begin.',
                   paletteKey: AppPagePaletteKey.speaking,
                   highlights: [
-                    'Ready for topic detail route.',
-                    'Can receive deep links from recommendations later.',
+                    'Conversation topic and setup details.',
+                    'Entry point before the guided speaking flow.',
                   ],
                 ),
               ),
@@ -345,11 +344,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'conversation/result/:id',
                 builder: (context, state) => const RoutePlaceholderPage(
                   title: 'Speaking Conversation Result',
-                  subtitle: 'Conversation result surface is reserved for later phases.',
+                  subtitle: 'Review the result of this conversation practice.',
                   paletteKey: AppPagePaletteKey.speaking,
                   highlights: [
-                    'Contract stabilized for result deep links.',
-                    'Will host reflection and next action CTA.',
+                    'Summary of the conversation result.',
+                    'Reflection and next-step actions.',
                   ],
                 ),
               ),
@@ -359,11 +358,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/custom-speaking',
             builder: (context, state) => const RoutePlaceholderPage(
               title: 'Custom Speaking',
-              subtitle: 'Custom speaking launcher will expand from this module root.',
+              subtitle: 'Build a custom speaking practice flow.',
               paletteKey: AppPagePaletteKey.speaking,
               highlights: [
-                'Reserved for custom conversation entry.',
-                'Fallback route already available for resolver.',
+                'Start a personalized conversation session.',
+                'Choose the setup that matches your practice goal.',
               ],
             ),
             routes: [
@@ -371,8 +370,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'conversation/:id',
                 builder: (context, state) => LearningSessionPlaceholderPage(
                   title: 'Custom Speaking Session',
-                  subtitle:
-                      'Custom conversation session placeholder for resume and start tracking.',
+                  subtitle: 'Continue your custom speaking session.',
                   route: state.uri.toString(),
                   module: 'CUSTOM_SPEAKING',
                   paletteKey: AppPagePaletteKey.speaking,
@@ -386,7 +384,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     referenceId: state.pathParameters['id'] ?? '',
                   ),
                   title: 'Custom Speaking Result',
-                  subtitle: 'Conversation result review now uses the same result journey loop as other modules.',
+                  subtitle: 'Review your custom speaking result and continue practicing.',
                   paletteKey: AppPagePaletteKey.speaking,
                 ),
               ),

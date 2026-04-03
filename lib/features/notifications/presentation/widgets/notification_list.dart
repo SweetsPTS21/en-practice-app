@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/design/widgets/app_state_widgets.dart';
 import '../../../../core/notifications/notification_models.dart';
-import '../../../../core/theme/theme_extensions.dart';
 import 'notification_list_item.dart';
 
 class NotificationList extends StatelessWidget {
@@ -19,15 +19,10 @@ class NotificationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: context.tokens.background.panelStrong,
-          borderRadius: BorderRadius.circular(context.tokens.radius.hero),
-          border: Border.all(color: context.tokens.border.subtle),
-        ),
-        child: const Text('No notifications yet.'),
+      return const AppEmptyState(
+        icon: Icons.notifications_none_rounded,
+        title: 'No notifications yet',
+        subtitle: 'New reminders, results and updates will appear here.',
       );
     }
 

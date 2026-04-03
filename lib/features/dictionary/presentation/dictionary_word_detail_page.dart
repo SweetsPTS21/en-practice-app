@@ -8,10 +8,7 @@ import '../../../core/theme/page_palettes.dart';
 import '../application/dictionary_controller.dart';
 
 class DictionaryWordDetailPage extends ConsumerWidget {
-  const DictionaryWordDetailPage({
-    super.key,
-    required this.wordId,
-  });
+  const DictionaryWordDetailPage({super.key, required this.wordId});
 
   final String wordId;
 
@@ -20,8 +17,10 @@ class DictionaryWordDetailPage extends ConsumerWidget {
     final word = ref.watch(dictionaryWordDetailProvider(wordId));
     return AppPageScaffold(
       title: 'Word detail',
-      subtitle: 'Inspect the saved word, its examples, and dictionary metadata.',
+      subtitle:
+          'Inspect the saved word, its examples, and dictionary metadata.',
       paletteKey: AppPagePaletteKey.dictionary,
+      onRefresh: () => ref.refresh(dictionaryWordDetailProvider(wordId).future),
       children: [
         ...word.when(
           data: (value) => [
@@ -30,7 +29,10 @@ class DictionaryWordDetailPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(value.word, style: Theme.of(context).textTheme.headlineSmall),
+                  Text(
+                    value.word,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                   const SizedBox(height: 8),
                   Text(value.meaning),
                   if (value.wordType.isNotEmpty) ...[
@@ -49,12 +51,17 @@ class DictionaryWordDetailPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Examples', style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      'Examples',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 12),
-                    ...value.examples.map((example) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Text('• $example'),
-                        )),
+                    ...value.examples.map(
+                      (example) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text('• $example'),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -64,9 +71,13 @@ class DictionaryWordDetailPage extends ConsumerWidget {
                   Expanded(
                     child: AppButton(
                       label: value.isFavorite ? 'Unfavorite' : 'Favorite',
-                      icon: value.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                      icon: value.isFavorite
+                          ? Icons.star_rounded
+                          : Icons.star_border_rounded,
                       onPressed: () async {
-                        await ref.read(dictionaryControllerProvider.notifier).toggleFavorite(value.id);
+                        await ref
+                            .read(dictionaryControllerProvider.notifier)
+                            .toggleFavorite(value.id);
                         ref.invalidate(dictionaryWordDetailProvider(wordId));
                       },
                     ),
@@ -78,7 +89,9 @@ class DictionaryWordDetailPage extends ConsumerWidget {
                       variant: AppButtonVariant.outline,
                       icon: Icons.delete_outline_rounded,
                       onPressed: () async {
-                        await ref.read(dictionaryControllerProvider.notifier).deleteWord(value.id);
+                        await ref
+                            .read(dictionaryControllerProvider.notifier)
+                            .deleteWord(value.id);
                         if (context.mounted) {
                           Navigator.of(context).pop();
                         }
@@ -97,9 +110,7 @@ class DictionaryWordDetailPage extends ConsumerWidget {
               ),
             ),
           ],
-          error: (error, _) => [
-            AppCard(child: Text(error.toString())),
-          ],
+          error: (error, _) => [AppCard(child: Text(error.toString()))],
         ),
       ],
     );

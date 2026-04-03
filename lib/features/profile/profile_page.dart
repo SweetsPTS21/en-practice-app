@@ -5,11 +5,10 @@ import '../auth/auth_providers.dart';
 import '../../core/design/widgets/app_button.dart';
 import '../../core/design/widgets/app_card.dart';
 import '../../core/design/widgets/app_page_scaffold.dart';
+import '../../core/design/widgets/app_state_widgets.dart';
 import '../../core/theme/page_palettes.dart';
 import '../../core/theme/theme_extensions.dart';
 import '../leaderboard/presentation/widgets/profile_leaderboard_snapshot.dart';
-import '../recommendation/presentation/widgets/recommendation_feed_section.dart';
-import '../../core/recommendation/recommendation_surface.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -22,7 +21,7 @@ class ProfilePage extends ConsumerWidget {
 
     return AppPageScaffold(
       title: 'Profile',
-      subtitle: 'Identity, competitive context and recommendation carry-over now share the same profile surface.',
+      subtitle: 'Review your account, track your progress snapshot and pick what to do next.',
       paletteKey: AppPagePaletteKey.profile,
       children: [
         AppCard(
@@ -30,12 +29,10 @@ class ProfilePage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Account',
-                style: Theme.of(context).textTheme.titleLarge,
+              const AppSectionHeader(
+                title: 'Account',
+                subtitle: 'Keep the core account details visible and easy to verify.',
               ),
-              const SizedBox(height: 8),
-              Text('Basic account state stays simple here while deeper profile surfaces arrive later.'),
               SizedBox(height: tokens.density.regularGap),
               _ProfileRow(
                 label: 'Name',
@@ -65,12 +62,10 @@ class ProfilePage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Profile scope',
-                style: Theme.of(context).textTheme.titleLarge,
+              const AppSectionHeader(
+                title: 'What stays here',
+                subtitle: 'This page keeps identity, progress visibility and preferences in one place.',
               ),
-              const SizedBox(height: 8),
-              Text('This surface now connects identity, progress visibility and downstream motivation loops.'),
               SizedBox(height: tokens.density.regularGap),
               const _Pill(label: 'Identity'),
               SizedBox(height: tokens.density.compactGap),
@@ -81,12 +76,6 @@ class ProfilePage extends ConsumerWidget {
           ),
         ),
         const ProfileLeaderboardSnapshot(),
-        const RecommendationFeedSection(
-          surface: RecommendationSurface.profile,
-          source: 'PROFILE_RECOMMENDATION',
-          title: 'Recommended next',
-          subtitle: 'Profile keeps a short feed of what to practice next.',
-        ),
       ],
     );
   }

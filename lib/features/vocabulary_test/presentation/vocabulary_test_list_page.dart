@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
+import '../../../core/design/widgets/app_header_icon_action.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
+import '../../../core/design/widgets/app_state_widgets.dart';
 import '../../../core/theme/page_palettes.dart';
 import '../../../core/vocabulary_test/vocabulary_test_models.dart';
 import '../application/vocabulary_test_list_controller.dart';
@@ -19,12 +21,13 @@ class VocabularyTestListPage extends ConsumerWidget {
 
     return AppPageScaffold(
       title: 'AI vocabulary tests',
-      subtitle: 'Generate personalized tests from your own vocabulary history and review older attempts.',
+      subtitle:
+          'Generate personalized tests from your own vocabulary history and review older attempts.',
       paletteKey: AppPagePaletteKey.vocabularyTest,
-      trailing: AppButton(
-        label: 'Attempt history',
+      onRefresh: controller.refresh,
+      trailing: AppHeaderIconAction(
+        tooltip: 'Attempt history',
         icon: Icons.history_rounded,
-        variant: AppButtonVariant.outline,
         onPressed: () => context.go('/vocabulary-tests/history'),
       ),
       children: [
@@ -35,13 +38,24 @@ class VocabularyTestListPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Create with AI', style: Theme.of(context).textTheme.titleLarge),
-                  const SizedBox(height: 12),
+                  const AppSectionHeader(
+                    title: 'Create with AI',
+                    subtitle:
+                        'Choose a test size, select the sources you want and generate one focused practice set.',
+                  ),
+                  const SizedBox(height: 16),
                   DropdownButtonFormField<int>(
                     initialValue: value.questionCount,
-                    decoration: const InputDecoration(labelText: 'Question count'),
+                    decoration: const InputDecoration(
+                      labelText: 'Question count',
+                    ),
                     items: const [5, 10, 15, 20]
-                        .map((count) => DropdownMenuItem(value: count, child: Text('$count')))
+                        .map(
+                          (count) => DropdownMenuItem(
+                            value: count,
+                            child: Text('$count'),
+                          ),
+                        )
                         .toList(growable: false),
                     onChanged: (next) {
                       if (next != null) {
@@ -66,7 +80,9 @@ class VocabularyTestListPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   AppButton(
-                    label: value.isGenerating ? 'Generating...' : 'Generate test',
+                    label: value.isGenerating
+                        ? 'Generating...'
+                        : 'Generate test',
                     icon: Icons.auto_awesome_rounded,
                     onPressed: value.isGenerating
                         ? null
@@ -84,10 +100,19 @@ class VocabularyTestListPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Generated tests', style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 12),
+                  const AppSectionHeader(
+                    title: 'Generated tests',
+                    subtitle:
+                        'Open a recent test or start a new one when you need fresh practice.',
+                  ),
+                  const SizedBox(height: 16),
                   if (value.tests.isEmpty)
-                    const Text('No AI-generated tests yet.')
+                    const AppEmptyState(
+                      icon: Icons.quiz_outlined,
+                      title: 'No AI-generated tests yet',
+                      subtitle:
+                          'Generate your first test to see it listed here.',
+                    )
                   else
                     ...value.tests.map(
                       (test) => ListTile(
@@ -101,7 +126,8 @@ class VocabularyTestListPage extends ConsumerWidget {
                               ? test.latestStatus.name
                               : '${test.latestAccuracyPercent!.round()}%',
                         ),
-                        onTap: () => context.go('/vocabulary-tests/${test.testId}'),
+                        onTap: () =>
+                            context.go('/vocabulary-tests/${test.testId}'),
                       ),
                     ),
                 ],
@@ -109,23 +135,12 @@ class VocabularyTestListPage extends ConsumerWidget {
             ),
           ],
           loading: () => const [
-            AppCard(
-              child: SizedBox(
-                height: 160,
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            ),
+            AppLoadingCard(height: 160, message: 'Loading vocabulary tests...'),
           ],
-          error: (error, _) => [
-            AppCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Vocabulary tests could not be loaded.'),
-                  const SizedBox(height: 8),
-                  Text(error.toString()),
-                ],
-              ),
+          error: (_, _) => const [
+            AppErrorCard(
+              title: 'Vocabulary tests are unavailable',
+              message: 'We could not load your generated tests right now.',
             ),
           ],
         ),

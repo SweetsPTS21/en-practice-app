@@ -85,11 +85,11 @@ const appPrimaryDestinations = <AppDestination>[
   ieltsDestination,
   writingDestination,
   speakingDestination,
-  profileDestination,
   leaderboardDestination,
 ];
 
 const appSecondaryDestinations = <AppDestination>[
+  profileDestination,
   previewDestination,
   settingsDestination,
 ];

@@ -10,10 +10,7 @@ import '../../../core/vocabulary_test/vocabulary_test_providers.dart';
 import '../application/vocabulary_test_list_controller.dart';
 
 class VocabularyTestPreviewPage extends ConsumerWidget {
-  const VocabularyTestPreviewPage({
-    super.key,
-    required this.testId,
-  });
+  const VocabularyTestPreviewPage({super.key, required this.testId});
 
   final String testId;
 
@@ -22,8 +19,10 @@ class VocabularyTestPreviewPage extends ConsumerWidget {
     final detail = ref.watch(vocabularyTestDetailProvider(testId));
     return AppPageScaffold(
       title: 'Vocabulary test preview',
-      subtitle: 'Preview the generated questions before starting a new attempt.',
+      subtitle:
+          'Preview the generated questions before starting a new attempt.',
       paletteKey: AppPagePaletteKey.vocabularyTest,
+      onRefresh: () => ref.refresh(vocabularyTestDetailProvider(testId).future),
       children: [
         ...detail.when(
           data: (value) => [
@@ -32,9 +31,14 @@ class VocabularyTestPreviewPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(value.title, style: Theme.of(context).textTheme.headlineSmall),
+                  Text(
+                    value.title,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                   const SizedBox(height: 8),
-                  Text('${value.questionCount} questions • ${value.estimatedMinutes} min'),
+                  Text(
+                    '${value.questionCount} questions • ${value.estimatedMinutes} min',
+                  ),
                   if (value.selectedSources.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text('Sources: ${value.selectedSources.join(', ')}'),
@@ -46,12 +50,19 @@ class VocabularyTestPreviewPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Question preview', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Question preview',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 12),
-                  ...value.questions.take(5).map(
+                  ...value.questions
+                      .take(5)
+                      .map(
                         (question) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
-                          child: Text('${question.order}. ${question.questionText}'),
+                          child: Text(
+                            '${question.order}. ${question.questionText}',
+                          ),
                         ),
                       ),
                 ],
@@ -73,7 +84,9 @@ class VocabularyTestPreviewPage extends ConsumerWidget {
                       label: 'Start test',
                       icon: Icons.play_arrow_rounded,
                       onPressed: () async {
-                        final response = await ref.read(vocabularyTestApiProvider).startTest(testId);
+                        final response = await ref
+                            .read(vocabularyTestApiProvider)
+                            .startTest(testId);
                         if (context.mounted) {
                           context.push(
                             '/vocabulary-tests/attempts/${response.attemptId}',

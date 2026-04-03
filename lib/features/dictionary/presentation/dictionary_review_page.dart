@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
+import '../../../core/design/widgets/app_state_widgets.dart';
 import '../../../core/dictionary/review_models.dart';
 import '../../../core/learning_journey/learning_journey_providers.dart';
 import '../../../core/theme/page_palettes.dart';
@@ -56,6 +57,15 @@ class DictionaryReviewPage extends ConsumerWidget {
               ];
             }
 
+            if (value.isSubmitting) {
+              return const [
+                AppLoadingCard(
+                  height: 160,
+                  message: 'Finishing your review...',
+                ),
+              ];
+            }
+
             if (word == null && value.session != null) {
               return [
                 AppCard(
@@ -98,7 +108,7 @@ class DictionaryReviewPage extends ConsumerWidget {
                     const SizedBox(height: 10),
                     LinearProgressIndicator(value: value.progress),
                     const SizedBox(height: 10),
-                    Text('${value.currentIndex + 1} / ${value.words.length}'),
+                    Text('${value.answeredCount + 1} / ${value.words.length}'),
                   ],
                 ),
               ),
@@ -128,7 +138,9 @@ class DictionaryReviewPage extends ConsumerWidget {
                       child: AppButton(
                         label: 'Needs review',
                         variant: AppButtonVariant.outline,
-                        onPressed: () => _answer(context, ref, false),
+                        onPressed: value.isSubmitting
+                            ? null
+                            : () => _answer(context, ref, false),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -136,7 +148,9 @@ class DictionaryReviewPage extends ConsumerWidget {
                       child: AppButton(
                         label: 'Got it',
                         icon: Icons.check_rounded,
-                        onPressed: () => _answer(context, ref, true),
+                        onPressed: value.isSubmitting
+                            ? null
+                            : () => _answer(context, ref, true),
                       ),
                     ),
                   ],

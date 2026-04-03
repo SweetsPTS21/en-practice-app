@@ -5,11 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
+import '../../../core/design/widgets/app_state_widgets.dart';
 import '../../../core/navigation/learning_action_resolver.dart';
 import '../../../core/notifications/notification_models.dart';
-import '../../../core/recommendation/recommendation_surface.dart';
 import '../../../core/theme/page_palettes.dart';
-import '../../recommendation/presentation/widgets/recommendation_surface_slot.dart';
 import '../application/notification_center_controller.dart';
 import 'widgets/notification_list.dart';
 import 'widgets/notification_settings_card.dart';
@@ -24,13 +23,20 @@ class NotificationInboxPage extends ConsumerWidget {
     return AppPageScaffold(
       title: 'Notification Center',
       subtitle:
-          'Unread badge, action routing, mark-read flows and in-app re-entry now live in the mobile shell.',
+          'Review alerts, clear unread items and jump back to the right task.',
       paletteKey: AppPagePaletteKey.profile,
+      onRefresh: controller.load,
       children: [
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const AppSectionHeader(
+                title: 'Inbox overview',
+                subtitle:
+                    'Keep only the notifications that still need your attention.',
+              ),
+              const SizedBox(height: 16),
               Text(
                 '${controller.items.where((item) => !item.isRead).length} unread',
                 style: Theme.of(context).textTheme.titleMedium,
@@ -44,7 +50,9 @@ class NotificationInboxPage extends ConsumerWidget {
                     label: 'Mark all read',
                     icon: Icons.done_all_rounded,
                     variant: AppButtonVariant.outline,
-                    onPressed: controller.isSubmitting ? null : controller.markAllAsRead,
+                    onPressed: controller.isSubmitting
+                        ? null
+                        : controller.markAllAsRead,
                   ),
                 ],
               ),
@@ -52,37 +60,20 @@ class NotificationInboxPage extends ConsumerWidget {
           ),
         ),
         if (controller.isLoading)
-          const AppCard(
-            child: SizedBox(
-              height: 220,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          )
+          const AppLoadingCard(height: 220, message: 'Loading notifications...')
         else if (controller.errorMessage != null)
-          AppCard(
-            child: Column(
-              children: [
-                Text(controller.errorMessage ?? 'Unknown notification error'),
-                const SizedBox(height: 12),
-                AppButton(
-                  label: 'Retry',
-                  icon: Icons.refresh_rounded,
-                  onPressed: controller.load,
-                ),
-              ],
-            ),
+          AppErrorCard(
+            title: 'Notifications are unavailable',
+            message: controller.errorMessage ?? 'Please try again in a moment.',
+            onRetry: controller.load,
           )
         else
           NotificationList(
             items: controller.items,
-            onOpen: (item) => _handleOpenNotification(context, controller, item),
+            onOpen: (item) =>
+                _handleOpenNotification(context, controller, item),
             onDelete: controller.deleteNotification,
           ),
-        const RecommendationSurfaceSlot(
-          surface: RecommendationSurface.notification,
-          source: 'NOTIFICATION_RECOMMENDATION',
-          showFeedbackActions: true,
-        ),
         const NotificationSettingsCard(),
       ],
     );
@@ -100,7 +91,11 @@ class NotificationInboxPage extends ConsumerWidget {
 
     if (outcome.target.kind == LearningActionKind.external) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('External notification routes are not enabled on mobile yet.')),
+        const SnackBar(
+          content: Text(
+            'External notification routes are not enabled on mobile yet.',
+          ),
+        ),
       );
       return;
     }

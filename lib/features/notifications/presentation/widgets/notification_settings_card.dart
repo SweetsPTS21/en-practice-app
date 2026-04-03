@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/design/widgets/app_button.dart';
 import '../../../../core/design/widgets/app_card.dart';
+import '../../../../core/design/widgets/app_state_widgets.dart';
 import '../../../../core/notifications/notification_preferences_models.dart';
 import '../../../../core/push/push_providers.dart';
 import '../../application/notification_settings_controller.dart';
@@ -17,27 +18,27 @@ class NotificationSettingsCard extends ConsumerWidget {
     final pushLifecycle = ref.watch(pushLifecycleControllerProvider);
 
     if (controller.isLoading) {
-      return const AppCard(
-        child: SizedBox(
-          height: 120,
-          child: Center(child: CircularProgressIndicator()),
-        ),
+      return const AppLoadingCard(
+        height: 120,
+        message: 'Loading notification settings...',
       );
     }
 
     final preferences = controller.preferences;
     if (preferences == null) {
-      return const AppCard(child: Text('Notification preferences are unavailable.'));
+      return const AppErrorCard(
+        title: 'Settings are unavailable',
+        message: 'Notification preferences could not be loaded right now.',
+      );
     }
 
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Notification settings', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 10),
-          Text(
-            'Backend preferences and device permission are separate concerns, so both need to be visible in this phase.',
+          const AppSectionHeader(
+            title: 'Notification settings',
+            subtitle: 'Choose which updates you want to receive, then review device permission below.',
           ),
           const SizedBox(height: 16),
           _ToggleTile(

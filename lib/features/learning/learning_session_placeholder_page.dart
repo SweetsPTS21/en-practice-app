@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/design/widgets/app_button.dart';
 import '../../core/design/widgets/app_card.dart';
 import '../../core/design/widgets/app_page_scaffold.dart';
+import '../../core/design/widgets/app_state_widgets.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/theme/page_palettes.dart';
 import '../../core/learning_journey/learning_journey_providers.dart';
@@ -29,7 +30,6 @@ class LearningSessionPlaceholderPage extends ConsumerStatefulWidget {
   ConsumerState<LearningSessionPlaceholderPage> createState() =>
       _LearningSessionPlaceholderPageState();
 }
-
 class _LearningSessionPlaceholderPageState
     extends ConsumerState<LearningSessionPlaceholderPage> {
   bool _trackedStart = false;
@@ -72,12 +72,10 @@ class _LearningSessionPlaceholderPageState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                context.tr('learningSession.title'),
-                style: Theme.of(context).textTheme.titleLarge,
+              AppSectionHeader(
+                title: context.tr('learningSession.title'),
+                subtitle: context.tr('learningSession.description'),
               ),
-              const SizedBox(height: 8),
-              Text(context.tr('learningSession.description')),
               const SizedBox(height: 18),
               Wrap(
                 spacing: 12,
@@ -103,18 +101,15 @@ class _LearningSessionPlaceholderPageState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                context.tr('learningSession.metaTitle'),
-                style: Theme.of(context).textTheme.titleLarge,
+              const AppSectionHeader(
+                title: 'Before you start',
+                subtitle: 'Use this screen to confirm the flow, then continue or return without losing context.',
               ),
-              const SizedBox(height: 12),
-              _SessionRow(
-                label: context.tr('learningSession.routeLabel'),
-                value: widget.route,
-              ),
-              _SessionRow(
-                label: context.tr('learningSession.moduleLabel'),
-                value: widget.module,
+              const SizedBox(height: 16),
+              AppEmptyState(
+                icon: Icons.play_circle_outline_rounded,
+                title: '${widget.module} session ready',
+                subtitle: 'When you complete this flow, the app will take you to the matching result screen.',
               ),
             ],
           ),
@@ -168,35 +163,5 @@ class _LearningSessionPlaceholderPageState
     }
 
     return '/home?refresh=${DateTime.now().millisecondsSinceEpoch}';
-  }
-}
-
-class _SessionRow extends StatelessWidget {
-  const _SessionRow({
-    required this.label,
-    required this.value,
-  });
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        children: [
-          Expanded(child: Text(label)),
-          const SizedBox(width: 12),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
