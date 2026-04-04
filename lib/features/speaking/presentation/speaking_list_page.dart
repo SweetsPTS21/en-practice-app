@@ -11,6 +11,7 @@ import '../../../core/theme/page_palettes.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../../core/theme/theme_tokens.dart';
 import '../application/speaking_controllers.dart';
+import 'speaking_history_page.dart';
 
 const List<_FilterOption> _speakingPartFilters = <_FilterOption>[
   _FilterOption('ALL', 'All'),
@@ -44,7 +45,7 @@ class SpeakingListPage extends ConsumerWidget {
       trailing: AppHeaderIconAction(
         tooltip: 'History',
         icon: Icons.history_rounded,
-        onPressed: () => context.go('/speaking/history'),
+        onPressed: () => _openSpeakingHistorySheet(context),
       ),
       onRefresh: controller.refresh,
       children: [
@@ -208,6 +209,23 @@ class SpeakingListPage extends ConsumerWidget {
       ],
     );
   }
+}
+
+Future<void> _openSpeakingHistorySheet(BuildContext context) async {
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    backgroundColor: context.tokens.background.canvas,
+    builder: (sheetContext) {
+      return SpeakingHistorySheet(
+        onSelected: (item) {
+          Navigator.of(sheetContext).pop();
+          context.go('/speaking/result/${item.id}');
+        },
+      );
+    },
+  );
 }
 
 class _SpeakingTopicTile extends StatelessWidget {

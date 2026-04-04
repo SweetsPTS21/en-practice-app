@@ -13,6 +13,7 @@ import '../../../core/theme/page_palettes.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../../core/theme/theme_tokens.dart';
 import '../application/writing_controllers.dart';
+import 'writing_history_page.dart';
 
 const List<_FilterOption> _writingTypeFilters = <_FilterOption>[
   _FilterOption('ALL', 'All'),
@@ -44,7 +45,7 @@ class WritingListPage extends ConsumerWidget {
       trailing: AppHeaderIconAction(
         tooltip: 'History',
         icon: Icons.history_rounded,
-        onPressed: () => context.go('/writing/history'),
+        onPressed: () => _openWritingHistorySheet(context),
       ),
       onRefresh: controller.refresh,
       children: [
@@ -225,6 +226,23 @@ class WritingListPage extends ConsumerWidget {
       ],
     );
   }
+}
+
+Future<void> _openWritingHistorySheet(BuildContext context) async {
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    backgroundColor: context.tokens.background.canvas,
+    builder: (sheetContext) {
+      return WritingHistorySheet(
+        onSelected: (item) {
+          Navigator.of(sheetContext).pop();
+          context.go('/writing/submission/${item.id}');
+        },
+      );
+    },
+  );
 }
 
 class _WritingTaskTile extends StatelessWidget {

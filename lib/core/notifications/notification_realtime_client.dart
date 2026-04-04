@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'notification_api.dart';
-import 'notification_models.dart';
 
 class NotificationRealtimeClient extends ChangeNotifier {
   NotificationRealtimeClient({
@@ -22,11 +21,9 @@ class NotificationRealtimeClient extends ChangeNotifier {
   Timer? _pollTimer;
   bool _isDisposed = false;
   bool _isPolling = false;
-  String? _latestKnownNotificationId;
 
   int unreadCount = 0;
   bool isReady = false;
-  NotificationItem? foregroundNotification;
 
   Future<void> _bootstrap() async {
     await refreshBaseline();
@@ -44,17 +41,12 @@ class NotificationRealtimeClient extends ChangeNotifier {
     if (!_isAuthenticated) {
       unreadCount = 0;
       isReady = true;
-      foregroundNotification = null;
       _notifySafely();
       return;
     }
 
     try {
-      final notifications = await _api.getNotifications();
       unreadCount = await _api.getUnreadCount();
-      _latestKnownNotificationId = notifications.isEmpty
-          ? null
-          : notifications.first.id;
     } catch (_) {
       unreadCount = 0;
     } finally {
@@ -70,18 +62,7 @@ class NotificationRealtimeClient extends ChangeNotifier {
 
     _isPolling = true;
     try {
-      final notifications = await _api.getNotifications();
-      final nextUnreadCount = await _api.getUnreadCount();
-      final latestNotification = notifications.isEmpty
-          ? null
-          : notifications.first;
-
-      unreadCount = nextUnreadCount;
-      if (latestNotification != null &&
-          latestNotification.id != _latestKnownNotificationId) {
-        _latestKnownNotificationId = latestNotification.id;
-        foregroundNotification = latestNotification;
-      }
+      unreadCount = await _api.getUnreadCount();
       _notifySafely();
     } catch (_) {
       // Polling should never break the app shell.
@@ -109,19 +90,6 @@ class NotificationRealtimeClient extends ChangeNotifier {
     } catch (_) {
       // Ignore sync errors.
     }
-  }
-
-  void consumeForegroundNotification() {
-    foregroundNotification = null;
-    _notifySafely();
-  }
-
-  void acknowledgeLatestNotification(String? notificationId) {
-    if (notificationId == null || notificationId.isEmpty) {
-      return;
-    }
-
-    _latestKnownNotificationId = notificationId;
   }
 
   void _notifySafely() {

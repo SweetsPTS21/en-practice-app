@@ -8,7 +8,6 @@ import '../../../app/navigation/app_destinations.dart';
 import '../../../features/auth/auth_providers.dart';
 import '../../../features/auth/models/auth_models.dart';
 import '../../../features/notifications/presentation/widgets/foreground_push_banner.dart';
-import '../../../features/notifications/presentation/widgets/notification_toast_host.dart';
 import '../../notifications/notification_providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme/page_palettes.dart';
@@ -165,6 +164,10 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.location.startsWith('/ielts/take/')) {
+      return widget.child;
+    }
+
     final tokens = context.tokens;
     final currentDestination = resolveDestination(widget.location);
     final auth = ref.watch(authControllerProvider);
@@ -210,7 +213,7 @@ class _AppShellState extends ConsumerState<AppShell> {
                             duration: tokens.motion.normal,
                             curve: Curves.easeOutCubic,
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                              padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
                               child: _ShellHeader(
                                 user: auth.user,
                                 onLogout: auth.isSubmitting
@@ -306,7 +309,6 @@ class _AppShellState extends ConsumerState<AppShell> {
                     ),
                   ],
                 ),
-                const NotificationToastHost(),
                 const ForegroundPushBanner(),
               ],
             ),
@@ -328,7 +330,7 @@ class _ShellHeader extends StatelessWidget {
     final tokens = context.tokens;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+      padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
       decoration: BoxDecoration(
         color: tokens.background.mobileDrawer,
         borderRadius: BorderRadius.circular(tokens.radius.xl),
@@ -405,26 +407,18 @@ class _HeaderActionCluster extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
 
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: tokens.background.panelStrong,
-        borderRadius: BorderRadius.circular(tokens.radius.hero),
-        border: Border.all(color: tokens.border.subtle),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const _HeaderNotificationBellButton(),
-          Container(
-            width: 1,
-            height: 24,
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            color: tokens.border.subtle,
-          ),
-          _AvatarMenu(user: user, onLogout: onLogout),
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const _HeaderNotificationBellButton(),
+        Container(
+          width: 1,
+          height: 24,
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          color: tokens.border.subtle,
+        ),
+        _AvatarMenu(user: user, onLogout: onLogout),
+      ],
     );
   }
 }

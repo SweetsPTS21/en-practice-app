@@ -99,6 +99,8 @@ flutter doctor -v
 ## Reference
 
 - [Flutter docs](https://docs.flutter.dev/)
+- [App design guideline](docs/flutter_app_design_guidelines.md)
+- [Agent instructions](AGENTS.md)
 
 ## Firebase App Distribution
 

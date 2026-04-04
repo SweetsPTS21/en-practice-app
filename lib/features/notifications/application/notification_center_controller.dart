@@ -27,9 +27,6 @@ class NotificationCenterController extends ChangeNotifier {
     try {
       final api = ref.read(notificationApiProvider);
       items = await api.getNotifications();
-      ref
-          .read(notificationRealtimeClientProvider)
-          .acknowledgeLatestNotification(items.isEmpty ? null : items.first.id);
       await ref
           .read(notificationRealtimeClientProvider)
           .syncUnreadCount(items.where((item) => !item.isRead).length);

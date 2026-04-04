@@ -17,16 +17,17 @@ import '../../features/dictionary/presentation/dictionary_review_page.dart';
 import '../../features/dictionary/presentation/dictionary_word_detail_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/ielts/ielts_page.dart';
+import '../../features/ielts/presentation/ielts_detail_page.dart';
+import '../../features/ielts/presentation/ielts_result_page.dart';
+import '../../features/ielts/presentation/ielts_taking_page.dart';
 import '../../features/leaderboard/leaderboard_page.dart';
 import '../../features/leaderboard/xp_history_page.dart';
-import '../../features/learning/learning_session_placeholder_page.dart';
 import '../../features/notifications/presentation/notification_inbox_page.dart';
 import '../../features/profile/profile_page.dart';
 import '../../features/reports/presentation/weekly_report_page.dart';
 import '../../features/results/data/result_snapshot_request.dart';
 import '../../features/results/presentation/result_journey_page.dart';
 import '../../features/settings/settings_page.dart';
-import '../../features/shared/route_placeholder_page.dart';
 import '../../features/custom_speaking/presentation/custom_speaking_chat_page.dart';
 import '../../features/custom_speaking/presentation/custom_speaking_history_page.dart';
 import '../../features/custom_speaking/presentation/custom_speaking_page.dart';
@@ -111,6 +112,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/auth-loading',
         builder: (context, state) => const AuthLoadingPage(),
+      ),
+      GoRoute(
+        path: '/ielts/take/:attemptId',
+        builder: (context, state) => IeltsTakingPage(
+          attemptId: state.pathParameters['attemptId'] ?? '',
+        ),
       ),
       ShellRoute(
         builder: (context, state, child) {
@@ -206,40 +213,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/ielts',
-            builder: (context, state) => const IeltsPage(),
+            builder: (context, state) => IeltsPage(initialUri: state.uri),
             routes: [
               GoRoute(
                 path: 'test/:testId',
-                builder: (context, state) => const RoutePlaceholderPage(
-                  title: 'IELTS Test Detail',
-                  subtitle: 'Review the test details before you begin.',
-                  paletteKey: AppPagePaletteKey.ielts,
-                  highlights: [
-                    'Overview of the selected test.',
-                    'Entry point before starting the session.',
-                  ],
-                ),
-              ),
-              GoRoute(
-                path: 'take/:attemptId',
-                builder: (context, state) => LearningSessionPlaceholderPage(
-                  title: 'IELTS Session',
-                  subtitle: 'Continue your IELTS practice session.',
-                  route: state.uri.toString(),
-                  module: 'IELTS',
-                  paletteKey: AppPagePaletteKey.ielts,
+                builder: (context, state) => IeltsDetailPage(
+                  testId: state.pathParameters['testId'] ?? '',
+                  initialUri: state.uri,
                 ),
               ),
               GoRoute(
                 path: 'result/:attemptId',
-                builder: (context, state) => ResultJourneyPage(
-                  request: ResultSnapshotRequest(
-                    module: ResultSnapshotModule.ielts,
-                    referenceId: state.pathParameters['attemptId'] ?? '',
-                  ),
-                  title: 'IELTS Result',
-                  subtitle: 'See your IELTS result and decide what to do next.',
-                  paletteKey: AppPagePaletteKey.ielts,
+                builder: (context, state) => IeltsResultPage(
+                  attemptId: state.pathParameters['attemptId'] ?? '',
                 ),
               ),
             ],
