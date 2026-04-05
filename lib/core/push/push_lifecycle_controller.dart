@@ -72,7 +72,11 @@ class PushLifecycleController extends ChangeNotifier {
     }
 
     if (_isAuthenticated) {
-      await syncToken();
+      if (permissionSnapshot?.status == PushPermissionStatus.unknown) {
+        await requestPermission();
+      } else if (permissionSnapshot?.status == PushPermissionStatus.granted) {
+        await syncToken();
+      }
       if (_isDisposed) {
         return;
       }
@@ -129,6 +133,31 @@ class PushLifecycleController extends ChangeNotifier {
       return;
     }
     _safeNotifyListeners();
+  }
+
+  Future<void> refreshPermissionStatus({bool syncIfGranted = true}) async {
+    final previousStatus = permissionSnapshot?.status;
+    permissionSnapshot = await _permissionService.refresh();
+    if (_isDisposed) {
+      return;
+    }
+
+    final shouldSyncToken =
+        syncIfGranted &&
+        _isAuthenticated &&
+        permissionSnapshot?.status == PushPermissionStatus.granted &&
+        previousStatus != PushPermissionStatus.granted;
+
+    if (shouldSyncToken) {
+      await syncToken(force: true);
+      return;
+    }
+
+    _safeNotifyListeners();
+  }
+
+  Future<void> openSystemNotificationSettings() {
+    return _adapter.openNotificationSettings();
   }
 
   void dismissForegroundMessage() {

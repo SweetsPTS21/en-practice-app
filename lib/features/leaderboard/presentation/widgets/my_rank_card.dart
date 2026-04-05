@@ -42,44 +42,31 @@ class MyRankCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             )
           else ...[
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final availableWidth =
-                    constraints.hasBoundedWidth &&
-                        constraints.maxWidth.isFinite &&
-                        constraints.maxWidth > 0
-                    ? constraints.maxWidth
-                    : MediaQuery.sizeOf(context).width - 40;
-                final compact = availableWidth < 360;
-                final itemWidth = compact
-                    ? availableWidth
-                    : (availableWidth - 24) / 3;
-
-                return Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    SizedBox(
-                      width: itemWidth,
-                      child: _MetricBlock(
-                        label: 'Current rank',
-                        value: '#${rank!.rank}',
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _MetricBlock(label: 'XP', value: '${rank!.xp}'),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _MetricBlock(
-                        label: 'To next rank',
-                        value: '${rank!.xpToNextRank}',
-                      ),
-                    ),
-                  ],
-                );
-              },
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _MetricBlock(
+                    label: 'Current rank',
+                    value: '#${rank!.rank}',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                _MetricDivider(color: tokens.border.subtle),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MetricBlock(label: 'XP', value: '${rank!.xp}'),
+                ),
+                const SizedBox(width: 12),
+                _MetricDivider(color: tokens.border.subtle),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MetricBlock(
+                    label: 'To next rank',
+                    value: '${rank!.xpToNextRank}',
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             Container(
@@ -132,27 +119,34 @@ class _MetricBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
+        ),
+        const SizedBox(height: 6),
+        Text(value, style: Theme.of(context).textTheme.titleMedium),
+      ],
+    );
+  }
+}
+
+class _MetricDivider extends StatelessWidget {
+  const _MetricDivider({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: tokens.background.panel,
-        borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: tokens.border.subtle),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
-          ),
-          const SizedBox(height: 6),
-          Text(value, style: Theme.of(context).textTheme.titleMedium),
-        ],
-      ),
+      width: 1,
+      height: 44,
+      color: color,
     );
   }
 }

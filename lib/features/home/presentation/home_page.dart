@@ -487,10 +487,6 @@ class _HomeContent extends ConsumerWidget {
             ),
           ),
         ),
-        const SliverPadding(
-          padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
-          sliver: SliverToBoxAdapter(child: LeaderboardSummaryWidget()),
-        ),
         if (state.flagshipRetention?.hasAnyBlock == true)
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -550,10 +546,14 @@ class _HomeContent extends ConsumerWidget {
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
           sliver: SliverToBoxAdapter(
             child: _ProgressSnapshotCard(snapshot: state.progressSnapshot),
           ),
+        ),
+        const SliverPadding(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 32),
+          sliver: SliverToBoxAdapter(child: LeaderboardSummaryWidget()),
         ),
       ],
     );

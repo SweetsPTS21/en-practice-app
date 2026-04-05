@@ -162,7 +162,7 @@ class IeltsQuestionRenderer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(tokens.radius.xl),
                 border: Border.all(color: tokens.border.subtle),
               ),
-              child: IeltsMarkdownBlock(data: question.contextText!),
+              child: Text(question.contextText!),
             ),
             const SizedBox(height: 16),
           ],
@@ -222,9 +222,11 @@ class IeltsQuestionRenderer extends StatelessWidget {
 class IeltsAnswerReviewCard extends StatelessWidget {
   const IeltsAnswerReviewCard({
     super.key,
+    required this.displayIndex,
     required this.question,
   });
 
+  final int displayIndex;
   final IeltsQuestion question;
 
   @override
@@ -236,44 +238,81 @@ class IeltsAnswerReviewCard extends StatelessWidget {
         correct.isNotEmpty &&
         submitted.length == correct.length &&
         submitted.every((value) => correct.contains(value));
+    final statusColor = matched ? tokens.success : tokens.danger;
+    final statusIcon = matched
+        ? Icons.check_circle_rounded
+        : Icons.close_rounded;
 
-    return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  question.prompt,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: tokens.background.panelStrong,
+                shape: BoxShape.circle,
+                border: Border.all(color: tokens.border.subtle),
               ),
-              const SizedBox(width: 12),
-              Text(
-                matched ? 'Correct' : 'Review',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: matched ? tokens.success : tokens.warning,
-                ),
+              alignment: Alignment.center,
+              child: Text(
+                '$displayIndex',
+                style: Theme.of(context).textTheme.labelMedium,
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _ReviewRow(
-            label: 'Your answer',
-            value: submitted.isEmpty ? 'No answer' : submitted.join(', '),
-          ),
-          const SizedBox(height: 8),
-          _ReviewRow(
-            label: 'Correct answer',
-            value: correct.isEmpty ? 'Unavailable' : correct.join(', '),
-          ),
-          if ((question.explanation ?? '').isNotEmpty) ...[
-            const SizedBox(height: 8),
-            _ReviewRow(label: 'Why', value: question.explanation!),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          question.prompt,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Container(
+                        width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Icon(
+                  statusIcon,
+                  size: 18,
+                          color: statusColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  _InlineReviewRow(
+                    label: 'Your answer',
+                    value: submitted.isEmpty ? 'No answer' : submitted.join(', '),
+                  ),
+                  const SizedBox(height: 6),
+                  _InlineReviewRow(
+                    label: 'Correct answer',
+                    value: correct.isEmpty ? 'Unavailable' : correct.join(', '),
+                  ),
+                  if ((question.explanation ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    _ReviewRow(label: 'Why', value: question.explanation!),
+                  ],
+                ],
+              ),
+            ),
           ],
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -454,19 +493,113 @@ class _TextSlotGroup extends StatelessWidget {
         final current = index < answers.length ? answers[index] : '';
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: TextFormField(
-            key: ValueKey('${slot.id}-$current'),
-            initialValue: current,
-            minLines: 1,
-            maxLines: slot.placeholder.length > 24 ? 2 : 1,
+          child: _TextSlotField(
+            key: ValueKey(slot.id),
+            slot: slot,
+            value: current,
             onChanged: (value) => onChanged(index, value),
-            decoration: InputDecoration(
-              labelText: slot.label,
-              hintText: slot.placeholder,
-            ),
           ),
         );
       }).toList(growable: false),
+    );
+  }
+}
+
+class _TextSlotField extends StatefulWidget {
+  const _TextSlotField({
+    super.key,
+    required this.slot,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final IeltsAnswerSlot slot;
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<_TextSlotField> createState() => _TextSlotFieldState();
+}
+
+class _TextSlotFieldState extends State<_TextSlotField> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.value);
+    _focusNode = FocusNode();
+  }
+
+  @override
+  void didUpdateWidget(covariant _TextSlotField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_controller.text == widget.value) {
+      return;
+    }
+    final selection = _controller.selection;
+    _controller.value = TextEditingValue(
+      text: widget.value,
+      selection: TextSelection.collapsed(
+        offset: selection.baseOffset.clamp(0, widget.value.length),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: _controller,
+      focusNode: _focusNode,
+      minLines: 1,
+      maxLines: widget.slot.placeholder.length > 24 ? 2 : 1,
+      onChanged: widget.onChanged,
+      decoration: InputDecoration(
+        labelText: widget.slot.label,
+        hintText: widget.slot.placeholder,
+      ),
+    );
+  }
+}
+
+class _InlineReviewRow extends StatelessWidget {
+  const _InlineReviewRow({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '$label: ',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(
+              color: tokens.text.secondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          TextSpan(
+            text: value,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
     );
   }
 }

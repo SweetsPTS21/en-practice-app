@@ -43,7 +43,10 @@ dependencies:
   flutter_riverpod: ^2.6.1
   flutter_secure_storage: ^9.2.4
   go_router: ^16.0.0
+  just_audio: ^0.10.5
+  package_info_plus: ^9.0.1
   shared_preferences: ^2.5.3
+  app_settings: ^7.0.0
 
 dev_dependencies:
   flutter_test:

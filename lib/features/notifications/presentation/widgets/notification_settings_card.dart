@@ -5,9 +5,9 @@ import '../../../../core/design/widgets/app_button.dart';
 import '../../../../core/design/widgets/app_card.dart';
 import '../../../../core/design/widgets/app_state_widgets.dart';
 import '../../../../core/notifications/notification_preferences_models.dart';
+import '../../../../core/push/push_platform_adapter.dart';
 import '../../../../core/push/push_providers.dart';
 import '../../application/notification_settings_controller.dart';
-import 'push_permission_sheet.dart';
 
 class NotificationSettingsCard extends ConsumerWidget {
   const NotificationSettingsCard({super.key});
@@ -25,6 +25,9 @@ class NotificationSettingsCard extends ConsumerWidget {
     }
 
     final preferences = controller.preferences;
+    final permissionStatus =
+        pushLifecycle.permissionSnapshot?.status ??
+        PushPermissionStatus.unknown;
     if (preferences == null) {
       return const AppErrorCard(
         title: 'Settings are unavailable',
@@ -93,12 +96,35 @@ class NotificationSettingsCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(pushLifecycle.permissionSnapshot?.label ?? 'Checking...'),
+                const SizedBox(height: 6),
+                Text(
+                  permissionStatus == PushPermissionStatus.unknown
+                      ? 'We will ask once inside the app. After that, you can manage push in your device settings.'
+                      : 'Use your device notification settings to turn alerts on or off for this app.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
                 const SizedBox(height: 12),
                 AppButton(
-                  label: 'Manage push permission',
+                  label: permissionStatus == PushPermissionStatus.unknown
+                      ? 'Enable push permission'
+                      : 'Open system notification settings',
                   icon: Icons.notifications_active_rounded,
                   variant: AppButtonVariant.outline,
-                  onPressed: () => PushPermissionSheet.show(context),
+                  onPressed:
+                      pushLifecycle.isRequestingPermission ||
+                          pushLifecycle.isSyncingToken
+                      ? null
+                      : () async {
+                          final lifecycle = ref.read(
+                            pushLifecycleControllerProvider,
+                          );
+                          if (permissionStatus ==
+                              PushPermissionStatus.unknown) {
+                            await lifecycle.requestPermission();
+                            return;
+                          }
+                          await lifecycle.openSystemNotificationSettings();
+                        },
                 ),
               ],
             ),

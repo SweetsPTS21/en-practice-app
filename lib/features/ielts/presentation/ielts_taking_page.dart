@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
@@ -33,6 +34,7 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
   int _elapsedSeconds = 0;
   bool _immersiveEnabled = false;
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _questionAnchorKey = GlobalKey();
 
   @override
   void initState() {
@@ -177,39 +179,43 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
       (section) => section.id == runtime.activeSectionId,
       orElse: () => detail.sections.first,
     );
-    final isReadingSection = activeSection.skill == IeltsSkill.reading;
+    final sectionInstructions = activeSection.instructions?.trim();
+    final sectionAudioUrl = activeSection.audioUrl?.trim();
+    final isPassageDrivenSection =
+        detail.skill == IeltsSkill.reading ||
+        detail.skill == IeltsSkill.listening;
     final currentSectionQuestions = activeSection.questions;
     final questionIndex = currentSectionQuestions.indexWhere(
       (item) => item.questionId == focusedQuestion.questionId,
     );
-    final readingPassages = _readingQuestionPassages(activeSection);
-    final sharedReadingPassages = _sharedReadingPassages(activeSection);
-    final activeReadingPassage = isReadingSection
+    final sectionQuestionPassages = _readingQuestionPassages(activeSection);
+    final sharedReadingPassages = detail.skill == IeltsSkill.reading
+        ? _sharedReadingPassages(activeSection)
+        : const <IeltsPassageContent>[];
+    final activePassage = isPassageDrivenSection
         ? _resolveActiveReadingPassage(
             activeSection,
             focusedQuestion.questionId,
           )
         : null;
-    final activeReadingQuestions = activeReadingPassage == null
+    final activePassageQuestions = activePassage == null
         ? const <IeltsQuestion>[]
         : currentSectionQuestions
-              .where(
-                (question) => question.passageId == activeReadingPassage.id,
-              )
+              .where((question) => question.passageId == activePassage.id)
               .toList(growable: false);
-    final previousReadingTarget = isReadingSection
+    final previousPassageTarget = isPassageDrivenSection
         ? _findAdjacentReadingTarget(
             detail,
             activeSectionId: activeSection.id,
-            currentPassageId: activeReadingPassage?.id,
+            currentPassageId: activePassage?.id,
             direction: -1,
           )
         : null;
-    final nextReadingTarget = isReadingSection
+    final nextPassageTarget = isPassageDrivenSection
         ? _findAdjacentReadingTarget(
             detail,
             activeSectionId: activeSection.id,
-            currentPassageId: activeReadingPassage?.id,
+            currentPassageId: activePassage?.id,
             direction: 1,
           )
         : null;
@@ -234,15 +240,14 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
                 _selectSectionAndScrollTop(controller, sectionId),
           ),
         ),
-        if ((activeSection.description ?? '').isNotEmpty) ...[
+        if ((sectionInstructions ?? '').isNotEmpty) ...[
           const SizedBox(height: 12),
           _MarkdownContentCard(
             label: 'Section instructions',
-            data: activeSection.description!,
+            data: sectionInstructions!,
           ),
         ],
-        if ((activeSection.audioUrl ?? '').isNotEmpty ||
-            (activeSection.audioSeekHint ?? '').isNotEmpty) ...[
+        if ((sectionAudioUrl ?? '').isNotEmpty) ...[
           const SizedBox(height: 12),
           AppCard(
             child: Column(
@@ -252,23 +257,21 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
                   'Listening source',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 8),
-                if ((activeSection.audioSeekHint ?? '').isNotEmpty)
-                  Text(activeSection.audioSeekHint!),
-                if ((activeSection.audioUrl ?? '').isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  SelectableText(activeSection.audioUrl!),
-                ],
+                const SizedBox(height: 12),
+                _SectionAudioPlayer(
+                  key: ValueKey(activeSection.id),
+                  audioUrl: sectionAudioUrl!,
+                ),
               ],
             ),
           ),
         ],
         const SizedBox(height: 12),
-        if (isReadingSection && activeReadingPassage != null) ...[
+        if (isPassageDrivenSection && activePassage != null) ...[
           _ReadingPassageNavigator(
             section: activeSection,
-            passages: readingPassages,
-            activePassageId: activeReadingPassage.id,
+            passages: sectionQuestionPassages,
+            activePassageId: activePassage.id,
             answers: runtime.answers,
             questions: currentSectionQuestions,
             onPassagePressed: (passage) {
@@ -287,34 +290,23 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
           ),
           if (sharedReadingPassages.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const _ReadingContentSectionHeader(
-              title: 'Original Session Passage',
+            _ReadingPassageSection(
+              section: activeSection,
+              passages: sharedReadingPassages,
+              label: 'Source passage',
             ),
-            const SizedBox(height: 10),
-            for (final passage in sharedReadingPassages) ...[
-              _ReadingPassageCard(
-                label: 'Source passage',
-                badge: _compactReadingPassageTitle(activeSection, passage),
-                title: _readingPassageHeading(passage),
-                body: passage.body,
-              ),
-              const SizedBox(height: 12),
-            ],
           ],
           const SizedBox(height: 4),
-          const _ReadingContentSectionHeader(title: 'Question Content'),
-          const SizedBox(height: 10),
-          _ReadingPassageCard(
-            label: 'Question passage',
-            badge: _compactReadingPassageTitle(
-              activeSection,
-              activeReadingPassage,
-            ),
-            title: _readingPassageHeading(activeReadingPassage),
-            body: activeReadingPassage.body,
+          _ReadingPassageSection(
+            section: activeSection,
+            passages: [activePassage],
+            label: detail.skill == IeltsSkill.listening
+                ? 'Passage content'
+                : 'Question passage',
           ),
           const SizedBox(height: 12),
-          ...activeReadingQuestions.asMap().entries.expand((entry) sync* {
+          SizedBox(key: _questionAnchorKey),
+          ...activePassageQuestions.asMap().entries.expand((entry) sync* {
             final question = entry.value;
             yield IeltsQuestionRenderer(
               question: question,
@@ -328,11 +320,12 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
               showContextText: false,
               showPassageTitle: false,
             );
-            if (entry.key != activeReadingQuestions.length - 1) {
+            if (entry.key != activePassageQuestions.length - 1) {
               yield const SizedBox(height: 12);
             }
           }),
         ] else ...[
+          SizedBox(key: _questionAnchorKey),
           IeltsQuestionRenderer(
             question: focusedQuestion,
             answers:
@@ -357,15 +350,17 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
             children: [
               Expanded(
                 child: AppButton(
-                  label: isReadingSection ? 'Previous passage' : 'Previous',
+                  label: isPassageDrivenSection
+                      ? 'Previous passage'
+                      : 'Previous',
                   variant: AppButtonVariant.outline,
-                  onPressed: isReadingSection
-                      ? (previousReadingTarget == null
+                  onPressed: isPassageDrivenSection
+                      ? (previousPassageTarget == null
                             ? null
                             : () => _focusQuestionAndScrollTop(
                                 controller,
-                                previousReadingTarget.sectionId,
-                                previousReadingTarget.questionId,
+                                previousPassageTarget.sectionId,
+                                previousPassageTarget.questionId,
                               ))
                       : (questionIndex <= 0
                             ? null
@@ -380,15 +375,15 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
               const SizedBox(width: 10),
               Expanded(
                 child: AppButton(
-                  label: isReadingSection ? 'Continue' : 'Next',
+                  label: isPassageDrivenSection ? 'Continue' : 'Next',
                   variant: AppButtonVariant.tonal,
-                  onPressed: isReadingSection
-                      ? (nextReadingTarget == null
+                  onPressed: isPassageDrivenSection
+                      ? (nextPassageTarget == null
                             ? null
                             : () => _focusQuestionAndScrollTop(
                                 controller,
-                                nextReadingTarget.sectionId,
-                                nextReadingTarget.questionId,
+                                nextPassageTarget.sectionId,
+                                nextPassageTarget.questionId,
                               ))
                       : (questionIndex < 0 ||
                                 questionIndex >=
@@ -405,7 +400,7 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
             ],
           ),
         ),
-        if (!isReadingSection) ...[
+        if (!isPassageDrivenSection) ...[
           const SizedBox(height: 12),
           IeltsQuestionNavigator(
             questions: currentSectionQuestions,
@@ -429,7 +424,7 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
     final seconds = detail.remainingSeconds == null
         ? _elapsedSeconds
         : math.max(detail.remainingSeconds! - _elapsedSeconds, 0);
-    final label = detail.remainingSeconds == null ? 'Elapsed' : 'Remaining';
+    final label = detail.remainingSeconds == null ? '' : 'Remaining';
     return '$label ${_formatClock(seconds)}';
   }
 
@@ -447,7 +442,7 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
     String questionId,
   ) {
     controller.focusQuestion(sectionId, questionId);
-    _jumpToTop();
+    _scrollToQuestionAnchor();
   }
 
   void _jumpToTop() {
@@ -455,6 +450,21 @@ class _IeltsTakingPageState extends ConsumerState<IeltsTakingPage> {
       return;
     }
     _scrollController.jumpTo(0);
+  }
+
+  void _scrollToQuestionAnchor() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _questionAnchorKey.currentContext;
+      if (context == null) {
+        return;
+      }
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        alignment: 0.0,
+      );
+    });
   }
 
   Future<void> _enterImmersiveMode() async {
@@ -596,11 +606,204 @@ class _TakingTopBar extends StatelessWidget {
   }
 }
 
+class _SectionAudioPlayer extends StatefulWidget {
+  const _SectionAudioPlayer({super.key, required this.audioUrl});
+
+  final String audioUrl;
+
+  @override
+  State<_SectionAudioPlayer> createState() => _SectionAudioPlayerState();
+}
+
+class _SectionAudioPlayerState extends State<_SectionAudioPlayer> {
+  late final AudioPlayer _player;
+  String? _loadError;
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+    _loadAudio();
+  }
+
+  @override
+  void didUpdateWidget(covariant _SectionAudioPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.audioUrl != widget.audioUrl) {
+      _loadAudio();
+    }
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadAudio() async {
+    setState(() {
+      _loadError = null;
+    });
+    try {
+      await _player.stop();
+      await _player.setUrl(widget.audioUrl);
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _loadError = 'Audio unavailable';
+      });
+    }
+  }
+
+  Future<void> _togglePlayback() async {
+    if (_player.playing) {
+      await _player.pause();
+      return;
+    }
+    await _player.play();
+  }
+
+  Future<void> _seekRelative(Duration delta) async {
+    final duration = _player.duration ?? Duration.zero;
+    final current = _player.position;
+    final target = current + delta;
+    final bounded = target < Duration.zero
+        ? Duration.zero
+        : target > duration
+        ? duration
+        : target;
+    await _player.seek(bounded);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    if (_loadError != null) {
+      return Text(
+        _loadError!,
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: tokens.danger),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        StreamBuilder<PlayerState>(
+          stream: _player.playerStateStream,
+          builder: (context, snapshot) {
+            final state = snapshot.data;
+            final isLoading =
+                state?.processingState == ProcessingState.loading ||
+                state?.processingState == ProcessingState.buffering;
+            final isPlaying = state?.playing ?? false;
+            final isCompleted =
+                state?.processingState == ProcessingState.completed;
+            return Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                AppButton(
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          if (isCompleted) {
+                            await _player.seek(Duration.zero);
+                          }
+                          await _togglePlayback();
+                        },
+                  compact: true,
+                  icon: isPlaying && !isCompleted
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
+                  label: isPlaying && !isCompleted ? 'Pause' : 'Play',
+                ),
+                AppButton(
+                  onPressed: () => _seekRelative(const Duration(seconds: -10)),
+                  compact: true,
+                  variant: AppButtonVariant.outline,
+                  icon: Icons.replay_10_rounded,
+                  label: '-10s',
+                ),
+                AppButton(
+                  onPressed: () => _seekRelative(const Duration(seconds: 10)),
+                  compact: true,
+                  variant: AppButtonVariant.outline,
+                  icon: Icons.forward_10_rounded,
+                  label: '+10s',
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 12),
+        StreamBuilder<Duration?>(
+          stream: _player.durationStream,
+          builder: (context, durationSnapshot) {
+            final total = durationSnapshot.data ?? Duration.zero;
+            return StreamBuilder<Duration>(
+              stream: _player.positionStream,
+              builder: (context, positionSnapshot) {
+                final position = positionSnapshot.data ?? Duration.zero;
+                final maxMillis = math.max(total.inMilliseconds, 1);
+                final value = position.inMilliseconds
+                    .clamp(0, maxMillis)
+                    .toDouble();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Slider(
+                      value: value,
+                      min: 0,
+                      max: maxMillis.toDouble(),
+                      onChanged: total == Duration.zero
+                          ? null
+                          : (nextValue) => _player.seek(
+                              Duration(milliseconds: nextValue.round()),
+                            ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          _formatAudioDuration(position),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: tokens.text.secondary),
+                        ),
+                        const Spacer(),
+                        Text(
+                          _formatAudioDuration(total),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: tokens.text.secondary),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
 String _formatClock(int seconds) {
   final safeSeconds = math.max(seconds, 0);
   final minutes = safeSeconds ~/ 60;
   final remainSeconds = safeSeconds % 60;
   return '${minutes.toString().padLeft(2, '0')}:${remainSeconds.toString().padLeft(2, '0')}';
+}
+
+String _formatAudioDuration(Duration duration) {
+  final totalSeconds = duration.inSeconds;
+  final minutes = totalSeconds ~/ 60;
+  final seconds = totalSeconds % 60;
+  return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 }
 
 class _SessionOverviewCard extends StatelessWidget {
@@ -633,7 +836,7 @@ class _SessionOverviewCard extends StatelessWidget {
           children: [
             Expanded(
               child: IeltsSessionTimer(
-                label: isCountdown ? 'Remaining' : 'Elapsed',
+                label: isCountdown ? 'Remaining' : '',
                 seconds: remainingSeconds,
               ),
             ),
@@ -695,7 +898,7 @@ class _SessionOverviewCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      section.title,
+                      _sectionDisplayTitle(section),
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: selected
                             ? tokens.primary
@@ -716,15 +919,13 @@ List<IeltsPassageContent> _readingQuestionPassages(
   IeltsSessionSection section,
 ) {
   return section.passages
-      .where((passage) => passage.questionIds.isNotEmpty)
+      .where((passage) => passage.hasQuestions)
       .toList(growable: false);
 }
 
 List<IeltsPassageContent> _sharedReadingPassages(IeltsSessionSection section) {
   return section.passages
-      .where(
-        (passage) => passage.sharedContextOnly || passage.questionIds.isEmpty,
-      )
+      .where((passage) => passage.sharedContentOnly || !passage.hasQuestions)
       .toList(growable: false);
 }
 
@@ -925,17 +1126,60 @@ class _ReadingPassageCard extends StatelessWidget {
     required this.label,
     required this.badge,
     required this.title,
-    required this.body,
+    required this.content,
   });
 
   final String label;
   final String badge;
   final String title;
-  final String body;
+  final String content;
 
   @override
   Widget build(BuildContext context) {
-    if (body.trim().isEmpty) {
+    if (content.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: context.tokens.text.secondary),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          badge,
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge?.copyWith(color: context.tokens.primary),
+        ),
+        if (title.trim().isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
+        ],
+        const SizedBox(height: 12),
+        IeltsMarkdownBlock(data: _normalizePassageMarkdown(content)),
+      ],
+    );
+  }
+}
+
+class _ReadingPassageSection extends StatelessWidget {
+  const _ReadingPassageSection({
+    required this.section,
+    required this.passages,
+    required this.label,
+  });
+
+  final IeltsSessionSection section;
+  final List<IeltsPassageContent> passages;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    if (passages.isEmpty) {
       return const SizedBox.shrink();
     }
     return AppCard(
@@ -943,56 +1187,21 @@ class _ReadingPassageCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: context.tokens.text.secondary,
+          for (final entry in passages.asMap().entries) ...[
+            _ReadingPassageCard(
+              label: label,
+              badge: _compactReadingPassageTitle(section, entry.value),
+              title: _readingPassageHeading(entry.value),
+              content: entry.value.content ?? '',
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            badge,
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge?.copyWith(color: context.tokens.primary),
-          ),
-          if (title.trim().isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            if (entry.key != passages.length - 1) ...[
+              const SizedBox(height: 12),
+              Divider(color: context.tokens.border.subtle),
+              const SizedBox(height: 12),
+            ],
           ],
-          const SizedBox(height: 12),
-          IeltsMarkdownBlock(data: body),
         ],
       ),
-    );
-  }
-}
-
-class _ReadingContentSectionHeader extends StatelessWidget {
-  const _ReadingContentSectionHeader({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: context.tokens.primary,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(color: context.tokens.text.primary),
-        ),
-      ],
     );
   }
 }
@@ -1001,17 +1210,15 @@ String _compactReadingPassageTitle(
   IeltsSessionSection section,
   IeltsPassageContent passage,
 ) {
-  final index = section.passages.indexWhere((item) => item.id == passage.id);
-  final labelIndex = index < 0 ? 1 : index + 1;
-  final rawTitle = passage.title.trim();
+  final rawTitle = (passage.title ?? '').trim();
   if (_isQuestionGroupTitle(rawTitle)) {
     return rawTitle.replaceAll('–', '-');
   }
-  return 'Passage $labelIndex';
+  return 'Passage ${passage.passageOrder}';
 }
 
 String _readingPassageHeading(IeltsPassageContent passage) {
-  final title = passage.title.trim();
+  final title = (passage.title ?? '').trim();
   if (title.isEmpty || _isQuestionGroupTitle(title)) {
     return '';
   }
@@ -1022,6 +1229,14 @@ bool _isQuestionGroupTitle(String value) {
   final normalized = value.trim().toLowerCase();
   return normalized.startsWith('question ') ||
       normalized.startsWith('questions ');
+}
+
+String _normalizePassageMarkdown(String value) {
+  final normalized = value.replaceAll('\r\n', '\n');
+  return normalized.replaceAllMapped(
+    RegExp(r'(?<!\n)\n(!\[)'),
+    (match) => '\n\n${match.group(1)}',
+  );
 }
 
 class _MarkdownContentCard extends StatelessWidget {
@@ -1043,9 +1258,17 @@ class _MarkdownContentCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          IeltsMarkdownBlock(data: data),
+          IeltsMarkdownBlock(data: _normalizePassageMarkdown(data)),
         ],
       ),
     );
   }
+}
+
+String _sectionDisplayTitle(IeltsSessionSection section) {
+  final title = (section.title ?? '').trim();
+  if (title.isNotEmpty) {
+    return title;
+  }
+  return 'Section ${section.sectionOrder}';
 }

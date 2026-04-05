@@ -145,20 +145,6 @@ class WritingListPage extends ConsumerWidget {
                           onOpen: () => context.go(
                             '/writing/task/${value.tasks.items[index].id}',
                           ),
-                          onResume: () => context.go(
-                            '/writing/task/${value.tasks.items[index].id}/take',
-                          ),
-                          onBestResult:
-                              value
-                                      .highestScoreFor(
-                                        value.tasks.items[index].id,
-                                      )
-                                      ?.submissionId ==
-                                  null
-                              ? null
-                              : () => context.go(
-                                  '/writing/submission/${value.highestScoreFor(value.tasks.items[index].id)!.submissionId}',
-                                ),
                         ),
                         if (index != value.tasks.items.length - 1)
                           SizedBox(height: tokens.density.compactGap),
@@ -257,8 +243,6 @@ class _WritingTaskTile extends StatelessWidget {
     required this.isPending,
     required this.bandScore,
     required this.onOpen,
-    required this.onResume,
-    this.onBestResult,
   });
 
   final String taskTitle;
@@ -271,8 +255,6 @@ class _WritingTaskTile extends StatelessWidget {
   final bool isPending;
   final double? bandScore;
   final VoidCallback onOpen;
-  final VoidCallback onResume;
-  final VoidCallback? onBestResult;
 
   @override
   Widget build(BuildContext context) {
@@ -369,39 +351,13 @@ class _WritingTaskTile extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  label: 'Open',
-                  icon: Icons.description_outlined,
-                  compact: true,
-                  variant: AppButtonVariant.outline,
-                  onPressed: onOpen,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: AppButton(
-                  label: 'Write',
-                  icon: Icons.edit_rounded,
-                  compact: true,
-                  onPressed: onResume,
-                ),
-              ),
-              if (onBestResult != null) ...[
-                const SizedBox(width: 10),
-                Expanded(
-                  child: AppButton(
-                    label: 'Best',
-                    icon: Icons.insights_rounded,
-                    compact: true,
-                    variant: AppButtonVariant.tonal,
-                    onPressed: onBestResult,
-                  ),
-                ),
-              ],
-            ],
+          SizedBox(
+            width: double.infinity,
+            child: AppButton(
+              label: 'Open',
+              icon: Icons.description_outlined,
+              onPressed: onOpen,
+            ),
           ),
         ],
       ),

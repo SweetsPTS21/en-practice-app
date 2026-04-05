@@ -737,32 +737,50 @@ class IeltsQuestion {
 class IeltsPassageContent {
   const IeltsPassageContent({
     required this.id,
-    required this.title,
-    required this.body,
-    required this.questionIds,
-    this.sharedContextOnly = false,
+    required this.passageOrder,
+    required this.questions,
+    this.title,
+    this.content,
+    this.sharedContentOnly = false,
   });
 
   final String id;
-  final String title;
-  final String body;
-  final List<String> questionIds;
-  final bool sharedContextOnly;
+  final int passageOrder;
+  final String? title;
+  final String? content;
+  final List<IeltsQuestion> questions;
+  final bool sharedContentOnly;
 
-  factory IeltsPassageContent.fromJson(Map<String, dynamic> json) {
+  bool get hasQuestions => questions.isNotEmpty;
+
+  factory IeltsPassageContent.fromJson(
+    Map<String, dynamic> json, {
+    required int passageIndex,
+    required String sectionId,
+    required String? sectionTitle,
+  }) {
+    final passageId =
+        _readNullableString(json['id'] ?? json['passageId']) ??
+        '$sectionId-passage-${passageIndex + 1}';
+    final passageTitle = _readNullableString(json['title']);
     return IeltsPassageContent(
-      id: _readNullableString(json['id'] ?? json['passageId']) ?? '',
-      title: _readNullableString(json['title'] ?? json['name']) ?? 'Passage',
-      body:
-          _readNullableString(
-            json['body'] ?? json['content'] ?? json['text'] ?? json['html'],
-          ) ??
-          '',
-      questionIds: _readStringList(json['questionIds']),
-      sharedContextOnly:
-          json['sharedContentOnly'] == true ||
-          json['sharedContextOnly'] == true ||
-          json['contextOnly'] == true,
+      id: passageId,
+      passageOrder: _readInt(json['passageOrder'] ?? passageIndex + 1),
+      title: passageTitle,
+      content: _readNullableString(json['content']),
+      questions: _readList(
+        json['questions'],
+      ).asMap().entries.map((entry) {
+        return IeltsQuestion.fromJson(
+          entry.value,
+          index: entry.key,
+          sectionId: sectionId,
+          sectionTitle: sectionTitle,
+          passageId: passageId,
+          passageTitle: passageTitle,
+        );
+      }).toList(growable: false),
+      sharedContentOnly: json['sharedContentOnly'] == true,
     );
   }
 }
@@ -770,25 +788,22 @@ class IeltsPassageContent {
 class IeltsSessionSection {
   const IeltsSessionSection({
     required this.id,
-    required this.title,
-    required this.skill,
-    required this.questions,
+    required this.sectionOrder,
     required this.passages,
-    this.description,
+    this.title,
+    this.instructions,
     this.audioUrl,
-    this.audioSeekHint,
-    this.audioSeekStartRatio,
   });
 
   final String id;
-  final String title;
-  final IeltsSkill skill;
-  final List<IeltsQuestion> questions;
+  final int sectionOrder;
+  final String? title;
   final List<IeltsPassageContent> passages;
-  final String? description;
+  final String? instructions;
   final String? audioUrl;
-  final String? audioSeekHint;
-  final double? audioSeekStartRatio;
+
+  List<IeltsQuestion> get questions =>
+      passages.expand((passage) => passage.questions).toList(growable: false);
 
   factory IeltsSessionSection.fromJson(
     Map<String, dynamic> json, {
@@ -796,95 +811,27 @@ class IeltsSessionSection {
   }) {
     final sectionId =
         _readNullableString(json['id'] ?? json['sectionId']) ??
-        'section_$sectionIndex';
-    final sectionTitle =
-        _readNullableString(json['title'] ?? json['name']) ??
-        'Section ${sectionIndex + 1}';
-    final rawQuestions = <IeltsQuestion>[
-      ..._readList(json['questions']).asMap().entries.map(
-        (entry) => IeltsQuestion.fromJson(
-          entry.value,
-          index: entry.key,
-          sectionId: sectionId,
-          sectionTitle: sectionTitle,
-        ),
-      ),
-    ];
-    final parsedPassages = <IeltsPassageContent>[];
-    final sharedContextBlocks = <String>[];
-    for (final entry in _readList(json['passages']).asMap().entries) {
-      final passageMap = entry.value;
-      final passageId =
-          _readNullableString(passageMap['id'] ?? passageMap['passageId']) ??
-          '$sectionId-passage-${entry.key}';
-      final passageTitle =
-          _readNullableString(passageMap['title'] ?? passageMap['name']) ??
-          'Passage ${entry.key + 1}';
-      final contextText = _readNullableString(
-        passageMap['body'] ??
-            passageMap['content'] ??
-            passageMap['text'] ??
-            passageMap['html'],
+        'section_${sectionIndex + 1}';
+    final sectionOrder = _readInt(json['sectionOrder'] ?? sectionIndex + 1);
+    final sectionTitle = _readNullableString(json['title']);
+    final parsedPassages = _readList(
+      json['passages'],
+    ).asMap().entries.map((entry) {
+      return IeltsPassageContent.fromJson(
+        entry.value,
+        passageIndex: entry.key,
+        sectionId: sectionId,
+        sectionTitle: sectionTitle,
       );
-      final isSharedContextOnly =
-          passageMap['sharedContentOnly'] == true ||
-          passageMap['sharedContextOnly'] == true ||
-          passageMap['contextOnly'] == true;
-      final effectiveContext = _mergeMarkdownBlocks(
-        <String?>[
-          ...sharedContextBlocks,
-          contextText,
-        ],
-      );
-      final passageQuestions =
-          _readList(
-            passageMap['questions'] ?? passageMap['items'],
-          ).asMap().entries.map(
-            (questionEntry) => IeltsQuestion.fromJson(
-              questionEntry.value,
-              index: rawQuestions.length + questionEntry.key,
-              sectionId: sectionId,
-              sectionTitle: sectionTitle,
-              passageId: passageId,
-              passageTitle: passageTitle,
-              contextText: effectiveContext,
-            ),
-          );
-      if (isSharedContextOnly && (contextText ?? '').isNotEmpty) {
-        sharedContextBlocks.add(contextText!);
-      }
-      rawQuestions.addAll(passageQuestions);
-      parsedPassages.add(
-        IeltsPassageContent(
-          id: passageId,
-          title: passageTitle,
-          body: contextText ?? '',
-          questionIds: passageQuestions
-              .map((question) => question.questionId)
-              .toList(growable: false),
-          sharedContextOnly:
-              passageMap['sharedContentOnly'] == true ||
-              passageMap['sharedContextOnly'] == true ||
-              passageMap['contextOnly'] == true,
-        ),
-      );
-    }
+    }).toList(growable: false);
 
     return IeltsSessionSection(
       id: sectionId,
+      sectionOrder: sectionOrder,
       title: sectionTitle,
-      skill: _skillFromString(json['skill']),
-      questions: rawQuestions,
       passages: parsedPassages,
-      description: _readNullableString(
-        json['description'] ??
-            json['instruction'] ??
-            json['instructions'] ??
-            json['overview'],
-      ),
+      instructions: _readNullableString(json['instructions']),
       audioUrl: _readNullableString(json['audioUrl']),
-      audioSeekHint: _readNullableString(json['audioSeekHint']),
-      audioSeekStartRatio: _readDouble(json['audioSeekStartRatio']),
     );
   }
 }
@@ -935,9 +882,7 @@ class IeltsSessionDetail {
         : json;
     final testDetail = jsonMap(payload['testDetail']);
     final sections = _readList(
-          payload['sections'] ??
-              testDetail['sections'] ??
-              jsonMap(payload['test'])['sections'],
+          testDetail['sections'],
         )
         .asMap()
         .entries
@@ -952,9 +897,7 @@ class IeltsSessionDetail {
         .expand((section) => section.questions)
         .toList();
     final skill = _skillFromString(
-      payload['skill'] ??
-          testDetail['skill'] ??
-          (sections.isEmpty ? null : sections.first.skill.apiValue),
+      testDetail['skill'] ?? payload['skill'],
     );
     final timeLimitMinutes = _readNullableInt(
       payload['timeLimitMinutes'] ??

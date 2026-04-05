@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../core/theme/page_palettes.dart';
 import '../../../core/theme/theme_extensions.dart';
@@ -13,6 +14,7 @@ class AuthLoadingPage extends StatefulWidget {
 class _AuthLoadingPageState extends State<AuthLoadingPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  String? _versionLabel;
 
   @override
   void initState() {
@@ -21,12 +23,36 @@ class _AuthLoadingPageState extends State<AuthLoadingPage>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..repeat();
+    _loadVersionLabel();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadVersionLabel() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      final buildNumber = info.buildNumber.trim();
+      final label = buildNumber.isEmpty
+          ? 'v${info.version}'
+          : 'v${info.version}+${info.buildNumber}';
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _versionLabel = label;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _versionLabel = null;
+      });
+    }
   }
 
   @override
@@ -48,65 +74,83 @@ class _AuthLoadingPageState extends State<AuthLoadingPage>
           ),
         ),
         child: SafeArea(
-          child: Center(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 92,
-                  height: 92,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [palette.heroTop, palette.heroBottom],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: palette.accent.withValues(alpha: 0.18),
-                        blurRadius: tokens.motion.blurStrong + 14,
-                        offset: const Offset(0, 16),
+                const Spacer(),
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 92,
+                        height: 92,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [palette.heroTop, palette.heroBottom],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: palette.accent.withValues(alpha: 0.18),
+                              blurRadius: tokens.motion.blurStrong + 14,
+                              offset: const Offset(0, 16),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.auto_stories_rounded,
+                          color: Colors.white,
+                          size: 42,
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      AnimatedBuilder(
+                        animation: _controller,
+                        builder: (context, _) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(3, (index) {
+                              final phase = (_controller.value - (index * 0.18))
+                                  .clamp(0.0, 1.0);
+                              final opacity = 0.28 + (phase * 0.72);
+                              final scale = 0.84 + (phase * 0.28);
+
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  right: index == 2 ? 0 : 8,
+                                ),
+                                child: Transform.scale(
+                                  scale: scale,
+                                  child: Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: palette.accent.withValues(
+                                        alpha: opacity,
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          );
+                        },
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.auto_stories_rounded,
-                    color: Colors.white,
-                    size: 42,
-                  ),
                 ),
-                const SizedBox(height: 22),
-                AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, _) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(3, (index) {
-                        final phase = (_controller.value - (index * 0.18))
-                            .clamp(0.0, 1.0);
-                        final opacity = 0.28 + (phase * 0.72);
-                        final scale = 0.84 + (phase * 0.28);
-
-                        return Padding(
-                          padding: EdgeInsets.only(right: index == 2 ? 0 : 8),
-                          child: Transform.scale(
-                            scale: scale,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: palette.accent.withValues(
-                                  alpha: opacity,
-                                ),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                    );
-                  },
+                const Spacer(),
+                Text(
+                  _versionLabel ?? '',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: tokens.text.secondary,
+                  ),
                 ),
               ],
             ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
@@ -43,6 +44,11 @@ class FirebasePushPlatformAdapter extends PushPlatformAdapter {
   Future<PushPermissionStatus> requestPermission() async {
     final settings = await _messaging.requestPermission();
     return _mapAuthorizationStatus(settings.authorizationStatus);
+  }
+
+  @override
+  Future<void> openNotificationSettings() {
+    return AppSettings.openAppSettings(type: AppSettingsType.notification);
   }
 
   @override

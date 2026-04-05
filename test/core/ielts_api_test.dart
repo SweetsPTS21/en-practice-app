@@ -152,7 +152,14 @@ void main() {
       expect(session.attemptId, 'attempt-1');
       expect(session.testId, 'test-1');
       expect(session.testTitle, 'IELTS Academic 19 Reading Test 3');
+      expect(session.skill, IeltsSkill.reading);
       expect(session.sections, hasLength(1));
+      expect(session.sections.first.sectionOrder, 1);
+      expect(session.sections.first.instructions, 'Read passage 1');
+      expect(session.sections.first.passages, hasLength(2));
+      expect(session.sections.first.passages.first.passageOrder, 1);
+      expect(session.sections.first.passages.first.content, 'Shared context');
+      expect(session.sections.first.passages.first.sharedContentOnly, isTrue);
       expect(session.allQuestions, hasLength(2));
       expect(session.allQuestions.first.questionId, 'question-1');
     });
@@ -233,6 +240,77 @@ void main() {
       expect(
         session.sections.first.questions.map((question) => question.questionId).toList(),
         ['p1-q1', 'p1-q2', 'p2-q1', 'p2-q2'],
+      );
+    });
+
+    test('parses listening session with section audio and passage questions', () async {
+      final adapter = _RecordingAdapter(
+        responses: {
+          '/ielts/sessions/attempt-listening': '''
+          {
+            "success": true,
+            "message": "OK",
+            "data": {
+              "attemptId": "attempt-listening",
+              "attemptMode": "QUICK",
+              "scopeType": "PASSAGE",
+              "scopeId": "passage-2",
+              "testDetail": {
+                "id": "test-listening",
+                "title": "Cambridge Listening Test",
+                "skill": "LISTENING",
+                "sections": [
+                  {
+                    "id": "section-1",
+                    "sectionOrder": 1,
+                    "title": "Section 1",
+                    "instructions": "Questions 1-5",
+                    "audioUrl": "https://cdn.example.com/section-1.mp3",
+                    "passages": [
+                      {
+                        "id": "passage-2",
+                        "passageOrder": 2,
+                        "title": "Questions 1-5",
+                        "content": "Listen and answer questions 1-5.",
+                        "questions": [
+                          {
+                            "id": "question-1",
+                            "questionOrder": 1,
+                            "questionType": "SINGLE_CHOICE",
+                            "questionText": "Question one",
+                            "options": ["A", "B", "C"]
+                          },
+                          {
+                            "id": "question-2",
+                            "questionOrder": 2,
+                            "questionType": "SENTENCE_COMPLETION",
+                            "questionText": "Question two",
+                            "options": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+          ''',
+        },
+      );
+      final client = Dio(BaseOptions(baseUrl: 'http://localhost:8080/api'))
+        ..httpClientAdapter = adapter;
+      final api = IeltsApi(client, CompletionSnapshotApi(client));
+
+      final session = await api.getSession('attempt-listening');
+
+      expect(session.skill, IeltsSkill.listening);
+      expect(session.sections.first.audioUrl, 'https://cdn.example.com/section-1.mp3');
+      expect(session.sections.first.passages, hasLength(1));
+      expect(session.sections.first.passages.first.content, 'Listen and answer questions 1-5.');
+      expect(
+        session.sections.first.passages.first.questions.map((question) => question.questionId).toList(),
+        ['question-1', 'question-2'],
       );
     });
 

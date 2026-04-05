@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -37,6 +38,16 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     ref
         .read(appThemeControllerProvider.notifier)
         .syncSystemBrightness(PlatformDispatcher.instance.platformBrightness);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) {
+      return;
+    }
+    unawaited(
+      ref.read(pushLifecycleControllerProvider).refreshPermissionStatus(),
+    );
   }
 
   @override

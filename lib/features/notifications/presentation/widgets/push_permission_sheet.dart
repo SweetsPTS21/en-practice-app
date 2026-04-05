@@ -23,6 +23,18 @@ class PushPermissionSheet extends ConsumerWidget {
     final status =
         controller.permissionSnapshot?.status ?? PushPermissionStatus.unknown;
     final theme = Theme.of(context).textTheme;
+    final primaryLabel = switch (status) {
+      PushPermissionStatus.granted => 'Open system settings',
+      PushPermissionStatus.denied => 'Open system settings',
+      PushPermissionStatus.unsupported => 'Close',
+      PushPermissionStatus.unknown => 'Enable push',
+    };
+    final primaryIcon = switch (status) {
+      PushPermissionStatus.granted ||
+      PushPermissionStatus.denied => Icons.open_in_new_rounded,
+      PushPermissionStatus.unsupported => null,
+      PushPermissionStatus.unknown => Icons.notifications_active_rounded,
+    };
 
     return SafeArea(
       child: Padding(
@@ -43,11 +55,6 @@ class PushPermissionSheet extends ConsumerWidget {
               value: controller.permissionSnapshot?.label ?? 'Checking...',
             ),
             const SizedBox(height: 10),
-            _StatusRow(
-              label: 'Token sync',
-              value: controller.isSyncingToken ? 'Syncing…' : 'Idle',
-            ),
-            const SizedBox(height: 18),
             if (status == PushPermissionStatus.unsupported)
               Text(
                 'Push is not available on this build yet.',
@@ -55,7 +62,12 @@ class PushPermissionSheet extends ConsumerWidget {
               )
             else if (status == PushPermissionStatus.granted)
               Text(
-                'Push permission is enabled. We will keep your device token up to date.',
+                'Push permission is enabled. You can change it any time in your device notification settings.',
+                style: theme.bodyMedium,
+              )
+            else if (status == PushPermissionStatus.denied)
+              Text(
+                'Push permission is currently denied. Open your device notification settings to turn it back on.',
                 style: theme.bodyMedium,
               )
             else
@@ -68,9 +80,7 @@ class PushPermissionSheet extends ConsumerWidget {
               children: [
                 Expanded(
                   child: AppButton(
-                    label: status == PushPermissionStatus.granted
-                        ? 'Close'
-                        : 'Not now',
+                    label: 'Close',
                     variant: AppButtonVariant.outline,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -78,26 +88,26 @@ class PushPermissionSheet extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppButton(
-                    label: status == PushPermissionStatus.granted
-                        ? 'Sync token'
-                        : 'Enable push',
-                    icon: status == PushPermissionStatus.granted
-                        ? Icons.sync_rounded
-                        : Icons.notifications_active_rounded,
+                    label: primaryLabel,
+                    icon: primaryIcon,
                     onPressed:
                         controller.isRequestingPermission ||
                             controller.isSyncingToken
                         ? null
                         : () async {
-                            if (status == PushPermissionStatus.granted) {
-                              await ref
-                                  .read(pushLifecycleControllerProvider)
-                                  .syncToken(force: true);
+                            final lifecycle = ref.read(
+                              pushLifecycleControllerProvider,
+                            );
+                            if (status == PushPermissionStatus.unsupported) {
+                              Navigator.of(context).pop();
                               return;
                             }
-                            await ref
-                                .read(pushLifecycleControllerProvider)
-                                .requestPermission();
+                            if (status == PushPermissionStatus.unknown) {
+                              await lifecycle.requestPermission();
+                              return;
+                            }
+                            Navigator.of(context).pop();
+                            await lifecycle.openSystemNotificationSettings();
                           },
                   ),
                 ),

@@ -50,47 +50,34 @@ class _DictionaryPageState extends ConsumerState<DictionaryPage> {
         AppCard(
           strong: true,
           child: dictionary.when(
-            data: (state) => LayoutBuilder(
-              builder: (context, constraints) {
-                final availableWidth =
-                    constraints.hasBoundedWidth &&
-                        constraints.maxWidth.isFinite &&
-                        constraints.maxWidth > 0
-                    ? constraints.maxWidth
-                    : MediaQuery.sizeOf(context).width - 40;
-                final compact = availableWidth < 360;
-                final itemWidth = compact
-                    ? availableWidth
-                    : (availableWidth - 24) / 3;
-
-                return Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    SizedBox(
-                      width: itemWidth,
-                      child: _MetricTile(
-                        label: 'Saved words',
-                        value: '${state.stats.totalWords}',
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _MetricTile(
-                        label: 'Mastered',
-                        value: '${state.stats.masteredWords}',
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _MetricTile(
-                        label: 'Due now',
-                        value: '${state.stats.dueReviews}',
-                      ),
-                    ),
-                  ],
-                );
-              },
+            data: (state) => Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _MetricTile(
+                    label: 'Saved words',
+                    value: '${state.stats.totalWords}',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                _MetricDivider(color: Theme.of(context).dividerColor),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MetricTile(
+                    label: 'Mastered',
+                    value: '${state.stats.masteredWords}',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                _MetricDivider(color: Theme.of(context).dividerColor),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MetricTile(
+                    label: 'Due now',
+                    value: '${state.stats.dueReviews}',
+                  ),
+                ),
+              ],
             ),
             loading: () => const SizedBox(
               height: 96,
@@ -357,6 +344,21 @@ class _MetricTile extends StatelessWidget {
         const SizedBox(height: 6),
         Text(value, style: Theme.of(context).textTheme.headlineSmall),
       ],
+    );
+  }
+}
+
+class _MetricDivider extends StatelessWidget {
+  const _MetricDivider({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 44,
+      color: color,
     );
   }
 }

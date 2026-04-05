@@ -13,6 +13,8 @@ abstract class PushPlatformAdapter {
 
   Future<PushPermissionStatus> requestPermission();
 
+  Future<void> openNotificationSettings();
+
   Future<String?> getToken();
 
   Stream<String> get onTokenRefresh;
@@ -55,6 +57,9 @@ class NoopPushPlatformAdapter extends PushPlatformAdapter {
   Future<PushPermissionStatus> requestPermission() async {
     return PushPermissionStatus.unsupported;
   }
+
+  @override
+  Future<void> openNotificationSettings() async {}
 
   @override
   Future<String?> getToken() async {
