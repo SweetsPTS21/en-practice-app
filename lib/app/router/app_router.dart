@@ -325,7 +325,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'conversation/:id',
                 builder: (context, state) => CustomSpeakingChatPage(
                   conversationId: state.pathParameters['id'] ?? '',
-                  bootstrap: state.extra as CustomSpeakingStep?,
+                  bootstrap: state.extra as CustomSpeakingChatBootstrap?,
                 ),
               ),
               GoRoute(

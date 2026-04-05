@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/custom_speaking/custom_speaking_models.dart';
-import '../../../core/custom_speaking/custom_speaking_providers.dart';
 import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
 import '../../../core/design/widgets/app_header_icon_action.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
 import '../../../core/theme/page_palettes.dart';
+import '../../../core/theme/theme_extensions.dart';
+import '../application/custom_speaking_setup_controller.dart';
 
 class CustomSpeakingPage extends ConsumerStatefulWidget {
   const CustomSpeakingPage({super.key});
@@ -19,12 +20,6 @@ class CustomSpeakingPage extends ConsumerStatefulWidget {
 
 class _CustomSpeakingPageState extends ConsumerState<CustomSpeakingPage> {
   late final TextEditingController _topicController;
-  String _style = customSpeakingStyleOptions.first;
-  String _personality = customSpeakingPersonalityOptions.first;
-  String _expertise = customSpeakingExpertiseOptions.first;
-  String _voice = customSpeakingVoiceOptions.first;
-  bool _gradingEnabled = true;
-  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -40,10 +35,14 @@ class _CustomSpeakingPageState extends ConsumerState<CustomSpeakingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(customSpeakingSetupControllerProvider);
+    final controller = ref.read(customSpeakingSetupControllerProvider.notifier);
+    final tokens = context.tokens;
+
     return AppPageScaffold(
       title: 'Custom speaking',
       subtitle:
-          'Create a freestyle conversation with a chosen tone, personality, and voice, then continue the chat in a dedicated mobile session.',
+          'Start a focused speaking conversation, keep the turn loop live, and continue from the same route if you come back later.',
       paletteKey: AppPagePaletteKey.speaking,
       trailing: AppHeaderIconAction(
         tooltip: 'History',
@@ -56,101 +55,126 @@ class _CustomSpeakingPageState extends ConsumerState<CustomSpeakingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppButton(
-                label: 'Speaking',
-                icon: Icons.arrow_back_rounded,
-                compact: true,
-                variant: AppButtonVariant.outline,
-                onPressed: () => context.go('/speaking'),
+              Text(
+                'Conversation setup',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 8),
+              Text(
+                'Choose a topic and tone, then jump straight into the chat loop.',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: tokens.text.secondary),
+              ),
+              const SizedBox(height: 18),
               TextField(
                 controller: _topicController,
+                onChanged: controller.updateTopic,
+                minLines: 2,
+                maxLines: 3,
                 decoration: const InputDecoration(
-                  labelText: 'Conversation topic',
+                  labelText: 'Topic',
                   hintText:
-                      'Example: handling a tough client meeting in English',
+                      'Example: how technology is changing the way people learn English',
                 ),
               ),
-              const SizedBox(height: 14),
-              DropdownButtonFormField<String>(
-                initialValue: _style,
-                decoration: const InputDecoration(labelText: 'Style'),
+              const SizedBox(height: 16),
+              _OptionDropdown<String>(
+                label: 'Style',
+                value: state.style,
                 items: customSpeakingStyleOptions
-                    .map(
-                      (item) =>
-                          DropdownMenuItem(value: item, child: Text(item)),
-                    )
+                    .map((item) => DropdownMenuItem<String>(
+                          value: item.value,
+                          child: Text(item.label),
+                        ))
                     .toList(growable: false),
+                helperText: _descriptionForOption(
+                  customSpeakingStyleOptions,
+                  state.style,
+                ),
                 onChanged: (value) {
                   if (value != null) {
-                    setState(() => _style = value);
+                    controller.selectStyle(value);
                   }
                 },
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _personality,
-                decoration: const InputDecoration(labelText: 'Personality'),
+              _OptionDropdown<String>(
+                label: 'Personality',
+                value: state.personality,
                 items: customSpeakingPersonalityOptions
-                    .map(
-                      (item) =>
-                          DropdownMenuItem(value: item, child: Text(item)),
-                    )
+                    .map((item) => DropdownMenuItem<String>(
+                          value: item.value,
+                          child: Text(item.label),
+                        ))
                     .toList(growable: false),
+                helperText: _descriptionForOption(
+                  customSpeakingPersonalityOptions,
+                  state.personality,
+                ),
                 onChanged: (value) {
                   if (value != null) {
-                    setState(() => _personality = value);
+                    controller.selectPersonality(value);
                   }
                 },
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _expertise,
-                decoration: const InputDecoration(labelText: 'Expertise'),
+              _OptionDropdown<String>(
+                label: 'Expertise',
+                value: state.expertise,
                 items: customSpeakingExpertiseOptions
-                    .map(
-                      (item) =>
-                          DropdownMenuItem(value: item, child: Text(item)),
-                    )
+                    .map((item) => DropdownMenuItem<String>(
+                          value: item.value,
+                          child: Text(item.label),
+                        ))
                     .toList(growable: false),
+                helperText: _descriptionForOption(
+                  customSpeakingExpertiseOptions,
+                  state.expertise,
+                ),
                 onChanged: (value) {
                   if (value != null) {
-                    setState(() => _expertise = value);
+                    controller.selectExpertise(value);
                   }
                 },
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _voice,
-                decoration: const InputDecoration(labelText: 'Voice'),
+              _OptionDropdown<String?>(
+                label: 'Voice',
+                value: state.voiceName,
                 items: customSpeakingVoiceOptions
-                    .map(
-                      (item) =>
-                          DropdownMenuItem(value: item, child: Text(item)),
-                    )
+                    .map((item) => DropdownMenuItem<String?>(
+                          value: item.value,
+                          child: Text(item.label),
+                        ))
                     .toList(growable: false),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _voice = value);
-                  }
-                },
+                helperText: _descriptionForVoice(state.voiceName),
+                onChanged: controller.selectVoice,
               ),
               const SizedBox(height: 8),
               SwitchListTile(
-                value: _gradingEnabled,
+                value: state.gradingEnabled,
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Enable grading'),
                 subtitle: const Text(
-                  'Keep async grading and result revisit enabled for this conversation.',
+                  'Keep result review and completion scoring available after the conversation ends.',
                 ),
-                onChanged: (value) => setState(() => _gradingEnabled = value),
+                onChanged: controller.setGradingEnabled,
               ),
-              const SizedBox(height: 10),
+              if ((state.errorMessage ?? '').trim().isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  state.errorMessage!,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: tokens.danger),
+                ),
+              ],
+              const SizedBox(height: 16),
               AppButton(
-                label: _isSubmitting ? 'Starting...' : 'Start conversation',
+                label: state.isSubmitting ? 'Starting...' : 'Start conversation',
                 icon: Icons.play_circle_fill_rounded,
-                onPressed: _isSubmitting
+                onPressed: state.isSubmitting
                     ? null
                     : () => _startConversation(context),
               ),
@@ -162,51 +186,85 @@ class _CustomSpeakingPageState extends ConsumerState<CustomSpeakingPage> {
   }
 
   Future<void> _startConversation(BuildContext context) async {
-    final topic = _topicController.text.trim();
-    if (topic.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Topic is required.')));
-      return;
-    }
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
     try {
-      final step = await ref
-          .read(customSpeakingApiProvider)
-          .startConversation(
-            StartCustomSpeakingPayload(
-              topic: topic,
-              style: _style,
-              personality: _personality,
-              expertise: _expertise,
-              voiceName: _voice,
-              gradingEnabled: _gradingEnabled,
-            ),
-          );
+      final bootstrap = await ref
+          .read(customSpeakingSetupControllerProvider.notifier)
+          .startConversation();
       if (!context.mounted) {
         return;
       }
       context.go(
-        '/custom-speaking/conversation/${step.conversationId}',
-        extra: step,
+        '/custom-speaking/conversation/${bootstrap.conversationId}',
+        extra: bootstrap,
       );
     } catch (error) {
       if (!context.mounted) {
         return;
       }
+      final message = error.toString().replaceFirst('Exception: ', '');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(error.toString())));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  String _descriptionForOption(
+    List<CustomSpeakingOption> options,
+    String selectedValue,
+  ) {
+    for (final option in options) {
+      if (option.value == selectedValue) {
+        return option.description;
       }
     }
+    return '';
+  }
+
+  String _descriptionForVoice(String? selectedValue) {
+    for (final option in customSpeakingVoiceOptions) {
+      if (option.value == selectedValue) {
+        return option.description;
+      }
+    }
+    return customSpeakingVoiceOptions.first.description;
+  }
+}
+
+class _OptionDropdown<T> extends StatelessWidget {
+  const _OptionDropdown({
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.helperText,
+    required this.onChanged,
+  });
+
+  final String label;
+  final T value;
+  final List<DropdownMenuItem<T>> items;
+  final String helperText;
+  final ValueChanged<T?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButtonFormField<T>(
+          initialValue: value,
+          items: items,
+          decoration: InputDecoration(labelText: label),
+          onChanged: onChanged,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          helperText,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: tokens.text.secondary),
+        ),
+      ],
+    );
   }
 }

@@ -132,12 +132,6 @@ class _WritingTaskPageState extends ConsumerState<WritingTaskPage> {
                             draftController: draftController,
                           ),
                   ),
-                  AppButton(
-                    label: 'Task detail',
-                    variant: AppButtonVariant.outline,
-                    onPressed: () =>
-                        context.go('/writing/task/${widget.taskId}'),
-                  ),
                 ],
               ),
             ],

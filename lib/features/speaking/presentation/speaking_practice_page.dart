@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,10 +8,10 @@ import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
 import '../../../core/design/widgets/app_state_widgets.dart';
-import '../../../core/speaking/speaking_models.dart';
-import '../../../core/speaking/speaking_providers.dart';
 import '../../../core/theme/page_palettes.dart';
+import '../application/speaking_attempt_controller.dart';
 import '../application/speaking_controllers.dart';
+import 'widgets/speaking_answer_composer_card.dart';
 
 class SpeakingPracticePage extends ConsumerStatefulWidget {
   const SpeakingPracticePage({super.key, required this.topicId});
@@ -23,8 +25,7 @@ class SpeakingPracticePage extends ConsumerStatefulWidget {
 
 class _SpeakingPracticePageState extends ConsumerState<SpeakingPracticePage> {
   late final TextEditingController _transcriptController;
-  bool _isSubmitting = false;
-  final DateTime _openedAt = DateTime.now();
+  bool _resultNavigationHandled = false;
 
   @override
   void initState() {
@@ -41,11 +42,43 @@ class _SpeakingPracticePageState extends ConsumerState<SpeakingPracticePage> {
   @override
   Widget build(BuildContext context) {
     final detail = ref.watch(speakingTopicDetailProvider(widget.topicId));
+    final provider = speakingAttemptControllerProvider(widget.topicId);
+    final state = ref.watch(provider);
+    final controller = ref.read(provider.notifier);
+
+    ref.listen<String?>(provider.select((value) => value.transcriptDraft), (
+      previous,
+      next,
+    ) {
+      final text = next ?? '';
+      if (_transcriptController.text == text) {
+        return;
+      }
+      _transcriptController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    });
+
+    ref.listen<String?>(provider.select((value) => value.pendingResultRoute), (
+      previous,
+      next,
+    ) {
+      if (_resultNavigationHandled || next == null || next.isEmpty) {
+        return;
+      }
+      _resultNavigationHandled = true;
+      controller.consumePendingResultRoute();
+      if (!mounted) {
+        return;
+      }
+      context.go(next);
+    });
 
     return AppPageScaffold(
       title: 'Speaking attempt',
       subtitle:
-          'Use transcript-first submission as the safe fallback for mobile, then rely on async grading and result re-entry for the score.',
+          'Record your answer first, review the transcript, then send the attempt for grading.',
       paletteKey: AppPagePaletteKey.speaking,
       children: [
         switch (detail) {
@@ -83,6 +116,14 @@ class _SpeakingPracticePageState extends ConsumerState<SpeakingPracticePage> {
                     ),
                   ),
                 ],
+                const SizedBox(height: 16),
+                AppButton(
+                  label: 'Guided conversation',
+                  icon: Icons.forum_rounded,
+                  variant: AppButtonVariant.outline,
+                  onPressed: () =>
+                      context.go('/speaking/conversation/${widget.topicId}'),
+                ),
               ],
             ),
           ),
@@ -97,91 +138,47 @@ class _SpeakingPracticePageState extends ConsumerState<SpeakingPracticePage> {
             message: 'Loading speaking topic...',
           ),
         },
-        AppCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Transcript', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
-              const Text(
-                'Transcript fallback is enabled by default. Audio upload can be added later without blocking the phase-7 productive loop.',
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _transcriptController,
-                maxLines: 12,
-                minLines: 8,
-                decoration: const InputDecoration(
-                  hintText: 'Paste or type what you said here...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  AppButton(
-                    label: _isSubmitting ? 'Submitting...' : 'Submit attempt',
-                    icon: Icons.send_rounded,
-                    onPressed: _isSubmitting ? null : () => _submit(context),
-                  ),
-                  AppButton(
-                    label: 'Guided conversation',
-                    variant: AppButtonVariant.outline,
-                    onPressed: () =>
-                        context.go('/speaking/conversation/${widget.topicId}'),
-                  ),
-                ],
-              ),
-            ],
+        if (detail.hasValue)
+          SpeakingAnswerComposerCard(
+            title: 'Record your answer',
+            subtitle:
+                'Tap record, answer naturally, then review the transcript before sending the attempt.',
+            transcriptController: _transcriptController,
+            onTranscriptChanged: controller.updateTranscript,
+            onStartRecording: () =>
+                _runAction(context, controller.startRecording),
+            onStopRecording: () =>
+                _runAction(context, controller.stopRecording),
+            onClearTranscript: () => _runAction(context, controller.clearDraft),
+            onSubmit: () => _runAction(context, controller.submitAttempt),
+            isBusy: state.isSubmitting,
+            isRecording: state.isRecording,
+            sttSupported: state.sttSupported,
+            canSubmit: state.canSubmit,
+            timer: state.timer,
+            submitLabel: state.isSubmitting
+                ? 'Submitting...'
+                : 'Submit attempt',
+            helperMessage: state.helperMessage,
           ),
-        ),
       ],
     );
   }
 
-  Future<void> _submit(BuildContext context) async {
-    final transcript = _transcriptController.text.trim();
-    if (transcript.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Transcript is required for submission.')),
-      );
-      return;
-    }
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
+  Future<void> _runAction(
+    BuildContext context,
+    Future<void> Function() action,
+  ) async {
     try {
-      final timeSpentSeconds = DateTime.now().difference(_openedAt).inSeconds;
-      final result = await ref
-          .read(speakingApiProvider)
-          .submitAttempt(
-            widget.topicId,
-            SubmitSpeakingPayload(
-              transcript: transcript,
-              timeSpentSeconds: timeSpentSeconds <= 0 ? 1 : timeSpentSeconds,
-            ),
-          );
-      if (!context.mounted) {
-        return;
-      }
-      context.go('/speaking/result/${result.id}');
+      await action();
     } catch (error) {
       if (!context.mounted) {
         return;
       }
+      final message = error.toString().replaceFirst('Exception: ', '');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(error.toString())));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,10 +8,10 @@ import '../../../core/design/widgets/app_button.dart';
 import '../../../core/design/widgets/app_card.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
 import '../../../core/design/widgets/app_state_widgets.dart';
-import '../../../core/speaking_conversation/speaking_conversation_models.dart';
-import '../../../core/speaking_conversation/speaking_conversation_providers.dart';
 import '../../../core/theme/page_palettes.dart';
 import '../../speaking/application/speaking_controllers.dart';
+import '../../speaking/presentation/widgets/speaking_answer_composer_card.dart';
+import '../application/speaking_conversation_controller.dart';
 
 class SpeakingConversationPage extends ConsumerStatefulWidget {
   const SpeakingConversationPage({super.key, required this.topicId});
@@ -24,18 +26,12 @@ class SpeakingConversationPage extends ConsumerStatefulWidget {
 class _SpeakingConversationPageState
     extends ConsumerState<SpeakingConversationPage> {
   late final TextEditingController _transcriptController;
-  SpeakingConversationNextStep? _step;
-  final List<_TurnLog> _turns = <_TurnLog>[];
-  bool _isLoading = true;
-  bool _isSubmitting = false;
-  String? _error;
-  DateTime _turnOpenedAt = DateTime.now();
+  bool _resultNavigationHandled = false;
 
   @override
   void initState() {
     super.initState();
     _transcriptController = TextEditingController();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _startConversation());
   }
 
   @override
@@ -47,11 +43,43 @@ class _SpeakingConversationPageState
   @override
   Widget build(BuildContext context) {
     final topic = ref.watch(speakingTopicDetailProvider(widget.topicId));
+    final provider = speakingConversationControllerProvider(widget.topicId);
+    final state = ref.watch(provider);
+    final controller = ref.read(provider.notifier);
+
+    ref.listen<String?>(provider.select((value) => value.transcriptDraft), (
+      previous,
+      next,
+    ) {
+      final text = next ?? '';
+      if (_transcriptController.text == text) {
+        return;
+      }
+      _transcriptController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    });
+
+    ref.listen<String?>(provider.select((value) => value.pendingResultRoute), (
+      previous,
+      next,
+    ) {
+      if (_resultNavigationHandled || next == null || next.isEmpty) {
+        return;
+      }
+      _resultNavigationHandled = true;
+      controller.consumePendingResultRoute();
+      if (!mounted) {
+        return;
+      }
+      context.go(next);
+    });
 
     return AppPageScaffold(
       title: 'Guided conversation',
       subtitle:
-          'This loop starts from a speaking topic, tracks each turn, and opens a dedicated conversation result page once grading is ready.',
+          'Record each answer, keep the transcript in sync, and move through the interview turn by turn.',
       paletteKey: AppPagePaletteKey.speaking,
       children: [
         switch (topic) {
@@ -71,16 +99,16 @@ class _SpeakingConversationPageState
           ),
           _ => const SizedBox.shrink(),
         },
-        if (_isLoading)
+        if (state.isLoading)
           const AppLoadingCard(
             height: 220,
             message: 'Starting guided conversation...',
           )
-        else if (_error != null)
+        else if (state.loadErrorMessage != null)
           AppErrorCard(
             title: 'Conversation could not start',
-            message: _error!,
-            onRetry: _startConversation,
+            message: state.loadErrorMessage!,
+            onRetry: controller.retry,
           )
         else ...[
           AppCard(
@@ -89,43 +117,42 @@ class _SpeakingConversationPageState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _step?.aiQuestion ?? 'Preparing the next question...',
+                  state.step?.aiQuestion ?? 'Preparing the next question...',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Turn ${_step?.turnNumber ?? 0}${_step?.lastTurn == true ? ' • Final question' : ''}',
+                  'Turn ${state.step?.turnNumber ?? 0}${state.step?.lastTurn == true ? ' • Final question' : ''}',
                 ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: _transcriptController,
-                  minLines: 5,
-                  maxLines: 8,
-                  decoration: const InputDecoration(
-                    hintText: 'Type the answer you spoke...',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    AppButton(
-                      label: _isSubmitting ? 'Submitting...' : 'Send answer',
-                      icon: Icons.send_rounded,
-                      onPressed: _isSubmitting ? null : _submitTurn,
-                    ),
-                    AppButton(
-                      label: 'Conversation history',
-                      variant: AppButtonVariant.outline,
-                      onPressed: () =>
-                          context.go('/speaking/conversation/history'),
-                    ),
-                  ],
+                const SizedBox(height: 16),
+                AppButton(
+                  label: 'Conversation history',
+                  icon: Icons.history_rounded,
+                  variant: AppButtonVariant.outline,
+                  onPressed: () => context.go('/speaking/conversation/history'),
                 ),
               ],
             ),
+          ),
+          SpeakingAnswerComposerCard(
+            title: 'Record this answer',
+            subtitle:
+                'Start recording, answer the prompt naturally, then send the reviewed transcript to continue.',
+            transcriptController: _transcriptController,
+            onTranscriptChanged: controller.updateTranscript,
+            onStartRecording: () =>
+                _runAction(context, controller.startRecording),
+            onStopRecording: () =>
+                _runAction(context, controller.stopRecording),
+            onClearTranscript: () => _runAction(context, controller.clearDraft),
+            onSubmit: () => _runAction(context, controller.submitTurn),
+            isBusy: state.isSubmitting,
+            isRecording: state.isRecording,
+            sttSupported: state.sttSupported,
+            canSubmit: state.canSend,
+            timer: state.timer,
+            submitLabel: state.isSubmitting ? 'Sending...' : 'Send answer',
+            helperMessage: state.helperMessage,
           ),
           AppCard(
             child: Column(
@@ -136,12 +163,12 @@ class _SpeakingConversationPageState
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
-                if (_turns.isEmpty)
+                if (state.turns.isEmpty)
                   const Text(
                     'Your submitted turns will appear here as the conversation progresses.',
                   )
                 else
-                  ..._turns.map(
+                  ...state.turns.map(
                     (turn) => Padding(
                       padding: const EdgeInsets.only(bottom: 14),
                       child: Column(
@@ -162,99 +189,20 @@ class _SpeakingConversationPageState
     );
   }
 
-  Future<void> _startConversation() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-      _step = null;
-      _turns.clear();
-    });
-
+  Future<void> _runAction(
+    BuildContext context,
+    Future<void> Function() action,
+  ) async {
     try {
-      final step = await ref
-          .read(speakingConversationApiProvider)
-          .startConversation(widget.topicId);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _step = step;
-        _isLoading = false;
-        _turnOpenedAt = DateTime.now();
-      });
+      await action();
     } catch (error) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
-      setState(() {
-        _error = error.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _submitTurn() async {
-    final transcript = _transcriptController.text.trim();
-    if (transcript.isEmpty || _step == null) {
-      return;
-    }
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    try {
-      final nextStep = await ref
-          .read(speakingConversationApiProvider)
-          .submitTurn(
-            _step!.conversationId,
-            SubmitSpeakingConversationTurnPayload(
-              transcript: transcript,
-              timeSpentSeconds: _elapsedSeconds(_turnOpenedAt),
-            ),
-          );
-
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        _turns.add(
-          _TurnLog(aiQuestion: _step!.aiQuestion ?? '', transcript: transcript),
-        );
-        _transcriptController.clear();
-        _step = nextStep;
-        _turnOpenedAt = DateTime.now();
-      });
-
-      if (nextStep.conversationComplete && context.mounted) {
-        context.go('/speaking/conversation/result/${nextStep.conversationId}');
-      }
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
+      final message = error.toString().replaceFirst('Exception: ', '');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(error.toString())));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
-
-  int _elapsedSeconds(DateTime openedAt) {
-    final seconds = DateTime.now().difference(openedAt).inSeconds;
-    return seconds <= 0 ? 1 : seconds;
-  }
-}
-
-class _TurnLog {
-  const _TurnLog({required this.aiQuestion, required this.transcript});
-
-  final String aiQuestion;
-  final String transcript;
 }

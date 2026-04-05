@@ -1,14 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/custom_speaking/custom_speaking_models.dart';
-import '../../../core/custom_speaking/custom_speaking_providers.dart';
-import '../../../core/design/widgets/app_button.dart';
-import '../../../core/design/widgets/app_card.dart';
 import '../../../core/design/widgets/app_page_scaffold.dart';
 import '../../../core/design/widgets/app_state_widgets.dart';
 import '../../../core/theme/page_palettes.dart';
+import '../application/custom_speaking_chat_controller.dart';
+import 'widgets/conversation_message_list.dart';
+import 'widgets/conversation_recorder_panel.dart';
+import 'widgets/conversation_status_bar.dart';
 
 class CustomSpeakingChatPage extends ConsumerStatefulWidget {
   const CustomSpeakingChatPage({
@@ -18,7 +21,7 @@ class CustomSpeakingChatPage extends ConsumerStatefulWidget {
   });
 
   final String conversationId;
-  final CustomSpeakingStep? bootstrap;
+  final CustomSpeakingChatBootstrap? bootstrap;
 
   @override
   ConsumerState<CustomSpeakingChatPage> createState() =>
@@ -28,255 +31,135 @@ class CustomSpeakingChatPage extends ConsumerStatefulWidget {
 class _CustomSpeakingChatPageState
     extends ConsumerState<CustomSpeakingChatPage> {
   late final TextEditingController _transcriptController;
-  bool _isLoading = true;
-  bool _isSubmitting = false;
-  CustomSpeakingConversation? _conversation;
-  String? _error;
-  DateTime _turnOpenedAt = DateTime.now();
+  late final AutoDisposeNotifierProviderFamily<
+    CustomSpeakingChatController,
+    CustomSpeakingChatState,
+    CustomSpeakingChatArgs
+  >
+  _providerFactory;
+  late final CustomSpeakingChatArgs _args;
+  bool _resultNavigationHandled = false;
 
   @override
   void initState() {
     super.initState();
     _transcriptController = TextEditingController();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _loadConversation());
+    _providerFactory = customSpeakingChatControllerProvider;
+    _args = CustomSpeakingChatArgs(
+      conversationId: widget.conversationId,
+      bootstrap: widget.bootstrap,
+    );
   }
 
   @override
   void dispose() {
+    unawaited(
+      ref.read(_providerFactory(_args).notifier).registerAbandonedIfNeeded(),
+    );
     _transcriptController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final pendingPrompt =
-        _conversation?.pendingTurn?.aiMessage ?? widget.bootstrap?.aiMessage;
+    final provider = _providerFactory(_args);
+    final state = ref.watch(provider);
+    final controller = ref.read(provider.notifier);
+
+    ref.listen<String?>(provider.select((value) => value.transcriptDraft), (
+      previous,
+      next,
+    ) {
+      final text = next ?? '';
+      if (_transcriptController.text == text) {
+        return;
+      }
+      _transcriptController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    });
+
+    ref.listen<String?>(provider.select((value) => value.pendingResultRoute), (
+      previous,
+      next,
+    ) {
+      if (_resultNavigationHandled || next == null || next.isEmpty) {
+        return;
+      }
+      _resultNavigationHandled = true;
+      controller.consumePendingResultRoute();
+      if (!mounted) {
+        return;
+      }
+      context.go(next);
+    });
 
     return AppPageScaffold(
       title: 'Custom conversation',
       subtitle:
-          'Freestyle custom speaking stays on REST polling for mobile phase 7, but still supports grading, history, and revisit semantics.',
+          'Resume the same speaking thread, record each answer naturally, and hand off to the result page when the conversation finishes.',
       paletteKey: AppPagePaletteKey.speaking,
+      onRefresh: controller.refresh,
       children: [
-        if (_isLoading)
+        if (state.isInitialLoading && !state.hasRenderableConversation)
           const AppLoadingCard(
-            height: 220,
-            message: 'Loading custom conversation...',
+            height: 260,
+            message: 'Loading your conversation...',
           )
-        else if (_error != null)
+        else if (state.loadErrorMessage != null &&
+            !state.hasRenderableConversation)
           AppErrorCard(
-            title: 'Custom conversation is unavailable',
-            message: _error!,
-            onRetry: _loadConversation,
+            title: 'Conversation unavailable',
+            message: state.loadErrorMessage!,
+            onRetry: controller.refresh,
           )
         else ...[
-          AppCard(
-            strong: true,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _conversation?.title ??
-                      widget.bootstrap?.title ??
-                      'Conversation',
-                ),
-                const SizedBox(height: 8),
-                Text(_conversation?.topic ?? ''),
-                const SizedBox(height: 8),
-                Text(
-                  'Turns ${_conversation?.userTurnCount ?? widget.bootstrap?.userTurnCount ?? 0}/${_conversation?.maxUserTurns ?? widget.bootstrap?.maxUserTurns ?? 0}',
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  pendingPrompt ?? 'The conversation is ready to finish.',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ],
-            ),
+          ConversationStatusBar(
+            state: state,
+            onReplayPrompt: () =>
+                _runAction(context, controller.replayLatestPrompt),
+            onFinishConversation: () =>
+                _runAction(context, controller.finishConversation),
+            onOpenResult: () =>
+                context.go('/custom-speaking/result/${widget.conversationId}'),
           ),
-          AppCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _transcriptController,
-                  minLines: 5,
-                  maxLines: 8,
-                  decoration: const InputDecoration(
-                    hintText: 'Write the answer you spoke...',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    AppButton(
-                      label: _isSubmitting ? 'Sending...' : 'Send turn',
-                      icon: Icons.send_rounded,
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => _sendTurn(context),
-                    ),
-                    AppButton(
-                      label: 'Finish now',
-                      variant: AppButtonVariant.outline,
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => _finishConversation(context),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          ConversationMessageList(
+            messages: state.messages,
+            isWaitingForReply: state.isWaitingForReply,
           ),
-          if ((_conversation?.turns ?? const <CustomSpeakingTurn>[]).isNotEmpty)
-            AppCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Conversation turns',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 16),
-                  ..._conversation!.turns.map(
-                    (turn) => Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('AI: ${turn.aiMessage}'),
-                          const SizedBox(height: 6),
-                          Text(
-                            'You: ${turn.userTranscript ?? 'Waiting for answer'}',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          if (!state.isLocked)
+            ConversationRecorderPanel(
+              state: state,
+              transcriptController: _transcriptController,
+              onTranscriptChanged: controller.updateTranscript,
+              onStartRecording: () =>
+                  _runAction(context, controller.startRecording),
+              onStopRecording: () =>
+                  _runAction(context, controller.stopRecording),
+              onClearTranscript: () =>
+                  _runAction(context, controller.clearDraft),
+              onSendAnswer: () => _runAction(context, controller.submitTurn),
             ),
         ],
       ],
     );
   }
 
-  Future<void> _loadConversation() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
+  Future<void> _runAction(
+    BuildContext context,
+    Future<void> Function() action,
+  ) async {
     try {
-      final conversation = await ref
-          .read(customSpeakingApiProvider)
-          .getConversation(widget.conversationId);
-      if (!mounted) {
-        return;
-      }
-
-      if (conversation.status.toUpperCase() != 'IN_PROGRESS') {
-        context.go('/custom-speaking/result/${conversation.id}');
-        return;
-      }
-
-      setState(() {
-        _conversation = conversation;
-        _isLoading = false;
-        _turnOpenedAt = DateTime.now();
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _error = error.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _sendTurn(BuildContext context) async {
-    final transcript = _transcriptController.text.trim();
-    if (transcript.isEmpty) {
-      return;
-    }
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    try {
-      final step = await ref
-          .read(customSpeakingApiProvider)
-          .submitTurn(
-            widget.conversationId,
-            SubmitCustomSpeakingTurnPayload(
-              transcript: transcript,
-              timeSpentSeconds: _elapsedSeconds(_turnOpenedAt),
-            ),
-          );
-      if (!context.mounted) {
-        return;
-      }
-
-      _transcriptController.clear();
-      if (step.conversationComplete) {
-        context.go('/custom-speaking/result/${step.conversationId}');
-        return;
-      }
-
-      await _loadConversation();
+      await action();
     } catch (error) {
       if (!context.mounted) {
         return;
       }
+      final message = error.toString().replaceFirst('Exception: ', '');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(error.toString())));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
-  }
-
-  Future<void> _finishConversation(BuildContext context) async {
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    try {
-      final step = await ref
-          .read(customSpeakingApiProvider)
-          .finishConversation(widget.conversationId);
-      if (!context.mounted) {
-        return;
-      }
-      context.go('/custom-speaking/result/${step.conversationId}');
-    } catch (error) {
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error.toString())));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
-    }
-  }
-
-  int _elapsedSeconds(DateTime openedAt) {
-    final seconds = DateTime.now().difference(openedAt).inSeconds;
-    return seconds <= 0 ? 1 : seconds;
   }
 }

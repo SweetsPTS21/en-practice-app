@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>EN Practice needs microphone access so you can record speaking answers.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>EN Practice uses speech recognition to turn your speaking answers into reviewable transcripts.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
